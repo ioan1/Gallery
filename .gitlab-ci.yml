@@ -25,3 +25,4 @@ dockerize:
   stage: dockerize
   script:
     - cd service-categories
+    - docker build . -t service-categories
