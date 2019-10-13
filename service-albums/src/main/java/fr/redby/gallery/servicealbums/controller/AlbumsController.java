@@ -34,7 +34,6 @@ public class AlbumsController {
         if (directory.isDirectory()) {
             return Arrays.stream(directory.listFiles(f -> f.isDirectory()))
                     .map(f -> new Album(category, f.getName()))
-                    .sorted()
                     .collect(Collectors.toList());
         } else {
             return new ArrayList<>();

@@ -5,7 +5,7 @@ package fr.redby.gallery.servicealbums.bean;
  * @author Ioan Bernevig
  * @version $Revision$
  */
-public class Album implements Comparable<Album>{
+public class Album {
 
     private String category;
     private String name;
@@ -13,10 +13,6 @@ public class Album implements Comparable<Album>{
     public Album(final String category, final String name) {
         this.category = category;
         this.name = name;
-    }
-
-    @Override public int compareTo(final Album o) {
-        return this.name.compareTo(o.name);
     }
 
     public String getCategory() {
