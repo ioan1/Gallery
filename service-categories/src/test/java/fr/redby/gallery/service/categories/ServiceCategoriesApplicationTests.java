@@ -1,4 +1,4 @@
-package fr.redby.gallery.servicecategories;
+package fr.redby.gallery.service.categories;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
