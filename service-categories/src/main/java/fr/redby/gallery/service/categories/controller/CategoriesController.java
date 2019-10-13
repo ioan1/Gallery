@@ -1,4 +1,4 @@
-package fr.redby.gallery.servicecategories.controller;
+package fr.redby.gallery.service.categories.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
