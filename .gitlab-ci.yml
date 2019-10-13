@@ -35,4 +35,7 @@ dockerize:
     - cd ../service-albums
     - docker build -t docker.redby.fr/gallery/service-albums .
     - docker push docker.redby.fr/gallery/service-albums
+    - cd ../web-ui
+    - docker build -t docker.redby.fr/gallery/web-ui .
+    - docker push docker.redby.fr/gallery/web-ui
     
