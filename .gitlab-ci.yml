@@ -8,17 +8,22 @@ stages:
 cache:
   paths:
     - service-categories/target/
+    - service-albums/target/
 
 build:
   stage: build
   script:
     - cd service-categories
     - mvn compile 
+    - cd ../service-albums
+    - mvn compile 
 
 test:
   stage: test
   script:
     - cd service-categories
+    - mvn test package
+    - cd ../service-albums
     - mvn test package
 
 dockerize:
@@ -27,4 +32,7 @@ dockerize:
     - cd service-categories
     - docker build -t docker.redby.fr/gallery/service-categories .
     - docker push docker.redby.fr/gallery/service-categories
+    - cd ../service-albums
+    - docker build -t docker.redby.fr/gallery/service-albums .
+    - docker push docker.redby.fr/gallery/service-albums
     
