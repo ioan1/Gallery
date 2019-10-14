@@ -22,6 +22,8 @@ test:
     - mvn test package
     - cd ../service-albums
     - mvn test package
+  after_script:
+    - rm -rf .git
 
 dockerize:
   stage: dockerize
@@ -35,4 +37,5 @@ dockerize:
     - cd ../web-ui
     - docker build -t docker.redby.fr/gallery/web-ui .
     - docker push docker.redby.fr/gallery/web-ui
-    
+  after_script:
+    - rm -rf .git
