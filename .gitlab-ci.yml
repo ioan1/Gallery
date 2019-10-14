@@ -17,7 +17,7 @@ build:
     - mvn compile 
     - cd ../service-albums
     - mvn compile 
-    - set
+    - rm -rf /home/gitlab-runner/builds
 
 test:
   stage: test
@@ -26,6 +26,7 @@ test:
     - mvn test package
     - cd ../service-albums
     - mvn test package
+    - rm -rf /home/gitlab-runner/builds
 
 dockerize:
   stage: dockerize
@@ -39,4 +40,5 @@ dockerize:
     - cd ../web-ui
     - docker build -t docker.redby.fr/gallery/web-ui .
     - docker push docker.redby.fr/gallery/web-ui
+    - rm -rf /home/gitlab-runner/builds
     
