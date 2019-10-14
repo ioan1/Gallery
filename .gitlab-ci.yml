@@ -19,9 +19,9 @@ test:
   stage: test
   script:
     - cd service-categories
-    - mvn test package
+    - mvn test
     - cd ../service-albums
-    - mvn test package
+    - mvn test
   after_script:
     - rm -rf .git
 
@@ -29,9 +29,11 @@ dockerize:
   stage: dockerize
   script:
     - cd service-categories
+    - mvn package
     - docker build -t docker.redby.fr/gallery/service-categories .
     - docker push docker.redby.fr/gallery/service-categories
     - cd ../service-albums
+    - mvn package
     - docker build -t docker.redby.fr/gallery/service-albums .
     - docker push docker.redby.fr/gallery/service-albums
     - cd ../web-ui
