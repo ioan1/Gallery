@@ -17,7 +17,7 @@ build:
     - mvn compile 
     - cd ../service-albums
     - mvn compile 
-    - setenv
+    - set
 
 test:
   stage: test
