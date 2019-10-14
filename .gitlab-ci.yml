@@ -13,7 +13,7 @@ build:
     - cd ../service-albums
     - mvn compile 
   after_script:
-    - rm -rf .
+    - rm -rf .git
 
 test:
   stage: test
