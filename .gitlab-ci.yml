@@ -17,6 +17,8 @@ build:
     - mvn compile 
     - cd ../service-albums
     - mvn compile 
+  after_script:
+    - rm -rf /home/gitlab-runner/builds
 
 test:
   stage: test
