@@ -5,11 +5,6 @@ stages:
   - test
   - dockerize
 
-cache:
-  paths:
-    - service-categories/target/
-    - service-albums/target/
-
 build:
   stage: build
   script:
@@ -18,7 +13,7 @@ build:
     - cd ../service-albums
     - mvn compile 
   after_script:
-    - pwd
+    - rm -rf .
 
 test:
   stage: test
