@@ -12,6 +12,8 @@ build:
     - mvn compile 
     - cd ../service-albums
     - mvn compile 
+    - cd ../service-statistics
+    - mvn compile 
   after_script:
     - rm -rf .git
 
@@ -21,6 +23,8 @@ test:
     - cd service-categories
     - mvn test
     - cd ../service-albums
+    - mvn test
+    - cd ../service-statistics
     - mvn test
   after_script:
     - rm -rf .git
@@ -36,6 +40,10 @@ dockerize:
     - mvn package
     - docker build -t docker.redby.fr/gallery/service-albums .
     - docker push docker.redby.fr/gallery/service-albums
+    - cd ../service-statistics
+    - mvn package
+    - docker build -t docker.redby.fr/gallery/service-statistics .
+    - docker push docker.redby.fr/gallery/service-statistics
     - cd ../web-ui
     - docker build -t docker.redby.fr/gallery/web-ui .
     - docker push docker.redby.fr/gallery/web-ui
