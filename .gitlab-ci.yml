@@ -1,11 +1,5 @@
 image: maven:latest
 
-stages:
-  - service-categories
-  - service-albums
-  - service-statistics
-  - web-ui
-
 service-categories:
   stage: service-categories
   script:
