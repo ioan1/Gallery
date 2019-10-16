@@ -1,50 +1,45 @@
 image: maven:latest
 
 stages:
-  - build
-  - test
-  - dockerize
+  - service-categories
+  - service-albums
+  - service-statistics
+  - web-ui
 
-build:
-  stage: build
+service-categories:
+  stage: service-categories
   script:
     - cd service-categories
-    - mvn compile 
-    - cd ../service-albums
-    - mvn compile 
-    - cd ../service-statistics
-    - mvn compile 
-  after_script:
-    - rm -rf .git
-
-test:
-  stage: test
-  script:
-    - cd service-categories
-    - mvn test
-    - cd ../service-albums
-    - mvn test
-    - cd ../service-statistics
-    - mvn test
-  after_script:
-    - rm -rf .git
-
-dockerize:
-  stage: dockerize
-  script:
-    - cd service-categories
-    - mvn package
+    - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-categories .
     - docker push docker.redby.fr/gallery/service-categories
-    - cd ../service-albums
-    - mvn package
+  after_script:
+    - rm -rf .git
+
+service-albums:
+  stage: service-albums
+  script:
+    - cd service-albums
+    - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-albums .
     - docker push docker.redby.fr/gallery/service-albums
-    - cd ../service-statistics
-    - mvn package
+  after_script:
+    - rm -rf .git
+
+service-statistics:
+  stage: service-statistics
+  script:
+    - cd service-statistics
+    - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-statistics .
     - docker push docker.redby.fr/gallery/service-statistics
-    - cd ../web-ui
+  after_script:
+    - rm -rf .git
+
+web-ui:
+  stage: web-ui
+  script:
+    - cd web-ui
     - docker build -t docker.redby.fr/gallery/web-ui .
     - docker push docker.redby.fr/gallery/web-ui
   after_script:
