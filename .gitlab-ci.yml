@@ -1,7 +1,6 @@
 image: maven:latest
 
 service-categories:
-  stage: service-categories
   script:
     - cd service-categories
     - mvn compile test package
@@ -11,7 +10,6 @@ service-categories:
     - rm -rf .git
 
 service-albums:
-  stage: service-albums
   script:
     - cd service-albums
     - mvn compile test package
@@ -21,7 +19,6 @@ service-albums:
     - rm -rf .git
 
 service-statistics:
-  stage: service-statistics
   script:
     - cd service-statistics
     - mvn compile test package
@@ -31,7 +28,6 @@ service-statistics:
     - rm -rf .git
 
 web-ui:
-  stage: web-ui
   script:
     - cd web-ui
     - docker build -t docker.redby.fr/gallery/web-ui .
