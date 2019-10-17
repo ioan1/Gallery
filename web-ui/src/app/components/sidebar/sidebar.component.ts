@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CategoriesService } from "../../services/categories.service";
+import {Observable} from "rxjs";
 
 declare const $: any;
 declare interface RouteInfo {
@@ -24,11 +26,17 @@ export const ROUTES: RouteInfo[] = [
 })
 export class SidebarComponent implements OnInit {
   menuItems: any[];
+  categories: any;
 
-  constructor() { }
+  constructor(public categoriesService: CategoriesService ) { }
 
   ngOnInit() {
     this.menuItems = ROUTES.filter(menuItem => menuItem);
+
+    // Fetch the years (categories) and add them to the menu items.
+    this.categoriesService.getCategories().subscribe((data: {}) => {
+        this.categories = data;
+    })
   }
   isMobileMenu() {
       if ($(window).width() > 991) {

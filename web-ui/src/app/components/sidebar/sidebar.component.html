@@ -61,5 +61,12 @@
                 <p>{{menuItem.title}}</p>
             </a>
         </li>
+
+        <li routerLinkActive="active" *ngFor="let category of categories" class="nav-item">
+            <a class="nav-link" href="categories/{{category}}">
+                <i class="material-icons">collections</i>
+                <p>{{category}}</p>
+            </a>
+        </li>
     </ul>
 </div>
