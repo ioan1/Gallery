@@ -9,6 +9,6 @@ export class CategoriesService {
   constructor(private http: HttpClient) { }
 
   getCategories() {
-    return this.http.get('http://service-categories:8083/categories');
+    return this.http.get('https://gallery.redby.fr/rest/categories');
   }
 }
