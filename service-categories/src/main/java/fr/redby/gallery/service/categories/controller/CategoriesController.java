@@ -30,6 +30,7 @@ public class CategoriesController {
         if (directory.isDirectory()) {
             return Arrays.stream(directory.listFiles(f -> f.isDirectory()))
                     .map(f -> f.getName())
+                    .sorted()
                     .collect(Collectors.toList());
         } else {
             return new ArrayList<>();
