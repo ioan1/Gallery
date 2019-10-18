@@ -30,11 +30,26 @@ public class CategoriesController {
         if (directory.isDirectory()) {
             return Arrays.stream(directory.listFiles(f -> f.isDirectory()))
                     .map(f -> f.getName())
-                    .sorted()
+                    .filter(f -> isNumeric(f))
+                    .sorted((o1, o2) -> o2.compareTo(o1))
                     .collect(Collectors.toList());
         } else {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * TODO.
+     * @param strNum
+     * @return
+     */
+    private boolean isNumeric(String strNum) {
+        try {
+            Integer i = Integer.parseInt(strNum);
+        } catch (NumberFormatException | NullPointerException nfe) {
+            return false;
+        }
+        return true;
     }
 
 }

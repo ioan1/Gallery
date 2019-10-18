@@ -1,0 +1,18 @@
+version: '3'
+services:
+  service-categories:
+    image: "docker.redby.fr/gallery/service-categories:latest"
+    volumes:
+      - /gallery:/gallery
+    ports:
+      - "8083:8083"
+  service-albums:
+    image: "docker.redby.fr/gallery/service-albums:latest"
+    volumes:
+      - /gallery:/gallery
+    ports:
+      - "8084:8084"
+  web-ui:
+    image: "docker.redby.fr/gallery/web-ui:latest"
+    ports:
+      - "4200:4200"
