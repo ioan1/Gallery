@@ -9,10 +9,12 @@ public class Album {
 
     private String category;
     private String name;
+    private String path;
 
-    public Album(final String category, final String name) {
+    public Album(final String category, final String name, String absolutePath) {
         this.category = category;
         this.name = name;
+        this.path = absolutePath;
     }
 
     public String getCategory() {
@@ -29,5 +31,13 @@ public class Album {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

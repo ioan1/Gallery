@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
  * @version $Revision$
  */
 @RestController
-@RequestMapping ("/albums")
 public class AlbumsController {
 
     public static final String GALLERY_PATH = "GALLERY_PATH";
@@ -27,13 +26,14 @@ public class AlbumsController {
     /**
      * @return Service retrieving all albums (folder names) and returns them as-is.
      */
-    @GetMapping("/{category}")
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/albums/{category}", method = RequestMethod.GET)
     public List<Album> getAlbums(final @PathVariable String category) {
-        File directory = new File(System.getProperty(GALLERY_PATH) + File.pathSeparator + category);
+        System.out.println("getting albums for the category " + category);
+        File directory = new File(System.getProperty(GALLERY_PATH) + File.separator + category);
+        System.out.println("Parsing "+directory.getAbsolutePath());
         if (directory.isDirectory()) {
-            return Arrays.stream(directory.listFiles(f -> f.isDirectory()))
-                    .map(f -> new Album(category, f.getName()))
+            return Arrays.stream(directory.listFiles(f -> f.isDirectory())).peek(f -> System.out.println(f.getAbsolutePath()))
+                    .map(f -> new Album(category, f.getName(), f.getAbsolutePath()))
                     .collect(Collectors.toList());
         } else {
             return new ArrayList<>();
