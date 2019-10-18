@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CategoriesService } from "../../services/categories.service";
-import {Observable} from "rxjs";
 
 declare const $: any;
 declare interface RouteInfo {

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import {AlbumsService} from "../../services/albums.service";
 
 @Component({
   selector: 'app-category',
@@ -7,9 +9,22 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CategoryComponent implements OnInit {
 
-  constructor() { }
+  category  : string;
+  albums    : any;
+  constructor(private route: ActivatedRoute,
+              public albumsService: AlbumsService ) { }
 
   ngOnInit() {
+    this.route.paramMap.subscribe(pageParameters => {
+      this.category = pageParameters.get('id');
+    });
+
+
+    // Fetch the albums within this category
+    this.albumsService.getAlbums(this.category).subscribe((data: {}) => {
+      this.albums = data;
+      console.log(data);
+    })
   }
 
 }
