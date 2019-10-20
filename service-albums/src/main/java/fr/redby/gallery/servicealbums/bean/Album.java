@@ -20,6 +20,7 @@ public class Album {
 
     @JsonFormat(pattern = "dd/MM/yyyy") private Date date;
     private String category;
+    private String id;
     private String name;
     private String path;
     private List<File> files;
@@ -29,6 +30,7 @@ public class Album {
 
     public Album(final String category, final File directory) {
         this.category = category;
+        this.id = directory.getName();
         this.name = directory.getName();
         this.path = directory.getAbsolutePath();
 
@@ -70,32 +72,20 @@ public class Album {
         return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getId() {
+        return id;
     }
 
     public String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public Date getDate() {
         return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     public int getPictures() {

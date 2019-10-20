@@ -1,5 +1,6 @@
 export class Album {
 
+    id: string;
     category: string;
     name: string;
     path: string;
