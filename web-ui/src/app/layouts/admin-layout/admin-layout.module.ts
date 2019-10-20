@@ -6,6 +6,7 @@ import { AdminLayoutRoutes } from './admin-layout.routing';
 import { DashboardComponent } from '../../dashboard/dashboard.component';
 import { UserProfileComponent } from '../../user-profile/user-profile.component';
 import { CategoryComponent } from '../../components/category/category.component';
+import { AlbumComponent } from '../../components/album/album.component';
 import { TypographyComponent } from '../../typography/typography.component';
 import { IconsComponent } from '../../icons/icons.component';
 import { MapsComponent } from '../../maps/maps.component';
@@ -36,6 +37,7 @@ import {
     DashboardComponent,
     UserProfileComponent,
     CategoryComponent,
+    AlbumComponent,
     TypographyComponent,
     IconsComponent,
     MapsComponent,
