@@ -1,4 +1,3 @@
-
 package fr.redby.gallery.servicealbums.bean;
 
 import java.beans.Transient;
@@ -6,10 +5,7 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -22,8 +18,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 public class Album {
 
-    @JsonFormat(pattern="dd/MM/yyyy")
-    private Date date;
+    @JsonFormat(pattern = "dd/MM/yyyy") private Date date;
     private String category;
     private String name;
     private String path;
@@ -55,14 +50,15 @@ public class Album {
 
     /**
      * Returns ALL files within the album.
+     *
      * @param directory
      * @return
      */
     private List<File> parseDirectory(File directory) {
+        List<File> files = new ArrayList<>();
         System.out.println("parseDirectory in " + directory.getPath() + ", exists=" + directory.exists());
-        List<File> files = Arrays.asList(directory.listFiles());
-        System.out.println("Found the following number of files: " + files);
-        for(File file : files) {
+        for (File file : directory.listFiles()) {
+            files.add(file);
             if (file.isDirectory()) {
                 files.addAll(parseDirectory(file));
             }
@@ -103,15 +99,15 @@ public class Album {
     }
 
     public int getPictures() {
-        return (int) this.files.stream().filter(f->TypeOfFile.defineFor(f).equals(TypeOfFile.PICTURE)).count();
+        return (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.PICTURE)).count();
     }
 
     public int getVideos() {
-        return (int) this.files.stream().filter(f->TypeOfFile.defineFor(f).equals(TypeOfFile.VIDEO)).count();
+        return (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.VIDEO)).count();
     }
 
     public int getOthers() {
-        return (int) this.files.stream().filter(f->TypeOfFile.defineFor(f).equals(TypeOfFile.OTHER)).count();
+        return (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.OTHER)).count();
     }
 
 }
