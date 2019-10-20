@@ -32,7 +32,8 @@ public class AlbumsController {
         File directory = new File(System.getProperty(GALLERY_PATH) + File.separator + category);
         System.out.println("Parsing "+directory.getAbsolutePath());
         if (directory.isDirectory()) {
-            return Arrays.stream(directory.listFiles(f -> f.isDirectory())).peek(f -> System.out.println(f.getAbsolutePath()))
+            return Arrays.stream(directory.listFiles(f -> f.isDirectory()))
+                    .peek(f -> System.out.println(f.getAbsolutePath()))
                     .map(f -> new Album(category, f))
                     .collect(Collectors.toList());
         } else {

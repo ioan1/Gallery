@@ -59,7 +59,9 @@ public class Album {
      * @return
      */
     private List<File> parseDirectory(File directory) {
+        System.out.println("parseDirectory in " + directory.getPath() + ", exists=" + directory.exists());
         List<File> files = Arrays.asList(directory.listFiles());
+        System.out.println("Found the following number of files: " + files);
         for(File file : files) {
             if (file.isDirectory()) {
                 files.addAll(parseDirectory(file));
