@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.MediaType;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
+import net.coobird.thumbnailator.Thumbnails;
 
 /**
  * Service dedicated to the management of pictures.
@@ -45,10 +51,31 @@ import java.util.stream.Collectors;
         }
     }
 
-    @RequestMapping(value = "/picture/full/{file}", method = RequestMethod.GET)
-    public byte[] getFull(final @PathVariable String file) throws IOException {
-        File directory = new File(System.getProperty(GALLERY_PATH));
-        return Files.readAllBytes(Paths.get(directory.getAbsolutePath() + File.separator + file));
+    @RequestMapping(value = "/picture/full/**", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    public byte[] getFull(final HttpServletRequest request) throws IOException {
+        String requestURL = request.getRequestURL().toString();
+        String file = URLDecoder.decode(requestURL.split("/picture/full/")[1], "UTF-8");
+
+        File picture = new File(new File(System.getProperty(GALLERY_PATH)), file);
+        System.out.println("Reading the file " + picture.getAbsolutePath() + ", exists="+picture.exists());
+        return Files.readAllBytes(Paths.get(picture.getAbsolutePath()));
+    }
+
+    @RequestMapping(value = "/picture/small/**", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    public byte[] getSmall(final HttpServletRequest request) throws IOException {
+        String requestURL = request.getRequestURL().toString();
+        String file = URLDecoder.decode(requestURL.split("/picture/small/")[1], "UTF-8");
+
+        File picture = new File(new File(System.getProperty(GALLERY_PATH)), file);
+        System.out.println("Reading the file " + picture.getAbsolutePath() + ", exists="+picture.exists());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Thumbnails.of(picture)
+                .size(300, 300)
+                .outputFormat("jpg")
+                .toOutputStream(out);
+
+        return out.toByteArray();
     }
 
 }

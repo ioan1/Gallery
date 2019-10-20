@@ -1,23 +1,20 @@
 <div class="main-content">
-  <div class="container-fluid">
-      <div class="row">
-          <div class="col-md-12">
-              <div class="card card-plain">
-                  <div class="card-header card-header-danger">
-                      <h4 class="card-title mt-0">{{album}}</h4>
-                      <p class="card-category">{{category}}</p>
-                  </div>
-                  <div class="card-body">
-                      <div class="table-responsive">
-                          <ul>
-                              <li *ngFor="let picture of pictures">
-                                  {{picture.name}}
-                              </li>
-                          </ul>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-plain">
+                    <div class="card-header card-header-danger">
+                        <h4 class="card-title mt-0">{{album}}</h4>
+                        <p class="card-category"><a [routerLink]="['/category', category]">{{category}}</a></p>
+                    </div>
+                    <div class="card-body pictures">
+                        <div *ngFor="let picture of pictures" class="picture">
+                            <img alt="{{picture.name}}"
+                                 src="http://localhost:8080/picture/small/{{picture.category}}/{{picture.album}}/{{picture.name}}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
