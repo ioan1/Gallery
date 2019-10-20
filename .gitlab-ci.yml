@@ -27,6 +27,15 @@ service-statistics:
   after_script:
     - rm -rf .git
 
+service-pictures:
+  script:
+    - cd service-pictures
+    - mvn compile test package
+    - docker build -t docker.redby.fr/gallery/service-pictures .
+    - docker push docker.redby.fr/gallery/service-pictures
+  after_script:
+    - rm -rf .git
+    
 web-ui:
   script:
     - cd web-ui
