@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 
 /**
  * Service dedicated to the management of pictures.
@@ -72,6 +73,8 @@ import net.coobird.thumbnailator.Thumbnails;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Thumbnails.of(picture)
                 .size(300, 300)
+                .crop(Positions.CENTER)
+                .keepAspectRatio(true)
                 .outputFormat("jpg")
                 .toOutputStream(out);
 

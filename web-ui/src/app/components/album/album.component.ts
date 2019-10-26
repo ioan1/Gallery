@@ -18,7 +18,7 @@ export class AlbumComponent implements OnInit {
 
   public masonryOptions: NgxMasonryOptions = {
     transitionDuration: '0.1s',
-    columnWidth: 300,
+    columnWidth: 305,
   };
 
   constructor(private route: ActivatedRoute, private picturesService: PicturesService) { }
