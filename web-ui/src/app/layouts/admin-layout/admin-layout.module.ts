@@ -11,6 +11,7 @@ import { TypographyComponent } from '../../typography/typography.component';
 import { IconsComponent } from '../../icons/icons.component';
 import { MapsComponent } from '../../maps/maps.component';
 import { NotificationsComponent } from '../../notifications/notifications.component';
+import { NgxMasonryModule } from 'ngx-masonry';
 
 import {
   MatButtonModule,
@@ -32,6 +33,7 @@ import {
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
+    NgxMasonryModule
   ],
   declarations: [
     DashboardComponent,

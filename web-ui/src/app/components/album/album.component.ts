@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {PicturesService} from "../../services/pictures.service";
+import {NgxMasonryOptions} from "ngx-masonry";
 
 @Component({
   selector: 'app-album',
@@ -14,6 +15,11 @@ export class AlbumComponent implements OnInit {
   pictures  : any;
   videos    : any; // TODO
   others    : any; // TODO
+
+  public masonryOptions: NgxMasonryOptions = {
+    transitionDuration: '0.1s',
+    columnWidth: 300,
+  };
 
   constructor(private route: ActivatedRoute, private picturesService: PicturesService) { }
 

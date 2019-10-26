@@ -8,10 +8,12 @@
                         <p class="card-category"><a [routerLink]="['/category', category]">{{category}}</a></p>
                     </div>
                     <div class="card-body pictures">
-                        <div *ngFor="let picture of pictures" class="picture">
-                            <img alt="{{picture.name}}"
-                                 src="/rest/picture/small/{{picture.category}}/{{picture.album}}/{{picture.name}}"/>
-                        </div>
+                        <ngx-masonry [options]="masonryOptions" [useImagesLoaded]="true">
+                            <div ngxMasonryItem class="masonry-item" *ngFor="let picture of pictures">
+                                <img alt="{{picture.name}}"
+                                     src="https://gallery.redby.fr/rest/picture/small/{{picture.category}}/{{picture.album}}/{{picture.name}}"/>
+                            </div>
+                        </ngx-masonry>
                     </div>
                 </div>
             </div>
