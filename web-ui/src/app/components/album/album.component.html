@@ -11,7 +11,7 @@
                         <ngx-masonry [options]="masonryOptions" [useImagesLoaded]="true">
                             <div ngxMasonryItem class="masonry-item" *ngFor="let picture of pictures">
                                 <img alt="{{picture.name}}"
-                                     src="https://gallery.redby.fr/rest/picture/small/{{picture.category}}/{{picture.album}}/{{picture.name}}"/>
+                                     src="https://gallery.redby.fr/rest/picture/small/{{picture.category}}/{{picture.album}}/{{picture.name}}" (click)="showPicture(1, '2', '3')"/>
                             </div>
                         </ngx-masonry>
                     </div>

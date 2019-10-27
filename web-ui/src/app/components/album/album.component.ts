@@ -17,8 +17,9 @@ export class AlbumComponent implements OnInit {
   others    : any; // TODO
 
   public masonryOptions: NgxMasonryOptions = {
-    transitionDuration: '0.1s',
-    columnWidth: 305,
+    transitionDuration: '0.5s',
+    columnWidth: 300,
+    gutter: 10
   };
 
   constructor(private route: ActivatedRoute, private picturesService: PicturesService) { }
@@ -35,6 +36,10 @@ export class AlbumComponent implements OnInit {
       })
     });
 
+  }
+
+  showPicture(category: number, album: string, picture: string) {
+    alert('show picture: ' + picture);
   }
 
 }
