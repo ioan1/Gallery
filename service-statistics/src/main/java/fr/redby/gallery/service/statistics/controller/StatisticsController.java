@@ -26,11 +26,10 @@ public class StatisticsController {
     public DiskUsage getDiskUsage() {
 
         File root = new File(GALLERY_PATH);
-        System.out.println("Total space in "+GALLERY_PATH+": " + root.getTotalSpace());
-        System.out.println("Free space in "+GALLERY_PATH+": " + root.getFreeSpace());
-        System.out.println("Usable space in "+GALLERY_PATH+": " + root.getUsableSpace());
+        System.out.println("Total space in "+GALLERY_PATH+": " + (int) (root.getTotalSpace()/(1024*1024*1024)));
+        System.out.println("Free space in "+GALLERY_PATH+": " + (int) (root.getFreeSpace()/(1024*1024*1024)));
 
-        return new DiskUsage( ((int)root.getTotalSpace() - (int)root.getFreeSpace())/(1024*1024*1024), (int) (root.getTotalSpace() /(1024*1024*1024))); // TODO bug: total ok used 0 ...
+        return new DiskUsage( (int)((root.getTotalSpace() - root.getFreeSpace())/(1024*1024*1024)), (int) (root.getTotalSpace() /(1024*1024*1024))); // TODO bug: total ok used 0 ...
     }
 
 }
