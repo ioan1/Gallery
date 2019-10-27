@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as Chartist from 'chartist';
+import {DiskUsage} from "../models/disk-usage";
+import {StatisticsService} from "../services/statistics.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -8,7 +10,9 @@ import * as Chartist from 'chartist';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor() { }
+    private diskUsage: {};
+
+  constructor(private statisticsService: StatisticsService) { }
   startAnimationForLineChart(chart){
       let seq: any, delays: any, durations: any;
       seq = 0;
@@ -66,6 +70,13 @@ export class DashboardComponent implements OnInit {
       seq2 = 0;
   };
   ngOnInit() {
+      /** Disk usage **/
+      // Fetch the pictures within this category
+      this.statisticsService.getDiskUsage().subscribe((data: {}) => {
+          this.diskUsage = data;
+          console.log(data);
+      })
+
       /* ----------==========     Daily Sales Chart initialization For Documentation    ==========---------- */
 
       const dataDailySalesChart: any = {

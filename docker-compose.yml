@@ -18,6 +18,12 @@ services:
       - /gallery:/gallery
     ports:
       - "8085:8085"
+  service-statistics:
+    image: "docker.redby.fr/gallery/service-statistics:latest"
+    volumes:
+      - /gallery:/gallery
+    ports:
+      - "8086:8086"
   web-ui:
     image: "docker.redby.fr/gallery/web-ui:latest"
     ports:
