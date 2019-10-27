@@ -1,5 +1,11 @@
 image: maven:latest
 
+service-parent:
+  script:
+    - mvn clean install
+  after_script:
+    - rm -rf .git
+
 service-categories:
   script:
     - cd service-categories
