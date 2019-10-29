@@ -14,4 +14,8 @@ export class StatisticsService {
     return this.http.get('https://gallery.redby.fr/rest/statistics/disk');
   }
 
+  getSizePerYear() {
+    return this.http.get('https://gallery.redby.fr/rest/statistics/sizePerYear');
+  }
+
 }
