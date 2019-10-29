@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as Chartist from 'chartist';
-import {DiskUsage} from "../models/disk-usage";
-import {StatisticsService} from "../services/statistics.service";
+import {DiskUsage} from "../../models/disk-usage";
+import {StatisticsService} from "../../services/statistics.service";
 import * as moment from 'moment';
 
 @Component({
