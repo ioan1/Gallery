@@ -11,6 +11,7 @@ import {StatisticsService} from "../services/statistics.service";
 export class DashboardComponent implements OnInit {
 
     private diskUsage: {};
+    private sizePerYear: {};
 
   constructor(private statisticsService: StatisticsService) { }
   startAnimationForLineChart(chart){
@@ -77,28 +78,30 @@ export class DashboardComponent implements OnInit {
           console.log(data);
       })
 
-      /* ----------==========     Daily Sales Chart initialization For Documentation    ==========---------- */
+      // Fetch statistics about the size per year (year => GB used)
+      this.statisticsService.getSizePerYear().subscribe((data: {}) => {
+          this.sizePerYear = data;
+          console.log(data);
 
-      const dataDailySalesChart: any = {
-          labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-          series: [
-              [12, 17, 7, 17, 23, 18, 38]
-          ]
-      };
-
-     const optionsDailySalesChart: any = {
-          lineSmooth: Chartist.Interpolation.cardinal({
+          sizePerYearYears = [];
+          data.sizePerYear.forEach(function (value) {
+            console.log(value);
+          });
+          const dataSizePerYear: any = {
+            labels: Object.keys(this.sizePerYear),
+            series: [ Object.values(this.sizePerYear) ]
+          };
+          const optionsSizePerYear: any = {
+            lineSmooth: Chartist.Interpolation.cardinal({
               tension: 0
-          }),
-          low: 0,
-          high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-          chartPadding: { top: 0, right: 0, bottom: 0, left: 0},
-      }
-
-      var dailySalesChart = new Chartist.Line('#dailySalesChart', dataDailySalesChart, optionsDailySalesChart);
-
-      this.startAnimationForLineChart(dailySalesChart);
-
+            }),
+            low: 0,
+            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            chartPadding: { top: 0, right: 0, bottom: 0, left: 0},
+          }
+          var sizePerYearChart = new Chartist.Line('#sizePerYearChart', dataSizePerYear, optionsSizePerYear);
+          this.startAnimationForLineChart(sizePerYearChart);
+      })
 
       /* ----------==========     Completed Tasks Chart initialization    ==========---------- */
 
