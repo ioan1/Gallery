@@ -72,8 +72,10 @@ export class DashboardComponent implements OnInit {
       seq2 = 0;
   };
   ngOnInit() {
+      /** Initial state of some widgets. */
+      jQuery("#comp-sizePerYearChart").hide();
+
       /** Disk usage **/
-      // Fetch the pictures within this category
       this.statisticsService.getDiskUsage().subscribe((data: {}) => {
           this.diskUsage = data;
           console.log(data);
@@ -83,11 +85,9 @@ export class DashboardComponent implements OnInit {
       this.statisticsService.getSizePerYear().subscribe((data: {}) => {
           this.sizePerYear = data;
           console.log(data);
-
-          var sizePerYearChart = new Chartist.Line('.ct-chart', {
-              series: [
-                  this.sizePerYear
-              ]
+          jQuery("#comp-sizePerYearChart").show(250);
+          var sizePerYearChart = new Chartist.Line('#sizePerYearChart', {
+              series: [ this.sizePerYear ]
           }, {
               axisX: {
                   type: Chartist.FixedScaleAxis,
@@ -97,7 +97,6 @@ export class DashboardComponent implements OnInit {
                   }
               }
           });
-
           this.startAnimationForLineChart(sizePerYearChart);
       })
 
