@@ -1,6 +1,8 @@
 package fr.redby.gallery.service.statistics.controller;
 
 import fr.redby.gallery.service.statistics.beans.DiskUsage;
+import fr.redby.gallery.service.statistics.service.StatisticsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,17 +22,12 @@ import java.util.stream.Collectors;
 @RequestMapping ("/statistics")
 public class StatisticsController {
 
-    public static final String GALLERY_PATH = System.getProperty("GALLERY_PATH");
+    @Autowired
+    private StatisticsService service;
 
     @RequestMapping(value = "disk", method = RequestMethod.GET)
     public DiskUsage getDiskUsage() {
-
-        File root = new File(GALLERY_PATH);
-        System.out.println("Total space in "+GALLERY_PATH+": " + root.getTotalSpace());
-        System.out.println("Free space in "+GALLERY_PATH+": " + root.getFreeSpace());
-        System.out.println("Usable space in "+GALLERY_PATH+": " + root.getUsableSpace());
-
-        return new DiskUsage( ((int)root.getTotalSpace() - (int)root.getFreeSpace())/(1024*1024*1024), (int) (root.getTotalSpace() /(1024*1024*1024))); // TODO bug: total ok used 0 ...
+        return service.getDiskUsage();
     }
 
 }
