@@ -6,7 +6,7 @@ import java.util.*;
 
 public class SizePerYear {
 
-    public static class DataType {
+    public static class DataType implements Comparable<DataType> {
         public long x;
         public int y;
 
@@ -17,6 +17,10 @@ public class SizePerYear {
             cal.set(Calendar.HOUR_OF_DAY, 0);
             this.x = cal.getTime().getTime();
             this.y = folderSize;
+        }
+
+        @Override public int compareTo(DataType o) {
+            return new Long(x).compareTo(new Long(o.x));
         }
     }
 
@@ -36,7 +40,7 @@ public class SizePerYear {
     }
 
     public List<DataType> getData() {
-        return data;
+        return this.data;
     }
 
     public String getUnit() {

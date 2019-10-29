@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import * as Chartist from 'chartist';
 import {DiskUsage} from "../models/disk-usage";
 import {StatisticsService} from "../services/statistics.service";
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-dashboard',
@@ -83,23 +84,20 @@ export class DashboardComponent implements OnInit {
           this.sizePerYear = data;
           console.log(data);
 
-          sizePerYearYears = [];
-          data.sizePerYear.forEach(function (value) {
-            console.log(value);
+          var sizePerYearChart = new Chartist.Line('.ct-chart', {
+              series: [
+                  this.sizePerYear
+              ]
+          }, {
+              axisX: {
+                  type: Chartist.FixedScaleAxis,
+                  divisor: 5,
+                  labelInterpolationFnc: function(value) {
+                      return moment(value).format('YYYY');
+                  }
+              }
           });
-          const dataSizePerYear: any = {
-            labels: Object.keys(this.sizePerYear),
-            series: [ Object.values(this.sizePerYear) ]
-          };
-          const optionsSizePerYear: any = {
-            lineSmooth: Chartist.Interpolation.cardinal({
-              tension: 0
-            }),
-            low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-            chartPadding: { top: 0, right: 0, bottom: 0, left: 0},
-          }
-          var sizePerYearChart = new Chartist.Line('#sizePerYearChart', dataSizePerYear, optionsSizePerYear);
+
           this.startAnimationForLineChart(sizePerYearChart);
       })
 

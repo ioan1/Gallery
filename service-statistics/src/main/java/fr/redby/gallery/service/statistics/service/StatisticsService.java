@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class StatisticsService {
             System.out.println(year + " => " + folderSize);
             result.getData().add(new SizePerYear.DataType(year, folderSize));
         }
-
+        Collections.sort(result.getData());
         return result;
     }
 
