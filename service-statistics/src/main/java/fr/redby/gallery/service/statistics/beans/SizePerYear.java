@@ -1,10 +1,13 @@
 package fr.redby.gallery.service.statistics.beans;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 import java.util.Map;
 
 public class SizePerYear {
 
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date date;
     private Map<Integer, Integer> sizePerYear;
     private String unit = "GB";
