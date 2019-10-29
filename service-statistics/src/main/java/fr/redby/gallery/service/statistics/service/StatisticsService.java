@@ -29,7 +29,7 @@ public class StatisticsService {
     }
 
     public SizePerYear getSizePerYear() throws IOException {
-        Map<Integer, Integer> result = new LinkedHashMap<>();
+        SizePerYear result = new SizePerYear();
         File root = new File(System.getProperty("GALLERY_PATH"));
         for (File folder : root.listFiles(f -> f.isDirectory())) {
             if (!folder.getName().matches("[0-9]+")) continue;
@@ -39,10 +39,10 @@ public class StatisticsService {
                     .sum() / GB);
             int year = Integer.parseInt(folder.getName());
             System.out.println(year + " => " + folderSize);
-            result.put(year, folderSize);
+            result.getData().add(new SizePerYear.DataType(year, folderSize));
         }
 
-        return new SizePerYear(result);
+        return result;
     }
 
 }

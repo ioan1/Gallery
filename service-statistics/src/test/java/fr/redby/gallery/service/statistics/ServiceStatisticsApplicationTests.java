@@ -36,7 +36,7 @@ public class ServiceStatisticsApplicationTests {
 	public void testDiskUsagePerYear() throws IOException {
 		System.setProperty("GALLERY_PATH", File.listRoots()[0].getAbsolutePath());
 		SizePerYear sizePerYear = service.getSizePerYear();
-		System.out.println(sizePerYear.getSizePerYear());
+		System.out.println(sizePerYear);
 		Assert.assertEquals("GB", sizePerYear.getUnit());
 		Assert.assertNotNull(sizePerYear.getDate());
 	}
