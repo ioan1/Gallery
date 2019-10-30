@@ -12,6 +12,7 @@ import { IconsComponent } from '../../icons/icons.component';
 import { MapsComponent } from '../../maps/maps.component';
 import { NotificationsComponent } from '../../notifications/notifications.component';
 import { NgxMasonryModule } from 'ngx-masonry';
+import {DashboardSizePerYearChartComponent} from "../../components/dashboard-size-per-year-chart/dashboard-size-per-year-chart.component";
 
 import {
   MatButtonModule,
@@ -37,6 +38,7 @@ import {
   ],
   declarations: [
     DashboardComponent,
+    DashboardSizePerYearChartComponent,
     UserProfileComponent,
     CategoryComponent,
     AlbumComponent,

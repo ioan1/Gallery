@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as Chartist from 'chartist';
-import {DiskUsage} from "../../models/disk-usage";
 import {StatisticsService} from "../../services/statistics.service";
-import * as moment from 'moment';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,42 +10,9 @@ import * as moment from 'moment';
 export class DashboardComponent implements OnInit {
 
     private diskUsage: {};
-    private sizePerYear: {};
 
   constructor(private statisticsService: StatisticsService) { }
-  startAnimationForLineChart(chart){
-      let seq: any, delays: any, durations: any;
-      seq = 0;
-      delays = 80;
-      durations = 500;
 
-      chart.on('draw', function(data) {
-        if(data.type === 'line' || data.type === 'area') {
-          data.element.animate({
-            d: {
-              begin: 600,
-              dur: 700,
-              from: data.path.clone().scale(1, 0).translate(0, data.chartRect.height()).stringify(),
-              to: data.path.clone().stringify(),
-              easing: Chartist.Svg.Easing.easeOutQuint
-            }
-          });
-        } else if(data.type === 'point') {
-              seq++;
-              data.element.animate({
-                opacity: {
-                  begin: seq * delays,
-                  dur: durations,
-                  from: 0,
-                  to: 1,
-                  easing: 'ease'
-                }
-              });
-          }
-      });
-
-      seq = 0;
-  };
   startAnimationForBarChart(chart){
       let seq2: any, delays2: any, durations2: any;
 
@@ -72,8 +37,7 @@ export class DashboardComponent implements OnInit {
       seq2 = 0;
   };
   ngOnInit() {
-      /** Initial state of some widgets. */
-      jQuery("#comp-sizePerYearChart").hide();
+
 
       /** Disk usage **/
       this.statisticsService.getDiskUsage().subscribe((data: {}) => {
@@ -81,24 +45,7 @@ export class DashboardComponent implements OnInit {
           console.log(data);
       })
 
-      // Fetch statistics about the size per year (year => GB used)
-      this.statisticsService.getSizePerYear().subscribe((data: {}) => {
-          this.sizePerYear = data;
-          console.log(data);
-          jQuery("#comp-sizePerYearChart").show(250);
-          var sizePerYearChart = new Chartist.Line('#sizePerYearChart', {
-              series: [ this.sizePerYear ]
-          }, {
-              axisX: {
-                  type: Chartist.FixedScaleAxis,
-                  divisor: 5,
-                  labelInterpolationFnc: function(value) {
-                      return moment(value).format('YYYY');
-                  }
-              }
-          });
-          this.startAnimationForLineChart(sizePerYearChart);
-      })
+
 
       /* ----------==========     Completed Tasks Chart initialization    ==========---------- */
 
@@ -157,5 +104,39 @@ export class DashboardComponent implements OnInit {
       //start animation for the Emails Subscription Chart
       this.startAnimationForBarChart(websiteViewsChart);
   }
+
+    startAnimationForLineChart(chart){
+        let seq: any, delays: any, durations: any;
+        seq = 0;
+        delays = 80;
+        durations = 500;
+
+        chart.on('draw', function(data) {
+            if(data.type === 'line' || data.type === 'area') {
+                data.element.animate({
+                    d: {
+                        begin: 600,
+                        dur: 700,
+                        from: data.path.clone().scale(1, 0).translate(0, data.chartRect.height()).stringify(),
+                        to: data.path.clone().stringify(),
+                        easing: Chartist.Svg.Easing.easeOutQuint
+                    }
+                });
+            } else if(data.type === 'point') {
+                seq++;
+                data.element.animate({
+                    opacity: {
+                        begin: seq * delays,
+                        dur: durations,
+                        from: 0,
+                        to: 1,
+                        easing: 'ease'
+                    }
+                });
+            }
+        });
+
+        seq = 0;
+    };
 
 }
