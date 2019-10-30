@@ -14,6 +14,10 @@ export class StatisticsService {
     return this.http.get('https://gallery.redby.fr/rest/statistics/disk');
   }
 
+  getWaitForProcessing() {
+    return this.http.get('https://gallery.redby.fr/rest/statistics/waitForProcessing');
+  }
+
   getSizePerYear() {
     return this.http.get('https://gallery.redby.fr/rest/statistics/sizePerYear');
   }

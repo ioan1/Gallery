@@ -14,6 +14,7 @@ import { NotificationsComponent } from '../../notifications/notifications.compon
 import { NgxMasonryModule } from 'ngx-masonry';
 import {DashboardSizePerYearChartComponent} from "../../components/dashboard-size-per-year-chart/dashboard-size-per-year-chart.component";
 import {DashboardDiskUsageSummaryComponent} from "../../components/dashboard-disk-usage-summary/dashboard-disk-usage-summary.component";
+import {DashboardProcessingSummaryComponent} from "../../components/dashboard-processing-summary/dashboard-processing-summary.component";
 
 import {
   MatButtonModule,
@@ -41,6 +42,7 @@ import {
     DashboardComponent,
     DashboardSizePerYearChartComponent,
     DashboardDiskUsageSummaryComponent,
+    DashboardProcessingSummaryComponent,
     UserProfileComponent,
     CategoryComponent,
     AlbumComponent,
