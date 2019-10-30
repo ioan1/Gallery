@@ -12,17 +12,22 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class StatisticsService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( StatisticsService.class );
 
     private static final long GB = 1024*1024*1024;
     private static final String WAIT_FOR_PROCESSING = "A_TRIER";
 
     public DiskUsage getDiskUsage() {
         File root = new File(System.getProperty("GALLERY_PATH"));
-        System.out.println("Total space in "+System.getProperty("GALLERY_PATH")+": " + root.getTotalSpace());
-        System.out.println("Free space in "+System.getProperty("GALLERY_PATH")+": " + root.getFreeSpace());
-        System.out.println("Usable space in "+System.getProperty("GALLERY_PATH")+": " + root.getUsableSpace());
+        LOGGER.info("Total space in {}: {}", System.getProperty("GALLERY_PATH"), root.getTotalSpace());
+        LOGGER.info("Free space in {}: {}", System.getProperty("GALLERY_PATH"), root.getFreeSpace());
+        LOGGER.info("Usable space in {}: {}", System.getProperty("GALLERY_PATH"), root.getUsableSpace());
 
         int used = (int) (root.getTotalSpace()/GB - root.getFreeSpace()/GB);
         int available = (int) (root.getTotalSpace() / GB);
@@ -40,7 +45,7 @@ public class StatisticsService {
                     .mapToLong(p -> p.toFile().length())
                     .sum() / GB);
             int year = Integer.parseInt(folder.getName());
-            System.out.println(year + " => " + folderSize);
+            LOGGER.info("{} => {}", year, folderSize);
             result.getData().add(new SizePerYear.DataType(year, folderSize));
         }
         Collections.sort(result.getData());
