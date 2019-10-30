@@ -32,6 +32,11 @@ public class StatisticsController {
         return service.getDiskUsage();
     }
 
+    @RequestMapping(value = "waitForProcessing", method = RequestMethod.GET)
+    public Long getWaitForProcessing() throws IOException {
+        return service.getWaitForProcessing();
+    }
+
     @RequestMapping (value = "sizePerYear", method = RequestMethod.GET)
     public SizePerYear getFilesPerYear() throws IOException {
         return service.getSizePerYear();

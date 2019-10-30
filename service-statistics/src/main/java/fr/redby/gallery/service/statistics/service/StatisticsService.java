@@ -16,6 +16,7 @@ import java.util.Map;
 public class StatisticsService {
 
     private static final long GB = 1024*1024*1024;
+    private static final String WAIT_FOR_PROCESSING = "A_TRIER";
 
     public DiskUsage getDiskUsage() {
         File root = new File(System.getProperty("GALLERY_PATH"));
@@ -46,4 +47,10 @@ public class StatisticsService {
         return result;
     }
 
+    public Long getWaitForProcessing() throws IOException {
+        File root = new File(System.getProperty("GALLERY_PATH") + File.separator + WAIT_FOR_PROCESSING);
+        return Files.walk(root.toPath())
+                .filter(p -> p.toFile().isFile())
+                .count();
+    }
 }
