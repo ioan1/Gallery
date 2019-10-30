@@ -13,6 +13,7 @@ import { MapsComponent } from '../../maps/maps.component';
 import { NotificationsComponent } from '../../notifications/notifications.component';
 import { NgxMasonryModule } from 'ngx-masonry';
 import {DashboardSizePerYearChartComponent} from "../../components/dashboard-size-per-year-chart/dashboard-size-per-year-chart.component";
+import {DashboardDiskUsageSummaryComponent} from "../../components/dashboard-disk-usage-summary/dashboard-disk-usage-summary.component";
 
 import {
   MatButtonModule,
@@ -39,6 +40,7 @@ import {
   declarations: [
     DashboardComponent,
     DashboardSizePerYearChartComponent,
+    DashboardDiskUsageSummaryComponent,
     UserProfileComponent,
     CategoryComponent,
     AlbumComponent,

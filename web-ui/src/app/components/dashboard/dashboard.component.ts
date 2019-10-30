@@ -9,9 +9,8 @@ import {StatisticsService} from "../../services/statistics.service";
 })
 export class DashboardComponent implements OnInit {
 
-    private diskUsage: {};
 
-  constructor(private statisticsService: StatisticsService) { }
+  constructor() { }
 
   startAnimationForBarChart(chart){
       let seq2: any, delays2: any, durations2: any;
@@ -37,16 +36,6 @@ export class DashboardComponent implements OnInit {
       seq2 = 0;
   };
   ngOnInit() {
-
-
-      /** Disk usage **/
-      this.statisticsService.getDiskUsage().subscribe((data: {}) => {
-          this.diskUsage = data;
-          console.log(data);
-      })
-
-
-
       /* ----------==========     Completed Tasks Chart initialization    ==========---------- */
 
       const dataCompletedTasksChart: any = {
