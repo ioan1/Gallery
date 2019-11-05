@@ -34,4 +34,8 @@ public class Picture {
         return file.getName();
     }
 
+    public String getPath() {
+        return file.getAbsolutePath();
+    }
+
 }
