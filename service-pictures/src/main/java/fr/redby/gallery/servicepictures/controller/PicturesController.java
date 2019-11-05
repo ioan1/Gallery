@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
+import java.util.stream.Stream;
+
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 
@@ -35,14 +37,17 @@ import net.coobird.thumbnailator.geometry.Positions;
     public static final String GALLERY_PATH = "GALLERY_PATH";
 
     @RequestMapping(value = "/pictures/{category}/{album}", method = RequestMethod.GET)
-    public List<Picture> listPictures(final @PathVariable String category, final @PathVariable String album) {
+    public List<Picture> listPictures(final @PathVariable String category, final @PathVariable String album)
+            throws IOException {
         File directory = new File(System.getProperty(GALLERY_PATH));
         System.out.println("gallery directory: " + directory);
         File folder = new File(directory, category + File.separator + album);
         System.out.println("Listing all pictures located in " + folder.getAbsolutePath() + " , exists="+folder.exists());
 
         if (folder.isDirectory()) {
-            return Arrays.stream(folder.listFiles(f -> f.isFile()))
+            return Files.walk(folder.toPath())
+                    .map(p -> p.toFile())
+                    .filter(f -> f.isFile())
                     .filter(f->f.getName().toLowerCase().endsWith(".jpg"))
                     .peek(f -> System.out.println(f.getAbsolutePath()))
                     .map(f -> new Picture(category, album, f))
