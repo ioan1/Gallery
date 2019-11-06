@@ -1,11 +1,12 @@
 package fr.redby.gallery.servicealbums.controller;
 
 import fr.redby.gallery.servicealbums.bean.Album;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 public class AlbumsController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( AlbumsController.class );
     public static final String GALLERY_PATH = "GALLERY_PATH";
 
     /**
@@ -28,12 +30,12 @@ public class AlbumsController {
      */
     @RequestMapping(value = "/albums/{category}", method = RequestMethod.GET)
     public List<Album> getAlbums(final @PathVariable String category) {
-        System.out.println("getting albums for the category " + category);
+        LOGGER.info("Getting albums for the category {}", category);
         File directory = new File(System.getProperty(GALLERY_PATH) + File.separator + category);
-        System.out.println("Parsing "+directory.getAbsolutePath());
+        LOGGER.info("Parsing {}.", directory.getAbsolutePath());
         if (directory.isDirectory()) {
             return Arrays.stream(directory.listFiles(f -> f.isDirectory()))
-                    .peek(f -> System.out.println(f.getAbsolutePath()))
+                    .peek(f -> LOGGER.debug(f.getAbsolutePath()))
                     .map(f -> new Album(category, f))
                     .collect(Collectors.toList());
         } else {

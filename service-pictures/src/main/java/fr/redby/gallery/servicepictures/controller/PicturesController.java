@@ -1,27 +1,24 @@
 package fr.redby.gallery.servicepictures.controller;
 
 import fr.redby.gallery.servicepictures.bean.Picture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.http.MediaType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
-import java.util.stream.Stream;
 
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -34,22 +31,23 @@ import net.coobird.thumbnailator.geometry.Positions;
  */
 @RestController public class PicturesController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( PicturesController.class );
     public static final String GALLERY_PATH = "GALLERY_PATH";
 
     @RequestMapping(value = "/pictures/{category}/{album}", method = RequestMethod.GET)
     public List<Picture> listPictures(final @PathVariable String category, final @PathVariable String album)
             throws IOException {
         File directory = new File(System.getProperty(GALLERY_PATH));
-        System.out.println("gallery directory: " + directory);
+        LOGGER.info("gallery directory: {}", directory);
         File folder = new File(directory, category + File.separator + album);
-        System.out.println("Listing all pictures located in " + folder.getAbsolutePath() + " , exists="+folder.exists());
+        LOGGER.info("Listing all pictures located in {}, exists={}.", folder.getAbsolutePath(), folder.exists());
 
         if (folder.isDirectory()) {
             return Files.walk(folder.toPath())
                     .map(p -> p.toFile())
                     .filter(f -> f.isFile())
                     .filter(f->f.getName().toLowerCase().endsWith(".jpg"))
-                    .peek(f -> System.out.println(f.getAbsolutePath()))
+                    .peek(f -> LOGGER.debug(f.getAbsolutePath()))
                     .map(f -> new Picture(category, album, f))
                     .collect(Collectors.toList());
         } else {
@@ -63,7 +61,7 @@ import net.coobird.thumbnailator.geometry.Positions;
         String file = URLDecoder.decode(requestURL.split("/picture/full/")[1], "UTF-8");
 
         File picture = new File(file);
-        System.out.println("Reading the file " + picture.getAbsolutePath() + ", exists="+picture.exists());
+        LOGGER.info("Reading the file {}, exists={}", picture.getAbsolutePath(), picture.exists());
         return Files.readAllBytes(Paths.get(picture.getAbsolutePath()));
     }
 
@@ -73,7 +71,7 @@ import net.coobird.thumbnailator.geometry.Positions;
         String file = URLDecoder.decode(requestURL.split("/picture/small/")[1], "UTF-8");
 
         File picture = new File(file);
-        System.out.println("Reading the file " + picture.getAbsolutePath() + ", exists="+picture.exists());
+        LOGGER.info("Reading the file {}, exists={}.", picture.getAbsolutePath(), picture.exists());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Thumbnails.of(picture)

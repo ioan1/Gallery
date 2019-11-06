@@ -24,9 +24,6 @@ public class ServiceStatisticsApplicationTests {
 	public void testDiskUsage() {
 		System.setProperty("GALLERY_PATH", File.listRoots()[0].getAbsolutePath());
 		DiskUsage diskUsage = service.getDiskUsage();
-		System.out.println("Available: " + diskUsage.getAvailable());
-		System.out.println("Used: " + diskUsage.getUsed());
-		System.out.println("Unit: " + diskUsage.getUnit());
 		Assert.assertTrue(diskUsage.getAvailable() > 0);
 		Assert.assertTrue(diskUsage.getUsed() > 0);
 		Assert.assertNotNull(diskUsage.getUnit());
@@ -36,7 +33,6 @@ public class ServiceStatisticsApplicationTests {
 	public void testDiskUsagePerYear() throws IOException {
 		System.setProperty("GALLERY_PATH", File.listRoots()[0].getAbsolutePath());
 		SizePerYear sizePerYear = service.getSizePerYear();
-		System.out.println(sizePerYear);
 		Assert.assertEquals("GB", sizePerYear.getUnit());
 		Assert.assertNotNull(sizePerYear.getDate());
 	}
