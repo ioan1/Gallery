@@ -10,6 +10,7 @@
     </appender>
 
     <root level="info">
+        <appender-ref ref="STASH"/>
         <appender-ref ref="STDOUT"/>
     </root>
 
@@ -45,9 +46,9 @@
     </appender>
 
     <!-- Our logger writes to file, console and sends the data to Logstash -->
-    <logger name="ro.fortsoft.elk.testdata" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT"/>
+    <logger name="fr.redby.gallery.service.statistics" level="DEBUG" additivity="false">
         <appender-ref ref="STASH"/>
+        <appender-ref ref="STDOUT"/>
     </logger>
 
 </configuration>
