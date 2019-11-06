@@ -41,7 +41,7 @@
     </appender>
 
     <!-- Our logger writes to file, console and sends the data to Logstash -->
-    <logger name="fr.redby.gallery.service.statistics" level="DEBUG" additivity="false">
+    <logger name="fr.redby.gallery.service.pictures" level="DEBUG" additivity="false">
         <appender-ref ref="STASH"/>
         <appender-ref ref="STDOUT"/>
     </logger>
