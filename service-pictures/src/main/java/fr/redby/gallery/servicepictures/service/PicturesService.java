@@ -2,11 +2,8 @@ package fr.redby.gallery.servicepictures.service;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.xml.internal.ws.api.addressing.WSEndpointReference;
 import fr.redby.gallery.servicepictures.bean.ExifData;
 import fr.redby.gallery.servicepictures.bean.Picture;
 import net.coobird.thumbnailator.Thumbnails;
@@ -18,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +29,6 @@ public class PicturesService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( PicturesService.class );
     public static final String GALLERY_PATH = "GALLERY_PATH";
-    public static final String METADATA_PATH = "METADATA_PATH";
 
     /**
      * Returns all JPG pictures recursively in a given category/album.
@@ -80,7 +78,26 @@ public class PicturesService {
         return out.toByteArray();
     }
 
-
+    /**
+     * TODO.
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws ImageProcessingException
+     */
+    public byte[] getExifData(final File file) throws IOException, ImageProcessingException {
+        LOGGER.info("getExifData({})", file.getAbsolutePath());
+        File stored = getExifStoredMetadata(file);
+        if (stored.exists()) {
+            LOGGER.info("The file exists, reading all bytes.");
+            return Files.readAllBytes(stored.toPath());
+        } else {
+            LOGGER.info("No cache available, reading EXIF data.");
+            String data = readExifMetadata(file);
+            Files.write(stored.toPath(), data.getBytes());
+            return data.getBytes();
+        }
+    }
 
     /**
      * TODO.
@@ -89,7 +106,7 @@ public class PicturesService {
      */
     private File getExifStoredMetadata(final File file) {
         String galleryPath = new File(System.getProperty(GALLERY_PATH)).getAbsolutePath();
-        String metadataPath = new File(System.getProperty(METADATA_PATH)).getAbsolutePath();
+        String metadataPath = galleryPath + File.separator + "GALLERY_DATA/exif";
         return new File(file.getAbsolutePath().replace(galleryPath, metadataPath));
     }
 
