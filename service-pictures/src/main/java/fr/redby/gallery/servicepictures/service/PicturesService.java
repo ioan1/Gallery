@@ -1,5 +1,13 @@
 package fr.redby.gallery.servicepictures.service;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.xml.internal.ws.api.addressing.WSEndpointReference;
+import fr.redby.gallery.servicepictures.bean.ExifData;
 import fr.redby.gallery.servicepictures.bean.Picture;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -7,19 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.stream.ImageInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +30,7 @@ public class PicturesService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( PicturesService.class );
     public static final String GALLERY_PATH = "GALLERY_PATH";
+    public static final String METADATA_PATH = "METADATA_PATH";
 
     /**
      * Returns all JPG pictures recursively in a given category/album.
@@ -80,8 +80,33 @@ public class PicturesService {
         return out.toByteArray();
     }
 
-    public void readAndDisplayMetadata( String fileName ) {
 
+
+    /**
+     * TODO.
+     * @param file
+     * @return
+     */
+    private File getExifStoredMetadata(final File file) {
+        String galleryPath = new File(System.getProperty(GALLERY_PATH)).getAbsolutePath();
+        String metadataPath = new File(System.getProperty(METADATA_PATH)).getAbsolutePath();
+        return new File(file.getAbsolutePath().replace(galleryPath, metadataPath));
+    }
+
+    /**
+     *
+     * TODO.
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws ImageProcessingException
+     */
+    public String readExifMetadata(final File file) throws IOException, ImageProcessingException {
+        InputStream imageFile = new FileInputStream(file);
+        Metadata metadata = ImageMetadataReader.readMetadata(imageFile);
+        LOGGER.info("Read file {} and looking for EXIF data.", file.getAbsolutePath());
+        ExifData data = new ExifData(file, metadata);
+        return new ObjectMapper().writeValueAsString(data);
     }
 
 }
