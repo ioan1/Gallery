@@ -11,12 +11,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ioan Bernevig
  * @version $Revision$
  */
 public class Album {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( Album.class );
 
     @JsonFormat(pattern = "dd/MM/yyyy") private Date date;
     private String category;
@@ -58,7 +62,7 @@ public class Album {
      */
     private List<File> parseDirectory(File directory) {
         List<File> files = new ArrayList<>();
-        System.out.println("parseDirectory in " + directory.getPath() + ", exists=" + directory.exists());
+        LOGGER.info("parseDirectory in {}, exists={}.", directory.getPath(), directory.exists());
         for (File file : directory.listFiles()) {
             files.add(file);
             if (file.isDirectory()) {

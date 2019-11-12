@@ -6,6 +6,8 @@ import fr.redby.gallery.service.statistics.service.StatisticsService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -17,16 +19,17 @@ import java.io.IOException;
 @SpringBootTest
 public class ServiceStatisticsApplicationTests {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger( ServiceStatisticsApplicationTests.class );
+
+
 	@Autowired
 	private StatisticsService service;
 
 	@Test
 	public void testDiskUsage() {
 		System.setProperty("GALLERY_PATH", File.listRoots()[0].getAbsolutePath());
+		LOGGER.debug("Start testing disk usage.");
 		DiskUsage diskUsage = service.getDiskUsage();
-		System.out.println("Available: " + diskUsage.getAvailable());
-		System.out.println("Used: " + diskUsage.getUsed());
-		System.out.println("Unit: " + diskUsage.getUnit());
 		Assert.assertTrue(diskUsage.getAvailable() > 0);
 		Assert.assertTrue(diskUsage.getUsed() > 0);
 		Assert.assertNotNull(diskUsage.getUnit());
@@ -36,7 +39,6 @@ public class ServiceStatisticsApplicationTests {
 	public void testDiskUsagePerYear() throws IOException {
 		System.setProperty("GALLERY_PATH", File.listRoots()[0].getAbsolutePath());
 		SizePerYear sizePerYear = service.getSizePerYear();
-		System.out.println(sizePerYear);
 		Assert.assertEquals("GB", sizePerYear.getUnit());
 		Assert.assertNotNull(sizePerYear.getDate());
 	}

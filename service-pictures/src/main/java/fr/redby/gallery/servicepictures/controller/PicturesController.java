@@ -1,28 +1,24 @@
 package fr.redby.gallery.servicepictures.controller;
 
+import com.drew.imaging.ImageProcessingException;
 import fr.redby.gallery.servicepictures.bean.Picture;
+import fr.redby.gallery.servicepictures.service.PicturesService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.http.MediaType;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
-import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.geometry.Positions;
 
 /**
  * Service dedicated to the management of pictures.
@@ -32,24 +28,15 @@ import net.coobird.thumbnailator.geometry.Positions;
  */
 @RestController public class PicturesController {
 
-    public static final String GALLERY_PATH = "GALLERY_PATH";
+    private static final Logger LOGGER = LoggerFactory.getLogger( PicturesController.class );
+
+    @Autowired
+    private PicturesService service;
 
     @RequestMapping(value = "/pictures/{category}/{album}", method = RequestMethod.GET)
-    public List<Picture> listPictures(final @PathVariable String category, final @PathVariable String album) {
-        File directory = new File(System.getProperty(GALLERY_PATH));
-        System.out.println("gallery directory: " + directory);
-        File folder = new File(directory, category + File.separator + album);
-        System.out.println("Listing all pictures located in " + folder.getAbsolutePath() + " , exists="+folder.exists());
-
-        if (folder.isDirectory()) {
-            return Arrays.stream(folder.listFiles(f -> f.isFile()))
-                    .filter(f->f.getName().toLowerCase().endsWith(".jpg"))
-                    .peek(f -> System.out.println(f.getAbsolutePath()))
-                    .map(f -> new Picture(category, album, f))
-                    .collect(Collectors.toList());
-        } else {
-            return new ArrayList<>();
-        }
+    public List<Picture> listPictures(final @PathVariable String category, final @PathVariable String album)
+            throws IOException {
+        return service.listPictures(category, album);
     }
 
     @RequestMapping(value = "/picture/full/**", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
@@ -57,8 +44,8 @@ import net.coobird.thumbnailator.geometry.Positions;
         String requestURL = request.getRequestURL().toString();
         String file = URLDecoder.decode(requestURL.split("/picture/full/")[1], "UTF-8");
 
-        File picture = new File(new File(System.getProperty(GALLERY_PATH)), file);
-        System.out.println("Reading the file " + picture.getAbsolutePath() + ", exists="+picture.exists());
+        File picture = new File(file);
+        LOGGER.info("Reading the file {}, exists={}", picture.getAbsolutePath(), picture.exists());
         return Files.readAllBytes(Paths.get(picture.getAbsolutePath()));
     }
 
@@ -66,19 +53,14 @@ import net.coobird.thumbnailator.geometry.Positions;
     public byte[] getSmall(final HttpServletRequest request) throws IOException {
         String requestURL = request.getRequestURL().toString();
         String file = URLDecoder.decode(requestURL.split("/picture/small/")[1], "UTF-8");
+        return service.getSmall(new File(file), 300);
+    }
 
-        File picture = new File(new File(System.getProperty(GALLERY_PATH)), file);
-        System.out.println("Reading the file " + picture.getAbsolutePath() + ", exists="+picture.exists());
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Thumbnails.of(picture)
-                .size(300, 300)
-                .crop(Positions.CENTER)
-                .keepAspectRatio(true)
-                .outputFormat("jpg")
-                .toOutputStream(out);
-
-        return out.toByteArray();
+    @RequestMapping(value = "/picture/exif/**", method = RequestMethod.GET)
+    public byte[] getExifData(final HttpServletRequest request) throws IOException, ImageProcessingException {
+        String requestURL = request.getRequestURL().toString();
+        String file = URLDecoder.decode(requestURL.split("/picture/exif/")[1], "UTF-8");
+        return service.getExifData(new File(file));
     }
 
 }
