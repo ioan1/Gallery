@@ -20,7 +20,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
     @Override
     public MongoClient mongoClient() {
         return new MongoClient(
-                new ServerAddress("192.168.0.64", 27017),
+                new ServerAddress("192.168.0.63", 27017),
                 MongoCredential.createCredential("root", "admin", "password".toCharArray()),
                 MongoClientOptions.builder().build());
     }
