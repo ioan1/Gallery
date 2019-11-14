@@ -19,7 +19,7 @@ public class ExifData {
     private String id;
     private File picture;
     private Date date;
-    //private List<Directory> directories;
+    private List<Directory> directories;
 
     public ExifData() {
         super();
@@ -30,11 +30,11 @@ public class ExifData {
         this.id = picture.getAbsolutePath();
         this.picture = picture;
         this.date = new Date();
-        //this.directories = new ArrayList<>();
+        this.directories = new ArrayList<>();
         for (Directory directory : metadata.getDirectories()) {
-            //this.directories.add(directory); TODO
+            this.directories.add(directory); 
         }
-        //LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
+        LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
     }
 
     public String getId() { return id; }
@@ -43,9 +43,9 @@ public class ExifData {
         return picture;
     }
 
-    //public List<Directory> getDirectories() {
-     //   return directories;
-    //}
+    public List<Directory> getDirectories() {
+        return directories;
+    }
 
     public Date getDate() {
         return date;
