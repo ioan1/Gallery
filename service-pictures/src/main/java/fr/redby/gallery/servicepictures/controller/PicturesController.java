@@ -1,7 +1,5 @@
 package fr.redby.gallery.servicepictures.controller;
 
-import com.drew.imaging.ImageProcessingException;
-import fr.redby.gallery.servicepictures.bean.ExifData;
 import fr.redby.gallery.servicepictures.bean.Picture;
 import fr.redby.gallery.servicepictures.service.PicturesService;
 import org.slf4j.Logger;
@@ -55,13 +53,6 @@ import java.net.URLDecoder;
         String requestURL = request.getRequestURL().toString();
         String file = URLDecoder.decode(requestURL.split("/picture/small/")[1], "UTF-8");
         return service.getSmall(new File(file), 300);
-    }
-
-    @RequestMapping(value = "/picture/exif/**", method = RequestMethod.GET)
-    public ExifData getExifData(final HttpServletRequest request) throws IOException, ImageProcessingException {
-        String requestURL = request.getRequestURL().toString();
-        String file = URLDecoder.decode(requestURL.split("/picture/exif/")[1], "UTF-8");
-        return service.getExifData(new File(file));
     }
 
 }

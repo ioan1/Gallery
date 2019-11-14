@@ -3,6 +3,7 @@ package fr.redby.gallery.servicepictures;
 import com.drew.imaging.ImageProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.redby.gallery.servicepictures.bean.ExifData;
+import fr.redby.gallery.servicepictures.service.ExifService;
 import fr.redby.gallery.servicepictures.service.PicturesService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,7 +21,7 @@ import java.net.URISyntaxException;
 public class ServicePicturesApplicationTests {
 
 	@Autowired
-	private PicturesService service;
+	private ExifService exifService;
 
 	@Test
 	public void contextLoads() {
@@ -28,7 +29,7 @@ public class ServicePicturesApplicationTests {
 
 	@Test
 	public void testReadExifInformation() throws IOException, ImageProcessingException, URISyntaxException {
-		Assert.assertNotNull(service.readExifMetadata(new File(this.getClass().getResource("IMG_20191111_172129.jpg").getFile())));
+		Assert.assertNotNull(exifService.readExifMetadata(new File(this.getClass().getResource("IMG_20191111_172129.jpg").getFile())));
 	}
 
 }
