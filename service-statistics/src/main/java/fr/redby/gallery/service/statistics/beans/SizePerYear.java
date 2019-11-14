@@ -1,12 +1,15 @@
 package fr.redby.gallery.service.statistics.beans;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import fr.redby.gallery.service.statistics.repositories.SizePerYearRepository;
+import org.springframework.data.annotation.Id;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class SizePerYear {
+public class SizePerYear implements Serializable {
 
-    public static class DataType implements Comparable<DataType> {
+    public static class DataType implements Serializable, Comparable<DataType> {
         public long x;
         public int y;
 
@@ -24,6 +27,9 @@ public class SizePerYear {
         }
     }
 
+    @Id
+    private Integer id;
+
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Date date;
     private List<DataType> data;
@@ -33,6 +39,7 @@ public class SizePerYear {
     public SizePerYear() {
         this.date = new Date();
         this.data = new ArrayList<>();
+        this.id = SizePerYearRepository.STAT_IDENTIFIER;
     }
 
     public Date getDate() {

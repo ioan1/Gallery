@@ -92,6 +92,4 @@ public class ExifService {
                 .count();
     }
 
-    private void discoverPicture(File f) {
-    }
 }

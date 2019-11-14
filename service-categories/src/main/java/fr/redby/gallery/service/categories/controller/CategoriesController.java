@@ -12,11 +12,12 @@ import java.util.stream.Collectors;
 
 /**
  * Service dedicated to the management of categories.
+ *
  * @author Ioan Bernevig
  * @version $Revision$
  */
 @RestController
-@RequestMapping ("/categories")
+@RequestMapping("/categories")
 public class CategoriesController {
 
     public static final String GALLERY_PATH = "GALLERY_PATH";
@@ -40,6 +41,7 @@ public class CategoriesController {
 
     /**
      * TODO.
+     *
      * @param strNum
      * @return
      */
