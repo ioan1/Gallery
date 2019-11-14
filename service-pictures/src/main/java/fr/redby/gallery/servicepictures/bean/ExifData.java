@@ -17,30 +17,30 @@ public class ExifData {
 
     @Id
     private String id;
-    private File picture;
+    private String picture;
     private Date date;
-    private List<Directory> directories;
+    //private List<Directory> directories;
 
     public ExifData(final File picture, final Metadata metadata) {
         this.id = picture.getAbsolutePath();
         //this.picture = picture; TODO
         this.date = new Date();
-        this.directories = new ArrayList<>();
+        //this.directories = new ArrayList<>();
         for (Directory directory : metadata.getDirectories()) {
             //this.directories.add(directory); TODO
         }
-        LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
+        //LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
     }
 
     public String getId() { return id; }
 
-    public File getPicture() {
+    public String getPicture() {
         return picture;
     }
 
-    public List<Directory> getDirectories() {
-        return directories;
-    }
+    //public List<Directory> getDirectories() {
+     //   return directories;
+    //}
 
     public Date getDate() {
         return date;
