@@ -3,7 +3,7 @@ package fr.redby.gallery.service.statistics.beans;
 import java.io.Serializable;
 import java.util.Calendar;
 
-public class DataType implements Serializable, Comparable<SizePerYear.DataType> {
+public class DataType implements Serializable, Comparable<DataType> {
     public long x;
     public int y;
 
@@ -36,7 +36,7 @@ public class DataType implements Serializable, Comparable<SizePerYear.DataType> 
         this.y = y;
     }
 
-    @Override public int compareTo(SizePerYear.DataType o) {
+    @Override public int compareTo(DataType o) {
         return new Long(x).compareTo(new Long(o.x));
     }
 }

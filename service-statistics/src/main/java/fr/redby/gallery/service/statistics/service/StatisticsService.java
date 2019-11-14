@@ -1,5 +1,6 @@
 package fr.redby.gallery.service.statistics.service;
 
+import fr.redby.gallery.service.statistics.beans.DataType;
 import fr.redby.gallery.service.statistics.beans.DiskUsage;
 import fr.redby.gallery.service.statistics.beans.SizePerYear;
 import fr.redby.gallery.service.statistics.repositories.SizePerYearRepository;
@@ -54,7 +55,7 @@ public class StatisticsService {
                         .sum() / GB);
                 int year = Integer.parseInt(folder.getName());
                 LOGGER.info("{} => {}", year, folderSize);
-                result.getData().add(new SizePerYear.DataType(year, folderSize));
+                result.getData().add(new DataType(year, folderSize));
             }
             Collections.sort(result.getData());
             LOGGER.info("Saving the size per year into the database.");
