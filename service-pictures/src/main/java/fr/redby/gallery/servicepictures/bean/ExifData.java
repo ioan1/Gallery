@@ -2,24 +2,24 @@ package fr.redby.gallery.servicepictures.bean;
 
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.io.Serializable;
+import java.util.*;
 
-public class ExifData {
+public class ExifData implements Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ExifData.class );
 
     @Id
     private String id;
-    private File picture;
     private Date date;
-    private List<Directory> directories;
+
+    private HashMap<String, List<ExifTag>> directories;
 
     public ExifData() {
         super();
@@ -28,39 +28,22 @@ public class ExifData {
 
     public ExifData(final File picture, final Metadata metadata) {
         this.id = picture.getAbsolutePath();
-        this.picture = picture;
         this.date = new Date();
-        this.directories = new ArrayList<>();
+        this.directories = new HashMap<String, List<ExifTag>>();
         for (Directory directory : metadata.getDirectories()) {
-            //this.directories.add(directory);
+            List<ExifTag> tags = new ArrayList<>();
+            for (Tag tag : directory.getTags())  {
+                tags.add(new ExifTag(tag));
+            }
+            this.directories.put(directory.getName(), tags);
         }
         LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
     }
 
     public String getId() { return id; }
 
-    public File getPicture() {
-        return picture;
-    }
-
-    public List<Directory> getDirectories() {
+    public HashMap<String, List<ExifTag>> getDirectories() {
         return directories;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setPicture(File picture) {
-        this.picture = picture;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public void setDirectories(List<Directory> directories) {
-        this.directories = directories;
     }
 
     public Date getDate() {
