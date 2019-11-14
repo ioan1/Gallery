@@ -1,5 +1,16 @@
 package fr.redby.gallery.servicepictures;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Configuration
 @EnableMongoRepositories(basePackages = "fr.redby.gallery.servicepictures")
 public class MongoConfig extends AbstractMongoConfiguration {
@@ -11,11 +22,10 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
     @Override
     public MongoClient mongoClient() {
-        return new MongoClient("mongo", 27017);
+        return new MongoClient(
+                new ServerAddress("mongo", 27017),
+                MongoCredential.createCredential("root", "admin", "password".toCharArray()),
+                MongoClientOptions.builder().build());
     }
 
-    @Override
-    protected String getMappingBasePackage() {
-        return "fr.redby.gallery.servicepictures";
-    }
 }

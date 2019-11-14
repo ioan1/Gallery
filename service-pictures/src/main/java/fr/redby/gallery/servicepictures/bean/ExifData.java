@@ -2,10 +2,9 @@ package fr.redby.gallery.servicepictures.bean;
 
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
-import fr.redby.gallery.servicepictures.service.PicturesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Id;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,11 +15,14 @@ public class ExifData {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ExifData.class );
 
+    @Id
+    private String id;
     private File picture;
     private Date date;
     private List<Directory> directories;
 
     public ExifData(final File picture, final Metadata metadata) {
+        this.id = picture.getAbsolutePath();
         this.picture = picture;
         this.date = new Date();
         this.directories = new ArrayList<>();
@@ -29,6 +31,8 @@ public class ExifData {
         }
         LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
     }
+
+    public String getId() { return id; }
 
     public File getPicture() {
         return picture;
