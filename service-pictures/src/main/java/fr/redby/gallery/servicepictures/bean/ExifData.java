@@ -17,7 +17,7 @@ public class ExifData {
 
     @Id
     private String id;
-    private String picture;
+    private File picture;
     private Date date;
     //private List<Directory> directories;
 
@@ -28,7 +28,7 @@ public class ExifData {
 
     public ExifData(final File picture, final Metadata metadata) {
         this.id = picture.getAbsolutePath();
-        //this.picture = picture; TODO
+        this.picture = picture;
         this.date = new Date();
         //this.directories = new ArrayList<>();
         for (Directory directory : metadata.getDirectories()) {
@@ -39,7 +39,7 @@ public class ExifData {
 
     public String getId() { return id; }
 
-    public String getPicture() {
+    public File getPicture() {
         return picture;
     }
 
