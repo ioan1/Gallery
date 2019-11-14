@@ -21,6 +21,11 @@ public class ExifData {
     private Date date;
     //private List<Directory> directories;
 
+    public ExifData() {
+        super();
+        LOGGER.debug("Default constructor.");
+    }
+
     public ExifData(final File picture, final Metadata metadata) {
         this.id = picture.getAbsolutePath();
         //this.picture = picture; TODO
