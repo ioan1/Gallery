@@ -23,7 +23,7 @@ public class ExifData {
 
     public ExifData(final File picture, final Metadata metadata) {
         this.id = picture.getAbsolutePath();
-        this.picture = picture;
+        //this.picture = picture; TODO
         this.date = new Date();
         this.directories = new ArrayList<>();
         for (Directory directory : metadata.getDirectories()) {
