@@ -32,7 +32,7 @@ public class ExifData {
         this.date = new Date();
         this.directories = new ArrayList<>();
         for (Directory directory : metadata.getDirectories()) {
-            this.directories.add(directory); 
+            this.directories.add(directory);
         }
         LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
     }
@@ -45,6 +45,22 @@ public class ExifData {
 
     public List<Directory> getDirectories() {
         return directories;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setPicture(File picture) {
+        this.picture = picture;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setDirectories(List<Directory> directories) {
+        this.directories = directories;
     }
 
     public Date getDate() {
