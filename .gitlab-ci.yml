@@ -12,8 +12,9 @@ service-categories:
     - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-categories .
     - docker push docker.redby.fr/gallery/service-categories
-  changes:
-    - service-categories/**/*
+  only:
+    changes:
+      - service-categories/**/*
   after_script:
     - rm -rf .git
 
@@ -23,8 +24,9 @@ service-albums:
     - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-albums .
     - docker push docker.redby.fr/gallery/service-albums
-  changes:
-    - service-albums/**/*
+  only:
+    changes:
+      - service-albums/**/*
   after_script:
     - rm -rf .git
 
@@ -34,8 +36,9 @@ service-statistics:
     - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-statistics .
     - docker push docker.redby.fr/gallery/service-statistics
-  changes:
-    - service-statistics/**/*
+  only:
+    changes:
+      - service-statistics/**/*
   after_script:
     - rm -rf .git
 
@@ -45,8 +48,9 @@ service-pictures:
     - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-pictures .
     - docker push docker.redby.fr/gallery/service-pictures
-  changes:
-    - service-pictures/**/*
+  only:
+    changes:
+      - service-pictures/**/*
   after_script:
     - rm -rf .git
     
@@ -55,7 +59,8 @@ web-ui:
     - cd web-ui
     - docker build -t docker.redby.fr/gallery/web-ui .
     - docker push docker.redby.fr/gallery/web-ui
-  changes:
-    - web-ui/**/*
+  only:
+    changes:
+      - web-ui/**/*
   after_script:
     - rm -rf .git
