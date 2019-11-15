@@ -3,6 +3,7 @@ package fr.redby.gallery.service.statistics.service;
 import fr.redby.gallery.service.statistics.beans.DataType;
 import fr.redby.gallery.service.statistics.beans.DiskUsage;
 import fr.redby.gallery.service.statistics.beans.SizePerYear;
+import fr.redby.gallery.service.statistics.repositories.PictureResolutionPerYearRepository;
 import fr.redby.gallery.service.statistics.repositories.SizePerYearRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class StatisticsService {
 
     @Autowired
     private SizePerYearRepository sizePerYearRepository;
+
+    @Autowired
+    private PictureResolutionPerYearRepository pictureResolutionPerYearRepository;
 
     public DiskUsage getDiskUsage() {
         File root = new File(System.getProperty("GALLERY_PATH"));
