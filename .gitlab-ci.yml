@@ -12,7 +12,7 @@ service-categories:
     - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-categories .
     - docker push docker.redby.fr/gallery/service-categories
-   changes:
+  changes:
     - service-categories/**/*
   after_script:
     - rm -rf .git
@@ -23,7 +23,7 @@ service-albums:
     - mvn compile test package
     - docker build -t docker.redby.fr/gallery/service-albums .
     - docker push docker.redby.fr/gallery/service-albums
-   changes:
+  changes:
     - service-albums/**/*
   after_script:
     - rm -rf .git
