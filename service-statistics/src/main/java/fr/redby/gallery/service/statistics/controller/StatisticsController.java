@@ -42,4 +42,9 @@ public class StatisticsController {
         return service.getSizePerYear();
     }
 
+    @RequestMapping (value = "pictureResolutionPerYear", method = RequestMethod.GET)
+    public SizePerYear getPictureResolutionPerYear() throws IOException {
+        return service.getSizePerYear();
+    }
+
 }
