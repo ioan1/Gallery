@@ -43,7 +43,7 @@ import java.net.URLDecoder;
         String requestURL = request.getRequestURL().toString();
         String file = URLDecoder.decode(requestURL.split("/picture/full/")[1], "UTF-8");
 
-        File picture = new File(file);
+        File picture = new File(file); 
         LOGGER.info("Reading the file {}, exists={}", picture.getAbsolutePath(), picture.exists());
         return Files.readAllBytes(Paths.get(picture.getAbsolutePath()));
     }
