@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Date;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -29,7 +30,11 @@ public class ServicePicturesApplicationTests {
 
 	@Test
 	public void testReadExifInformation() throws IOException, ImageProcessingException, URISyntaxException {
-		Assert.assertNotNull(exifService.readExifMetadata(new File(this.getClass().getResource("IMG_20191111_172129.jpg").getFile())));
+		ExifData metadata = exifService.readExifMetadata(new File(this.getClass().getResource("IMG_20191111_172129.jpg").getFile()));
+		Assert.assertNotNull(metadata);
+		Assert.assertEquals("HUAWEI", metadata.getCameraMake());
+		Assert.assertEquals("EML-L29", metadata.getCameraModel());
+		Assert.assertEquals(1573492892000l, metadata.getDateTaken().getTime());
 	}
 
 }

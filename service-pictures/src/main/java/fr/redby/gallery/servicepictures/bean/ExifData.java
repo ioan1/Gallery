@@ -2,7 +2,9 @@ package fr.redby.gallery.servicepictures.bean;
 
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataException;
 import com.drew.metadata.Tag;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
@@ -17,7 +19,8 @@ public class ExifData implements Serializable {
 
     @Id
     private String id;
-    private Date date;
+    private String cameraMake, cameraModel;
+    private Date dateDiscovery, dateTaken;
 
     private HashMap<String, List<ExifTag>> directories;
 
@@ -26,9 +29,17 @@ public class ExifData implements Serializable {
         LOGGER.debug("Default constructor.");
     }
 
+    /**
+     * Copy/converter constructor taking as parameter a Metadata object and returns an ExifData (more useful for the gallery).
+     * @param picture the file to read
+     * @param metadata raw metadata
+     */
     public ExifData(final File picture, final Metadata metadata) {
         this.id = picture.getAbsolutePath();
-        this.date = new Date();
+        this.dateDiscovery = new Date();
+        this.dateTaken = getImageCreationDate(metadata);
+        this.cameraMake = getStringValue(metadata, ExifSubIFDDirectory.TAG_MAKE);
+        this.cameraModel = getStringValue(metadata, ExifSubIFDDirectory.TAG_MODEL);
         this.directories = new HashMap<String, List<ExifTag>>();
         for (Directory directory : metadata.getDirectories()) {
             List<ExifTag> tags = new ArrayList<>();
@@ -40,13 +51,59 @@ public class ExifData implements Serializable {
         LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
     }
 
+    /**
+     * TODO.
+     * @param metadata
+     * @return
+     */
+    private String getStringValue(final Metadata metadata, final int tag) {
+        for (Directory dir : metadata.getDirectories()) {
+            String value = dir.getString(tag);
+            if (value != null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * TODO.
+     * @param metadata
+     * @return
+     */
+    private Date getImageCreationDate(final Metadata metadata) {
+        for (Directory dir : metadata.getDirectories()) {
+            Date d = dir.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+            if (d != null) {
+                return d;
+            }
+        }
+        return null;
+    }
+
     public String getId() { return id; }
 
     public HashMap<String, List<ExifTag>> getDirectories() {
         return directories;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDateDiscovery() {
+        return dateDiscovery;
+    }
+
+    public String getCameraMake() {
+        return cameraMake;
+    }
+
+    public String getCameraModel() {
+        return cameraModel;
+    }
+
+    public Date getDateTaken() {
+        return dateTaken;
+    }
+
+    public void setDirectories(HashMap<String, List<ExifTag>> directories) {
+        this.directories = directories;
     }
 }
