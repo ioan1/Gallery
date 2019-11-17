@@ -2,8 +2,9 @@ package fr.redby.gallery.service.statistics.service;
 
 import fr.redby.gallery.service.statistics.beans.DataType;
 import fr.redby.gallery.service.statistics.beans.DiskUsage;
+import fr.redby.gallery.service.statistics.beans.PicturesPerYear;
 import fr.redby.gallery.service.statistics.beans.SizePerYear;
-import fr.redby.gallery.service.statistics.repositories.PictureResolutionPerYearRepository;
+import fr.redby.gallery.service.statistics.repositories.PicturesPerYearRepository;
 import fr.redby.gallery.service.statistics.repositories.SizePerYearRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ public class StatisticsService {
     private SizePerYearRepository sizePerYearRepository;
 
     @Autowired
-    private PictureResolutionPerYearRepository pictureResolutionPerYearRepository;
+    private PicturesPerYearRepository picturesPerYearRepository;
 
     public DiskUsage getDiskUsage() {
         File root = new File(System.getProperty("GALLERY_PATH"));
@@ -73,5 +75,9 @@ public class StatisticsService {
         return Files.walk(root.toPath())
                 .filter(p -> p.toFile().isFile())
                 .count();
+    }
+
+    public List<PicturesPerYear> getPicturesPerYear() {
+        return picturesPerYearRepository.findAll();
     }
 }
