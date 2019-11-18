@@ -12,19 +12,16 @@ public class PicturesPerYear implements Serializable, Comparable<PicturesPerYear
     public int y;
 
     public long getX() {
-        return x;
-    }
 
-    public void setX(long x) {
-        this.x = x;
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, (int) this.x);
+        cal.set(Calendar.DAY_OF_YEAR, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        return cal.getTime().getTime();
     }
 
     public int getY() {
         return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
     }
 
     @Override public int compareTo(PicturesPerYear o) {

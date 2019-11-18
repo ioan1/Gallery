@@ -4,7 +4,7 @@ import * as Chartist from "chartist";
 import * as moment from 'moment';
 
 @Component({
-  selector: '[app-dashboard-picture-resolution-per-year-chart]',
+  selector: '[app-dashboard-pictures-per-year-chart]',
   templateUrl: './dashboard-pictures-per-year-chart.component.html',
   styleUrls: ['./dashboard-pictures-per-year-chart.component.scss']
 })
@@ -21,6 +21,7 @@ export class DashboardPicturesPerYearChartComponent implements OnInit {
     // Fetch statistics about the picture resolution per year (year => average MP used)
     this.statisticsService.getPicturesPerYear().subscribe((data: {}) => {
       this.picturesPerYear = data;
+      console.log("Received pictures per year data");
       console.log(data);
       jQuery("#comp-picturesPerYearChart").show(250);
       var picturesPerYearChart = new Chartist.Line('#picturesPerYearChart', {
