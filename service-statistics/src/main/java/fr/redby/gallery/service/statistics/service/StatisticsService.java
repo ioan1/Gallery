@@ -16,6 +16,9 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * TODO.
+ */
 @Service
 public class StatisticsService {
 
@@ -30,6 +33,10 @@ public class StatisticsService {
     @Autowired
     private PicturesPerYearRepository picturesPerYearRepository;
 
+    /**
+     * TODO.
+     * @return
+     */
     public DiskUsage getDiskUsage() {
         File root = new File(System.getProperty("GALLERY_PATH"));
         LOGGER.info("Total space in {}: {}", System.getProperty("GALLERY_PATH"), root.getTotalSpace());
@@ -42,6 +49,11 @@ public class StatisticsService {
         return new DiskUsage(used, available);
     }
 
+    /**
+     * TODO.
+     * @return
+     * @throws IOException
+     */
     public SizePerYear getSizePerYear() throws IOException {
         Optional<SizePerYear> existing = sizePerYearRepository.findById(SizePerYearRepository.STAT_IDENTIFIER);
         if (existing.isPresent()) {
@@ -67,6 +79,11 @@ public class StatisticsService {
         }
     }
 
+    /**
+     * TODO.
+     * @return
+     * @throws IOException
+     */
     public Long getWaitForProcessing() throws IOException {
         File root = new File(System.getProperty("GALLERY_PATH") + File.separator + WAIT_FOR_PROCESSING);
         return Files.walk(root.toPath())
@@ -74,7 +91,13 @@ public class StatisticsService {
                 .count();
     }
 
+    /**
+     * Return the pictures per year statistics wrapped within a PicturesPerYearWrapper.
+     * @return PicturesPerYearWrapper
+     */
     public PicturesPerYearWrapper getPicturesPerYear() {
-        return new PicturesPerYearWrapper(picturesPerYearRepository.findAll());
+        List<PicturesPerYear> all = picturesPerYearRepository.findAll();
+        Collections.sort(all);
+        return new PicturesPerYearWrapper(all);
     }
 }
