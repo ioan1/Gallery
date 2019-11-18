@@ -13,7 +13,7 @@ import { MapsComponent } from '../../maps/maps.component';
 import { NotificationsComponent } from '../../notifications/notifications.component';
 import { NgxMasonryModule } from 'ngx-masonry';
 import {DashboardSizePerYearChartComponent} from "../../components/dashboard-size-per-year-chart/dashboard-size-per-year-chart.component";
-import {DashboardPictureResolutionPerYearChartComponent} from "../../components/dashboard-picture-resolution-per-year-chart/dashboard-picture-resolution-per-year-chart.component";
+import {DashboardPicturesPerYearChartComponent} from "../../components/dashboard-pictures-per-year-chart/dashboard-pictures-per-year-chart.component";
 import {DashboardDiskUsageSummaryComponent} from "../../components/dashboard-disk-usage-summary/dashboard-disk-usage-summary.component";
 import {DashboardProcessingSummaryComponent} from "../../components/dashboard-processing-summary/dashboard-processing-summary.component";
 
@@ -42,7 +42,7 @@ import {
   declarations: [
     DashboardComponent,
     DashboardSizePerYearChartComponent,
-    DashboardPictureResolutionPerYearChartComponent,
+    DashboardPicturesPerYearChartComponent,
     DashboardDiskUsageSummaryComponent,
     DashboardProcessingSummaryComponent,
     UserProfileComponent,

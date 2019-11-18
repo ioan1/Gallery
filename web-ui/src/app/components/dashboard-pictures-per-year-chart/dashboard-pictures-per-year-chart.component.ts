@@ -5,26 +5,26 @@ import * as moment from 'moment';
 
 @Component({
   selector: '[app-dashboard-picture-resolution-per-year-chart]',
-  templateUrl: './dashboard-picture-resolution-per-year-chart.component.html',
-  styleUrls: ['./dashboard-picture-resolution-per-year-chart.component.scss']
+  templateUrl: './dashboard-pictures-per-year-chart.component.html',
+  styleUrls: ['./dashboard-pictures-per-year-chart.component.scss']
 })
-export class DashboardPictureResolutionPerYearChartComponent implements OnInit {
+export class DashboardPicturesPerYearChartComponent implements OnInit {
 
-  private pictureResolutionPerYear: {};
+  private picturesPerYear: {};
 
   constructor(private statisticsService: StatisticsService) { }
 
   ngOnInit() {
     /** Initial state of some widgets. */
-    jQuery("#comp-pictureResolutionPerYearChart").hide();
+    jQuery("#comp-picturesPerYearChart").hide();
 
     // Fetch statistics about the picture resolution per year (year => average MP used)
-    this.statisticsService.getPictureResolutionPerYear().subscribe((data: {}) => {
-      this.pictureResolutionPerYear = data;
+    this.statisticsService.getPicturesPerYear().subscribe((data: {}) => {
+      this.picturesPerYear = data;
       console.log(data);
-      jQuery("#comp-pictureResolutionPerYearChart").show(250);
-      var pictureResolutionPerYearChart = new Chartist.Line('#pictureResolutionPerYearChart', {
-        series: [ this.pictureResolutionPerYear ]
+      jQuery("#comp-picturesPerYearChart").show(250);
+      var picturesPerYearChart = new Chartist.Line('#picturesPerYearChart', {
+        series: [ this.picturesPerYear ]
       }, {
         axisX: {
           type: Chartist.FixedScaleAxis,
@@ -34,7 +34,7 @@ export class DashboardPictureResolutionPerYearChartComponent implements OnInit {
           }
         }
       });
-      this.startAnimationForLineChart(pictureResolutionPerYearChart);
+      this.startAnimationForLineChart(picturesPerYearChart);
     })
   }
 

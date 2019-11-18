@@ -1,9 +1,6 @@
 package fr.redby.gallery.service.statistics.service;
 
-import fr.redby.gallery.service.statistics.beans.DataType;
-import fr.redby.gallery.service.statistics.beans.DiskUsage;
-import fr.redby.gallery.service.statistics.beans.PicturesPerYear;
-import fr.redby.gallery.service.statistics.beans.SizePerYear;
+import fr.redby.gallery.service.statistics.beans.*;
 import fr.redby.gallery.service.statistics.repositories.PicturesPerYearRepository;
 import fr.redby.gallery.service.statistics.repositories.SizePerYearRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +74,7 @@ public class StatisticsService {
                 .count();
     }
 
-    public List<PicturesPerYear> getPicturesPerYear() {
-        return picturesPerYearRepository.findAll();
+    public PicturesPerYearWrapper getPicturesPerYear() {
+        return new PicturesPerYearWrapper(picturesPerYearRepository.findAll());
     }
 }

@@ -2,6 +2,7 @@ package fr.redby.gallery.service.statistics.controller;
 
 import fr.redby.gallery.service.statistics.beans.DiskUsage;
 import fr.redby.gallery.service.statistics.beans.PicturesPerYear;
+import fr.redby.gallery.service.statistics.beans.PicturesPerYearWrapper;
 import fr.redby.gallery.service.statistics.beans.SizePerYear;
 import fr.redby.gallery.service.statistics.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class StatisticsController {
     }
 
     @RequestMapping (value = "picturesPerYear", method = RequestMethod.GET)
-    public List<PicturesPerYear> getPicturesPerYear() throws IOException {
+    public PicturesPerYearWrapper getPicturesPerYear() throws IOException {
         return service.getPicturesPerYear();
     }
 

@@ -22,7 +22,7 @@ export class StatisticsService {
     return this.http.get('https://gallery.redby.fr/rest/statistics/sizePerYear');
   }
 
-  getPictureResolutionPerYear() {
-    return this.http.get('https://gallery.redby.fr/rest/statistics/pictureResolutionPerYear');
+  getPicturesPerYear() {
+    return this.http.get('https://gallery.redby.fr/rest/statistics/picturesPerYear');
   }
 }
