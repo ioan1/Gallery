@@ -74,7 +74,7 @@ public class ExifData implements Serializable {
     private Date getImageCreationDate(final Metadata metadata) {
         for (Directory dir : metadata.getDirectories()) {
             Date d = dir.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
-            if (d != null && d.getYear() > 1900) { // Needed as some DSLRs return years on 2 digits ... .
+            if (d != null && d.getYear() < 1900) { // Needed as some DSLRs return years on 2 digits ... .
                 return d;
             }
         }
