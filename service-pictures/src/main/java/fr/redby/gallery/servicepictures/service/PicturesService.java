@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -64,15 +65,27 @@ public class PicturesService {
     public byte[] getSmall(final File picture, final int size) throws IOException {
         LOGGER.info("Reading the file {}, exists={}.", picture.getAbsolutePath(), picture.exists());
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Thumbnails.of(picture)
-                .size(size, size)
-                .crop(Positions.CENTER)
-                .keepAspectRatio(true)
-                .outputFormat("jpg")
-                .toOutputStream(out);
+        Jedis jedis = new Jedis("redis");
+        LOGGER.info("Getting response from the cache server: {}", jedis.ping());
 
-        return out.toByteArray();
+        byte[] cached = jedis.get(picture.getAbsolutePath().getBytes());
+        if (cached != null) {
+            LOGGER.info("Return cached thumbnail for {}.", picture.getAbsolutePath());
+            return cached;
+        } else {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Thumbnails.of(picture)
+                    .size(size, size)
+                    .crop(Positions.CENTER)
+                    .keepAspectRatio(true)
+                    .outputFormat("jpg")
+                    .toOutputStream(out);
+            byte[] res = out.toByteArray();
+
+            LOGGER.info("Caching the thumbnail for {}.", picture.getAbsolutePath());
+            jedis.set(picture.getAbsolutePath().getBytes(), res);
+            return out.toByteArray();
+        }
     }
 
 }
