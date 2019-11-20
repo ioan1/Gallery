@@ -17,6 +17,7 @@ export class AlbumComponent implements OnInit {
   videos    : any; // TODO
   others    : any; // TODO
   gallery   : any;
+  picturesLoaded: number; // defined the number of pictures really loaded. When this = total number, then the gallery is loaded.
 
   public masonryOptions: NgxMasonryOptions = {
     transitionDuration: '0.5s',
@@ -24,7 +25,9 @@ export class AlbumComponent implements OnInit {
     gutter: 10
   };
 
-  constructor(private route: ActivatedRoute, private picturesService: PicturesService) { }
+  constructor(private route: ActivatedRoute, private picturesService: PicturesService) {
+    this.picturesLoaded = 0;
+  }
 
   ngOnInit() {
     this.route.paramMap.subscribe(pageParameters => {
@@ -32,10 +35,8 @@ export class AlbumComponent implements OnInit {
       this.album = pageParameters.get('idalbum');
       // Fetch the pictures within this category
         this.picturesService.listPictures(this.category, this.album).subscribe((data: {}) => {
-          // render thumbnails
           this.pictures = data;
-          console.log(data);
-          setTimeout(this.startGallery, 500); // Obliged to have a small delay when starting the gallery, letting time maybe for the DOM to be there ...
+          console.log("Pictures retrieved and rendered");
       })
     });
 
@@ -43,7 +44,6 @@ export class AlbumComponent implements OnInit {
 
   /**
    * See: https://github.com/fengyuanchen/viewerjs/blob/master/README.md
-   * TODO: ensure this is called only when all thumbnails are loaded !!
    */
   startGallery() {
     this.gallery = new Viewer(document.getElementById('pictures'), {
@@ -55,10 +55,24 @@ export class AlbumComponent implements OnInit {
     this.gallery.full();
   }
 
-  public ngOnDestroy() {
+  ngOnDestroy() {
     if (this.gallery != undefined) {
       console.log('Destroying the gallery');
       this.gallery.destroy();
+    }
+  }
+
+  /**
+   * Even triggered each time a thumbnail is really loaded.
+   * This way, we start the gallery only when all images are loaded. This is important.
+   * @param evt picture load event.
+   */
+  onImageLoad(evt) {
+    if (evt && evt.target) {
+      this.picturesLoaded++;
+      if (this.picturesLoaded === this.pictures.length) {
+        this.startGallery();
+      }
     }
   }
 
