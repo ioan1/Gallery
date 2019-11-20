@@ -7,7 +7,7 @@
                         <h4 class="card-title mt-0">{{album}}</h4>
                         <p class="card-category"><a [routerLink]="['/category', category]">{{category}}</a></p>
                     </div>
-                    <div class="card-body pictures">
+                    <div id="pictures" class="card-body pictures">
                         <ngx-masonry [options]="masonryOptions" [useImagesLoaded]="true">
                             <div ngxMasonryItem class="masonry-item" *ngFor="let picture of pictures">
                                 <img alt="{{picture.name}}"
