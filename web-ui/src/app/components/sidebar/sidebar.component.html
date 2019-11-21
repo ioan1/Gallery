@@ -3,7 +3,7 @@
         <div class="logo-img">
             <img src="/assets/img/angular2-logo-red.png"/>
         </div>
-        Creative Tim
+        Photo Gallery
     </a>
 </div>
 <div class="sidebar-wrapper">
@@ -65,7 +65,7 @@
         <li routerLinkActive="active" *ngFor="let category of categories" class="nav-item">
             <a class="nav-link" [routerLink]="['/category/',category]">
                 <i class="material-icons">collections</i>
-                <p>{{category}}</p>
+                <p>{{category.name}}</p>
             </a>
         </li>
     </ul>

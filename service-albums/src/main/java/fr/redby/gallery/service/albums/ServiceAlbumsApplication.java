@@ -1,4 +1,4 @@
-package fr.redby.gallery.servicealbums;
+package fr.redby.gallery.service.albums;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

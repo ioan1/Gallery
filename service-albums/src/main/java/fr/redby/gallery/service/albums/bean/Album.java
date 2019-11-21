@@ -1,18 +1,16 @@
-package fr.redby.gallery.servicealbums.bean;
+package fr.redby.gallery.service.albums.bean;
 
-import java.beans.Transient;
 import java.io.File;
-import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Id;
 
 /**
  * @author Ioan Bernevig
@@ -24,8 +22,8 @@ public class Album {
 
     @JsonFormat(pattern = "dd/MM/yyyy") private Date date;
     private String category;
-    private String id;
     private String name;
+    @Id
     private String path;
     private List<File> files;
     private int pictures;
@@ -34,7 +32,6 @@ public class Album {
 
     public Album(final String category, final File directory) {
         this.category = category;
-        this.id = directory.getName();
         this.name = directory.getName();
         this.path = directory.getAbsolutePath();
 
@@ -78,10 +75,6 @@ public class Album {
 
     public String getName() {
         return name;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getPath() {

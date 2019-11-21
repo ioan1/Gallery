@@ -2,11 +2,9 @@
  * Copyright European Commission's
  * Taxation and Customs Union Directorate-General (DG TAXUD).
  */
-package fr.redby.gallery.servicealbums.bean;
+package fr.redby.gallery.service.albums.bean;
 
 import java.io.File;
-import java.lang.reflect.Type;
-import java.util.List;
 
 /**
  * @author FITSDEV3

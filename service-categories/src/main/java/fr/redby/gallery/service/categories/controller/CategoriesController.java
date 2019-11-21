@@ -1,5 +1,8 @@
 package fr.redby.gallery.service.categories.controller;
 
+import fr.redby.gallery.service.categories.bean.Category;
+import fr.redby.gallery.service.categories.service.CategoriesService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,38 +23,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/categories")
 public class CategoriesController {
 
-    public static final String GALLERY_PATH = "GALLERY_PATH";
+    @Autowired
+    private CategoriesService service;
 
     /**
      * @return Service retrieving all categories (folder names) and returns them as-is.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public List<String> getCategories() {
-        File directory = new File(System.getProperty(GALLERY_PATH));
-        if (directory.isDirectory()) {
-            return Arrays.stream(directory.listFiles(f -> f.isDirectory()))
-                    .map(f -> f.getName())
-                    .filter(f -> isNumeric(f))
-                    .sorted((o1, o2) -> o2.compareTo(o1))
-                    .collect(Collectors.toList());
-        } else {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * TODO.
-     *
-     * @param strNum
-     * @return
-     */
-    private boolean isNumeric(String strNum) {
-        try {
-            Integer i = Integer.parseInt(strNum);
-        } catch (NumberFormatException | NullPointerException nfe) {
-            return false;
-        }
-        return true;
+    public List<Category> getCategories() {
+        return service.getCategories();
     }
 
 }
