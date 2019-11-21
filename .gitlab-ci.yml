@@ -6,6 +6,17 @@ service-parent:
   after_script:
     - rm -rf .git
 
+service-scheduler:
+  script:
+    - cd service-scheduler
+    - docker build -t docker.redby.fr/gallery/service-scheduler .
+    - docker push docker.redby.fr/gallery/service-scheduler
+  only:
+    changes:
+      - service-scheduler/**/*
+  after_script:
+    - rm -rf .git
+
 service-categories:
   script:
     - cd service-categories

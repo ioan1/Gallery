@@ -39,3 +39,7 @@ services:
   redis:
     image: redis
     restart: always
+  service-scheduler:
+    image: "docker.redby.fr/gallery/service-scheduler:latest"
+    ports:
+      - "8080:8080"
