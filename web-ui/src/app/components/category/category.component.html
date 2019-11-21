@@ -166,7 +166,7 @@
                                   </th>
                               </thead>
                               <tbody>
-                                  <tr *ngFor="let album of albums" [routerLink]="['/category', category.name, 'album', album.path]">
+                                  <tr *ngFor="let album of albums" [routerLink]="['/category', category, 'album', album.id]">
                                       <td>
                                           {{album.date}}
                                       </td>

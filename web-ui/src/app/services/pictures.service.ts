@@ -9,7 +9,8 @@ export class PicturesService {
   constructor(private http: HttpClient) { }
 
   listPictures(category, album) {
-    return this.http.get('https://gallery.redby.fr/rest/pictures/'+category.name+'/'+album);
+    console.log("Listing pictures from category="+category+" and album="+album);
+    return this.http.get('https://gallery.redby.fr/rest/pictures/'+category+'/'+album);
   }
 
 }

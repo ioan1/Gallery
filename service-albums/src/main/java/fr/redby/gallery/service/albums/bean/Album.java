@@ -24,6 +24,7 @@ public class Album {
     private String category;
     private String name;
     @Id
+    private String id;
     private String path;
     private List<File> files;
     private int pictures;
@@ -33,6 +34,7 @@ public class Album {
     public Album(final String category, final File directory) {
         this.category = category;
         this.name = directory.getName();
+        this.id = directory.getName();
         this.path = directory.getAbsolutePath();
 
         // Extract date and name when available
@@ -75,6 +77,10 @@ public class Album {
 
     public String getName() {
         return name;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getPath() {
