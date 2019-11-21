@@ -5,7 +5,7 @@
                 <div class="card card-plain">
                     <div class="card-header card-header-danger">
                         <h4 class="card-title mt-0">{{album}}</h4>
-                        <p class="card-category"><a [routerLink]="['/category', category.name]">{{category.name}}</a></p>
+                        <p class="card-category"><a [routerLink]="['/category', category]">{{category}}</a></p>
                     </div>
                     <div id="pictures" class="card-body pictures">
                         <ngx-masonry [options]="masonryOptions" [useImagesLoaded]="true">
