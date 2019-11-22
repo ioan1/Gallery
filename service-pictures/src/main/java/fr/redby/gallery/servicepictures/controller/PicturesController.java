@@ -38,6 +38,16 @@ import java.net.URLDecoder;
         return service.listPictures(category, album);
     }
 
+    @RequestMapping(value = "/picture/medium/**", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    public byte[] getMedium(final HttpServletRequest request) throws IOException {
+        String requestURL = request.getRequestURL().toString();
+        String file = URLDecoder.decode(requestURL.split("/picture/medium/")[1], "UTF-8");
+
+        File picture = new File(file);
+        LOGGER.info("Reading the medium sized file {}, exists={}", picture.getAbsolutePath(), picture.exists());
+        return service.getMedium(new File(file));
+    }
+
     @RequestMapping(value = "/picture/full/**", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getFull(final HttpServletRequest request) throws IOException {
         String requestURL = request.getRequestURL().toString();

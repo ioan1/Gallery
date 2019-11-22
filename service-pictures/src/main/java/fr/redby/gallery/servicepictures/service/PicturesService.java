@@ -88,4 +88,22 @@ public class PicturesService {
         }
     }
 
+    /**
+     * Returns a medium sized image of the picture.
+     * @param picture the picture file
+     * @return a table of bytes representing a JPG of the thumbnail.
+     * @throws IOException any IO error is returned to the calling method.
+     */
+    public byte[] getMedium(final File picture) throws IOException {
+        LOGGER.info("Reading the file {}, exists={}.", picture.getAbsolutePath(), picture.exists());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Thumbnails.of(picture)
+                .size(1080, 1080)
+                .keepAspectRatio(true)
+                .outputFormat("jpg")
+                .toOutputStream(out);
+
+        return out.toByteArray();
+    }
 }

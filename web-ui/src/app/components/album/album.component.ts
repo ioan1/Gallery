@@ -48,7 +48,7 @@ export class AlbumComponent implements OnInit {
   startGallery() {
     this.gallery = new Viewer(document.getElementById('pictures'), {
       url(image) {
-        return image.src.replace('/small/', '/full/');
+        return image.src.replace('/small/', '/medium/');
       },
     });
     console.log('Starting the gallery');
