@@ -4,6 +4,7 @@ import { DashboardComponent } from '../../components/dashboard/dashboard.compone
 import { UserProfileComponent } from '../../user-profile/user-profile.component';
 import { CategoryComponent } from '../../components/category/category.component';
 import { AlbumComponent } from '../../components/album/album.component';
+import { SearchComponent } from '../../components/search/search.component';
 import { TypographyComponent } from '../../typography/typography.component';
 import { IconsComponent } from '../../icons/icons.component';
 import { MapsComponent } from '../../maps/maps.component';
@@ -13,6 +14,7 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'dashboard',                        component: DashboardComponent },
     { path: 'user-profile',                     component: UserProfileComponent },
     { path: 'category/:id',                     component: CategoryComponent },
+    { path: 'search/:keyword',                  component: SearchComponent },
     { path: 'category/:idcat/album/:idalbum',   component: AlbumComponent },
     { path: 'typography',                       component: TypographyComponent },
     { path: 'icons',                            component: IconsComponent },

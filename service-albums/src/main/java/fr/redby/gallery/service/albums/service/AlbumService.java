@@ -23,7 +23,12 @@ public class AlbumService {
     @Autowired
     private AlbumRepository repository;
 
-    public List<Album> getAlbums(final @PathVariable String category) {
+    /**
+     * TODO.
+     * @param category
+     * @return
+     */
+    public List<Album> listAlbums(final @PathVariable String category) {
         LOGGER.info("Getting albums for the category {}", category);
         File directory = new File(System.getProperty(GALLERY_PATH) + File.separator + category);
 
@@ -43,6 +48,17 @@ public class AlbumService {
                 return new ArrayList<>();
             }
         }
+    }
+
+    /**
+     * TODO.
+     * @param keyword
+     * @return
+     */
+    public List<Album> searchAlbums(final String keyword) {
+        LOGGER.info("Searching for albums with keyword {}", keyword);
+
+        return new ArrayList<>();
     }
 
 }

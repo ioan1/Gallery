@@ -7,6 +7,7 @@ import { DashboardComponent } from '../../components/dashboard/dashboard.compone
 import { UserProfileComponent } from '../../user-profile/user-profile.component';
 import { CategoryComponent } from '../../components/category/category.component';
 import { AlbumComponent } from '../../components/album/album.component';
+import { SearchComponent } from '../../components/search/search.component';
 import { TypographyComponent } from '../../typography/typography.component';
 import { IconsComponent } from '../../icons/icons.component';
 import { MapsComponent } from '../../maps/maps.component';
@@ -49,6 +50,7 @@ import {
     DashboardThumbnailsCacheComponent,
     UserProfileComponent,
     CategoryComponent,
+    SearchComponent,
     AlbumComponent,
     TypographyComponent,
     IconsComponent,

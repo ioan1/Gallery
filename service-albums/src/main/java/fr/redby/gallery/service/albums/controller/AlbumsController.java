@@ -30,9 +30,17 @@ public class AlbumsController {
     /**
      * @return Service retrieving all albums (folder names) and returns them as-is.
      */
-    @RequestMapping(value = "/albums/{category}", method = RequestMethod.GET)
-    public List<Album> getAlbums(final @PathVariable String category) {
-        return service.getAlbums(category);
+    @RequestMapping(value = "/albums/list/{category}", method = RequestMethod.GET)
+    public List<Album> listAlbums(final @PathVariable String category) {
+        return service.listAlbums(category);
+    }
+
+    /**
+     * @return Service searching for all albums matching the keyword.
+     */
+    @RequestMapping(value = "/albums/search/{keyword}", method = RequestMethod.GET)
+    public List<Album> searchAlbums(final @PathVariable String keyword) {
+        return service.searchAlbums(keyword);
     }
 
 }
