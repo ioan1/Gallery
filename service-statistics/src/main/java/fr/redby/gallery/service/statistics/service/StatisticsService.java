@@ -4,7 +4,9 @@ import fr.redby.gallery.service.statistics.beans.*;
 import fr.redby.gallery.service.statistics.repositories.PicturesPerYearRepository;
 import fr.redby.gallery.service.statistics.repositories.SizePerYearRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 
 import java.io.File;
 import java.io.IOException;
@@ -99,5 +101,13 @@ public class StatisticsService {
         List<PicturesPerYear> all = picturesPerYearRepository.findAll();
         Collections.sort(all);
         return new PicturesPerYearWrapper(all);
+    }
+
+    /**
+     * todo.
+     * @return
+     */
+    public Long getCachedThumbnails() {
+        return new Jedis("redis").dbSize();
     }
 }

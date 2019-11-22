@@ -27,6 +27,11 @@
 			<version>Lovelace-SR9</version>
 			<type>pom</type>
 		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>3.1.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

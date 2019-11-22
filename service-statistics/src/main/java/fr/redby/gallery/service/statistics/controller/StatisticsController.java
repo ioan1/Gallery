@@ -39,6 +39,11 @@ public class StatisticsController {
         return service.getWaitForProcessing();
     }
 
+    @RequestMapping(value = "cachedThumbnails", method = RequestMethod.GET)
+    public Long getCachedThumbnails() throws IOException {
+        return service.getCachedThumbnails();
+    }
+
     @RequestMapping (value = "sizePerYear", method = RequestMethod.GET)
     public SizePerYear getFilesPerYear() throws IOException {
         return service.getSizePerYear();

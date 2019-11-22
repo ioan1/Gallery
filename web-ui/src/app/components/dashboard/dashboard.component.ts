@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import * as Chartist from 'chartist';
-import {StatisticsService} from "../../services/statistics.service";
 
 @Component({
   selector: 'app-dashboard',
