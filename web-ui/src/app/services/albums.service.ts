@@ -10,7 +10,7 @@ export class AlbumsService {
     }
 
     getAlbums(category) {
-        return this.http.get('https://gallery.redby.fr/rest/albums/list' + category);
+        return this.http.get('https://gallery.redby.fr/rest/albums/list/' + category);
     }
 
     searchAlbums(keyword: string) {
