@@ -10,19 +10,20 @@ import {AlbumsService} from "../../services/albums.service";
 export class SearchComponent implements OnInit {
 
   keyword: string;
-  results: any;
+  albums: any;
 
   constructor(private route: ActivatedRoute,
               public albumsService: AlbumsService) { }
 
   ngOnInit() {
 
+    // Search for albums
     this.route.paramMap.subscribe(pageParameters => {
       this.keyword = pageParameters.get('keyword');
       // Fetch the albums within this category
       this.albumsService.searchAlbums(this.keyword).subscribe((data: {}) => {
-        this.results = data;
-        console.log("Got search results: " + data);
+        this.albums = data;
+        console.log("Got albums search results: " + data);
       })
     });
 

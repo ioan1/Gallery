@@ -11,12 +11,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 /**
  * @author Ioan Bernevig
  * @version $Revision$
  */
-public class Album {
+public class Album implements Comparable{
 
     private static final Logger LOGGER = LoggerFactory.getLogger( Album.class );
 
@@ -26,10 +27,15 @@ public class Album {
     @Id
     private String id;
     private String path;
+    @Transient
     private List<File> files;
     private int pictures;
     private int videos;
     private int others;
+
+    public Album() {
+        super();
+    }
 
     public Album(final String category, final File directory) {
         this.category = category;
@@ -51,6 +57,9 @@ public class Album {
 
         // Parse the files and get the number of pictures, videos and other files.
         this.files = parseDirectory(directory);
+        this.pictures = (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.PICTURE)).count();
+        this.videos = (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.VIDEO)).count();
+        this.others = (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.OTHER)).count();
     }
 
     /**
@@ -92,15 +101,28 @@ public class Album {
     }
 
     public int getPictures() {
-        return (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.PICTURE)).count();
+        return pictures;
     }
 
     public int getVideos() {
-        return (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.VIDEO)).count();
+        return videos;
     }
 
     public int getOthers() {
-        return (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.OTHER)).count();
+        return others;
     }
 
+    @Override
+    public int compareTo(Object o) {
+        Album other = (Album) o;
+        if (this.category.equals(other.category)) {
+            return this.category.compareTo(other.category);
+        } else {
+            if (this.date != null && other.date != null) {
+                return this.date.compareTo(other.date);
+            } else {
+                return this.name.compareTo(other.name);
+            }
+        }
+    }
 }

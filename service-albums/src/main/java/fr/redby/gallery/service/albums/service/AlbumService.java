@@ -32,17 +32,18 @@ public class AlbumService {
         LOGGER.info("Getting albums for the category {}", category);
         File directory = new File(System.getProperty(GALLERY_PATH) + File.separator + category);
 
-        List<Album> cached = repository.findAll();
+        List<Album> cached = repository.findByCategory(category);
         if (cached != null && !cached.isEmpty()) {
             LOGGER.info("Returning {} albums cached from the database.", cached.size());
             return cached;
         } else {
             LOGGER.info("Parsing {} and saving the albums to the database.", directory.getAbsolutePath());
             if (directory.isDirectory()) {
-                return Arrays.stream(directory.listFiles(f -> f.isDirectory()))
-                        .peek(f -> LOGGER.debug(f.getAbsolutePath()))
-                        .map(f -> new Album(category, f))
+                List<Album> res = Arrays.stream(directory.listFiles(f -> f.isDirectory()))
+                        .peek(f -> LOGGER.debug(f.getAbsolutePath())).map(f -> new Album(category, f))
                         .collect(Collectors.toList());
+                repository.saveAll(res);
+                return res;
             } else {
                 LOGGER.error("The provided path is not a folder.");
                 return new ArrayList<>();
@@ -57,8 +58,11 @@ public class AlbumService {
      */
     public List<Album> searchAlbums(final String keyword) {
         LOGGER.info("Searching for albums with keyword {}", keyword);
-
-        return new ArrayList<>();
+        List<Album> res =
+                repository.findAll().stream().filter(a -> a.getName().toLowerCase().contains(keyword.toLowerCase())).sorted()
+                        .collect(Collectors.toList());
+        LOGGER.info("Found {} albums matching the search criteria.", res.size());
+        return res;
     }
 
 }

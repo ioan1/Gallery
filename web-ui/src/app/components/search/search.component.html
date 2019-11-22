@@ -32,24 +32,24 @@
                               </th>
                           </thead>
                           <tbody>
-                              <tr>
+                              <tr *ngFor="let album of albums" [routerLink]="['/category', album.category, 'album', album.id]">
                                   <td>
-                                      2009
+                                      {{album.category}}
                                   </td>
                                   <td>
-                                      01/01/2009
-                                  </td>
-                                  <td class="text-primary">
-                                      Super photo album
+                                      {{album.date}}
                                   </td>
                                   <td>
-                                      13
+                                      {{album.name}}
                                   </td>
                                   <td>
-                                      1
+                                      {{album.pictures}}
                                   </td>
                                   <td>
-                                      2
+                                      {{album.videos}}
+                                  </td>
+                                  <td>
+                                      {{album.others}}
                                   </td>
                               </tr>
                           </tbody>
