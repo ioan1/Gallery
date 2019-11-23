@@ -9,7 +9,13 @@
                   <p class="card-category"> {{keyword}}</p>
               </div>
               <div class="card-body">
-                  <div class="table-responsive">
+
+                  <!-- Message informing that there is no search result -->
+                  <div class="alert alert-info" *ngIf="albums.length === 0">
+                      <span>There is no album/picture found. Please review your keyword...</span>
+                  </div>
+                  <!-- Show the results table -->
+                  <div class="table-responsive" *ngIf="albums.length > 0">
                       <table class="table">
                           <thead class=" text-primary">
                               <th>
