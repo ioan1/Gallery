@@ -18,6 +18,8 @@ services:
       - /gallery:/gallery
     ports:
       - "8085:8085"
+    deploy:
+      replicas: 5
   service-statistics:
     image: "docker.redby.fr/gallery/service-statistics:latest"
     volumes:
