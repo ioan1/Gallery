@@ -32,7 +32,6 @@ services:
       - "4200:4200"
   mongo:
     image: mongo
-    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
@@ -40,7 +39,6 @@ services:
       - "27017:27017"
   redis:
     image: redis
-    restart: always
   service-scheduler:
     image: "docker.redby.fr/gallery/service-scheduler:latest"
     ports:
