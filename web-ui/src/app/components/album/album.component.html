@@ -7,6 +7,12 @@
                         <h4 class="card-title mt-0">{{album}}</h4>
                         <p class="card-category"><a [routerLink]="['/category', category]">{{category}}</a></p>
                     </div>
+                    <div id="progress" class="alert alert-warning" *ngIf="this.picturesLoaded !== this.pictures.length">
+                        <button mat-button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <i class="material-icons">close</i>
+                        </button>
+                        <span><b> Warning - </b> Loading of pictures in progress <b>({{picturesLoaded}} / {{pictures.length}}</b>). Please wait...</span>
+                    </div>
                     <div id="pictures" class="card-body pictures">
                         <ngx-masonry [options]="masonryOptions" [useImagesLoaded]="true">
                             <div ngxMasonryItem class="masonry-item" *ngFor="let picture of pictures">
