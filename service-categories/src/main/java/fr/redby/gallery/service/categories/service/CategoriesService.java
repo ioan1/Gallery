@@ -53,10 +53,10 @@ public class CategoriesService {
     }
 
     /**
-     * TODO.
+     * Utility method to stipulate if the provided input is a valid integer or not.
      *
-     * @param strNum
-     * @return
+     * @param strNum input value
+     * @return true or false whether it's an integer or not.
      */
     private boolean isNumeric(String strNum) {
         try {

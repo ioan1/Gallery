@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,14 +19,15 @@ public class AlbumService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AlbumService.class );
     public static final String GALLERY_PATH = "GALLERY_PATH";
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     @Autowired
     private AlbumRepository repository;
 
     /**
-     * TODO.
-     * @param category
-     * @return
+     * Gets all albums for a given category.
+     * @param category the category
+     * @return list of albums matching the selected criteria.
      */
     public List<Album> listAlbums(final @PathVariable String category) {
         LOGGER.info("Getting albums for the category {}", category);
@@ -51,22 +53,44 @@ public class AlbumService {
     }
 
     /**
-     * TODO.
-     * @param keyword
-     * @return
+     * Search for albums using a keyword on the name as well as the date.
+     * @param keyword the keyword to use
+     * @return a search result
      */
     public List<Album> searchAlbums(final String keyword) {
         LOGGER.info("Searching for albums with keyword {}", keyword);
         List<Album> res =
-                repository.findAll().stream().filter(a -> a.getName().toLowerCase().contains(keyword.toLowerCase())).sorted()
+                repository.findAll()
+                        .stream()
+                        .filter(f -> searchAlbums(keyword, f))
+                        .sorted()
                         .collect(Collectors.toList());
         LOGGER.info("Found {} albums matching the search criteria.", res.size());
         return res;
     }
 
     /**
-     * TODO.
-     * @return
+     * Checks if a given album is matching the search criteria.
+     * Checks on name and date.
+     * @param keyword the keyword
+     * @param album the album
+     * @return boolean (matching or not).
+     */
+    private boolean searchAlbums(final String keyword, final Album album) {
+        if (album.getName() == null)
+            return false;
+        boolean nameCheck = album
+                .getName()
+                .toLowerCase()
+                .contains(keyword.toLowerCase());
+        boolean dateCheck = album.getDate() != null && SIMPLE_DATE_FORMAT.format(album.getDate()).contains(keyword);
+        return nameCheck || dateCheck;
+    }
+
+    /**
+     * Re-discover all albums and collect basic statistics.
+     * Stores the result in the DB.
+     * @return the albums discovered by category
      */
     public Map<String, List<Album>> discoverAlbums() {
         Map<String, List<Album>> res = new HashMap<>();
@@ -82,10 +106,10 @@ public class AlbumService {
     }
 
     /**
-     * TODO.
+     * Utility method to stipulate if the provided input is a valid integer or not.
      *
-     * @param strNum
-     * @return
+     * @param strNum input value
+     * @return true or false whether it's an integer or not.
      */
     private boolean isNumeric(String strNum) {
         try {

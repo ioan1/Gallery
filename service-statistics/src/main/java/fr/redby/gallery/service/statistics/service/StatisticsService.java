@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO.
+ * Service dedicated to any statistical processing.
  */
 @Service
 public class StatisticsService {
@@ -36,8 +36,8 @@ public class StatisticsService {
     private PicturesPerYearRepository picturesPerYearRepository;
 
     /**
-     * TODO.
-     * @return
+     * Returns the disk usage (free space vs used).
+     * @return DiskUsage entity
      */
     public DiskUsage getDiskUsage() {
         File root = new File(System.getProperty("GALLERY_PATH"));
@@ -52,9 +52,9 @@ public class StatisticsService {
     }
 
     /**
-     * TODO.
-     * @return
-     * @throws IOException
+     * Returns the sizes of each category per year.
+     * @return Everything is wrapped into a SizePerYear entity.
+     * @throws IOException any error is returned to the calling method.
      */
     public SizePerYear getSizePerYear() throws IOException {
         Optional<SizePerYear> existing = sizePerYearRepository.findById(SizePerYearRepository.STAT_IDENTIFIER);
@@ -82,9 +82,8 @@ public class StatisticsService {
     }
 
     /**
-     * TODO.
-     * @return
-     * @throws IOException
+     * @return the number of images waiting to be processed.
+     * @throws IOException Any error is returned to the calling method.
      */
     public Long getWaitForProcessing() throws IOException {
         File root = new File(System.getProperty("GALLERY_PATH") + File.separator + WAIT_FOR_PROCESSING);
@@ -104,8 +103,7 @@ public class StatisticsService {
     }
 
     /**
-     * todo.
-     * @return
+     * @return the number of thumbnails that are cached in the redis database.
      */
     public Long getCachedThumbnails() {
         return new Jedis("redis").dbSize();

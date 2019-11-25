@@ -1,11 +1,7 @@
-/**
- * Copyright European Commission's
- * Taxation and Customs Union Directorate-General (DG TAXUD).
- */
 package fr.redby.gallery.service.statistics.beans;
 
 /**
- * TODO.
+ * Entity holding the disk usage statistics (used vs available).
  * @author FITSDEV3
  * @version $Revision$
  */

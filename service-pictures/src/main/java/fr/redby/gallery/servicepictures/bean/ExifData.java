@@ -52,9 +52,11 @@ public class ExifData implements Serializable {
     }
 
     /**
-     * TODO.
-     * @param metadata
-     * @return
+     * Returns a textual value from the metadata. Searches in all Exif directories.
+     * If none found, returns null.
+     * @param metadata the metadata directory
+     * @param tag the tag to be found
+     * @return the string representation
      */
     private String getStringValue(final Metadata metadata, final int tag) {
         for (Directory dir : metadata.getDirectories()) {
@@ -67,9 +69,9 @@ public class ExifData implements Serializable {
     }
 
     /**
-     * TODO.
-     * @param metadata
-     * @return
+     * Returns the image creation date from the Exif directory.
+     * @param metadata the Exif directories
+     * @return the image creation date
      */
     private Date getImageCreationDate(final Metadata metadata) {
         for (Directory dir : metadata.getDirectories()) {
