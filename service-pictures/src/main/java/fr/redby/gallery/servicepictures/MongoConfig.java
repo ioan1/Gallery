@@ -17,7 +17,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
     @Override
     protected String getDatabaseName() {
-        return "gallery";
+        return "service-pictures";
     }
 
     @Override
