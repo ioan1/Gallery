@@ -75,7 +75,7 @@ public class AlbumService {
         repository.deleteAll();
         File directory = new File(System.getProperty(GALLERY_PATH));
         for (File category : directory.listFiles(f->isNumeric(f.getName()))) {
-            listAlbums(category.getName());
+            res.put(category.getName(), listAlbums(category.getName()));
         }
 
         return res;
