@@ -9,9 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.FilenameFilter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,4 +64,35 @@ public class AlbumService {
         return res;
     }
 
+    /**
+     * TODO.
+     * @return
+     */
+    public Map<String, List<Album>> discoverAlbums() {
+        Map<String, List<Album>> res = new HashMap<>();
+
+        LOGGER.info("Discovering all albums.");
+        repository.deleteAll();
+        File directory = new File(System.getProperty(GALLERY_PATH));
+        for (File category : directory.listFiles(f->isNumeric(f.getName()))) {
+            listAlbums(category.getName());
+        }
+
+        return res;
+    }
+
+    /**
+     * TODO.
+     *
+     * @param strNum
+     * @return
+     */
+    private boolean isNumeric(String strNum) {
+        try {
+            Integer i = Integer.parseInt(strNum);
+        } catch (NumberFormatException | NullPointerException nfe) {
+            return false;
+        }
+        return true;
+    }
 }

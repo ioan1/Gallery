@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +27,17 @@ public class AlbumsController {
 
     @Autowired
     private AlbumService service;
+
+    /**
+     * Discovers all existing albums and basic statistics over them.
+     * Meant to be called at regular interval by the scheduler service.
+     * This will be cached into the database allowing the search by example.
+     * @return result of the discovery.
+     */
+    @RequestMapping(value = "/albums/discover", method = RequestMethod.GET)
+    public Map<String, List<Album>> discoverAlbums() {
+        return service.discoverAlbums();
+    }
 
     /**
      * @return Service retrieving all albums (folder names) and returns them as-is.
