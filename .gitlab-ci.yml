@@ -44,7 +44,7 @@ service-albums:
 service-statistics:
   script:
     - cd service-statistics
-    - mvn compile test package
+    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-statistics -Dsonar.host.url=http://192.168.0.111:9000 -Dsonar.login=8d82a0f69c4e86d0a7b03c5c078308fef1ec2726
     - docker build -t docker.redby.fr/gallery/service-statistics .
     - docker push docker.redby.fr/gallery/service-statistics
   only:
@@ -56,7 +56,7 @@ service-statistics:
 service-pictures:
   script:
     - cd service-pictures
-    - mvn compile test package
+    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-pictures -Dsonar.host.url=http://192.168.0.111:9000 -Dsonar.login=8d82a0f69c4e86d0a7b03c5c078308fef1ec2726
     - docker build -t docker.redby.fr/gallery/service-pictures .
     - docker push docker.redby.fr/gallery/service-pictures
   only:
