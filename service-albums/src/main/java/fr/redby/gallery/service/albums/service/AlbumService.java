@@ -19,7 +19,7 @@ public class AlbumService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AlbumService.class );
     public static final String GALLERY_PATH = "GALLERY_PATH";
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     @Autowired
     private AlbumRepository repository;
@@ -83,7 +83,7 @@ public class AlbumService {
                 .getName()
                 .toLowerCase()
                 .contains(keyword.toLowerCase());
-        boolean dateCheck = album.getDate() != null && SIMPLE_DATE_FORMAT.format(album.getDate()).contains(keyword);
+        boolean dateCheck = album.getDate() != null && simpleDateFormat.format(album.getDate()).contains(keyword);
         return nameCheck || dateCheck;
     }
 

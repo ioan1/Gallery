@@ -35,7 +35,4 @@ public enum TypeOfFile {
         return extensions;
     }
 
-    public void setExtensions(String[] extensions) {
-        this.extensions = extensions;
-    }
 }
