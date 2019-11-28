@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Service dedicated to the management of pictures.
@@ -74,22 +76,27 @@ public class ExifService {
      * @param category the category/year
      * @return the number of pictures discovered
      */
-    public Long discoverCategory(final String category) throws IOException {
+    public Long discoverCategory(final String category) {
         File folder = new File(new File(System.getProperty(GALLERY_PATH)), category);
         LOGGER.info("Discovering EXIF information on all pictures located in {}, exists={}.", folder.getAbsolutePath(), folder.exists());
-        return Files.walk(folder.toPath())
-                .map(p -> p.toFile())
-                .filter(f -> f.isFile())
-                .filter(f->f.getName().toLowerCase().endsWith(".jpg"))
-                .peek(f -> LOGGER.debug("Triggering the discovering of Exif data for {}.", f.getAbsolutePath()))
-                .peek(f -> {
-                    try {
-                        getExifData(f);
-                    } catch (IOException | ImageProcessingException e) {
-                        LOGGER.error("Error when getting Exif data for {}.", f);
-                    }
-                })
-                .count();
+        try (Stream<Path> stream = Files.walk(folder.toPath())) {
+            return stream
+                    .map(p -> p.toFile())
+                    .filter(f -> f.isFile())
+                    .filter(f->f.getName().toLowerCase().endsWith(".jpg"))
+                    .peek(f -> LOGGER.debug("Triggering the discovering of Exif data for {}.", f.getAbsolutePath()))
+                    .peek(f -> {
+                        try {
+                            getExifData(f);
+                        } catch (IOException | ImageProcessingException e) {
+                            LOGGER.error("Error when getting Exif data for {}.", f);
+                        }
+                    })
+                    .count();
+        } catch (IOException e) {
+            LOGGER.error("Error when discovering categories.", e);
+            return null;
+        }
     }
 
 }
