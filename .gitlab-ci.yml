@@ -20,7 +20,8 @@ service-scheduler:
 service-categories:
   script:
     - cd service-categories
-    - mvn compile test package
+    - mvn sonar:sonar -Dsonar.projectKey=service-categories -Dsonar.host.url=http://192.168.0.111:9000 -Dsonar.login=8d82a0f69c4e86d0a7b03c5c078308fef1ec2726
+    - mvn clean compile test package
     - docker build -t docker.redby.fr/gallery/service-categories .
     - docker push docker.redby.fr/gallery/service-categories
   only:
@@ -33,7 +34,7 @@ service-albums:
   script:
     - cd service-albums
     - mvn sonar:sonar -Dsonar.projectKey=service-albums -Dsonar.host.url=http://192.168.0.111:9000 -Dsonar.login=8d82a0f69c4e86d0a7b03c5c078308fef1ec2726
-    - mvn compile test package
+    - mvn clean compile test package
     - docker build -t docker.redby.fr/gallery/service-albums .
     - docker push docker.redby.fr/gallery/service-albums
   only:
