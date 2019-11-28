@@ -91,7 +91,9 @@ import org.slf4j.LoggerFactory;
      */
     public Long getWaitForProcessing() throws IOException {
         File root = new File(System.getProperty("GALLERY_PATH") + File.separator + WAIT_FOR_PROCESSING);
-        return Files.walk(root.toPath()).filter(p -> p.toFile().isFile()).count();
+        try (Stream<Path> stream = Files.walk(root.toPath())) {
+            return stream.filter(p -> p.toFile().isFile()).count();
+        }
     }
 
     /**
