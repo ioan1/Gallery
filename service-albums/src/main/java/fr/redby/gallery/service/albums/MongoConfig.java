@@ -12,8 +12,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories(basePackages = "fr.redby.gallery.service.albums")
 public class MongoConfig extends AbstractMongoConfiguration {
 
-    public static final String HOST = "192.168.0.63";
-    public static final int PORT = 27017;
+    private static final String HOST = "192.168.0.63";
+    private static final int PORT = 27017;
 
     @Override
     protected String getDatabaseName() {
