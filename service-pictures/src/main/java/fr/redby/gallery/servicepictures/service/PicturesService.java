@@ -26,6 +26,7 @@ public class PicturesService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( PicturesService.class );
     public static final String GALLERY_PATH = "GALLERY_PATH";
+    public static final String REDIS = "redis";
 
     @Autowired
     private ExifDataRepository exifDataRepository;
@@ -70,27 +71,29 @@ public class PicturesService {
     public byte[] getSmall(final File picture, final int size) throws IOException {
         LOGGER.info("Reading the file {}, exists={}.", picture.getAbsolutePath(), picture.exists());
 
-        Jedis jedis = new Jedis("redis");
-        LOGGER.info("Getting response from the cache server: {}", jedis.ping());
+        try (Jedis jedis = new Jedis(REDIS)) {
+            LOGGER.info("Getting response from the cache server: {}", jedis.ping());
 
-        byte[] cached = jedis.get(picture.getAbsolutePath().getBytes());
-        if (cached != null) {
-            LOGGER.info("Return cached thumbnail for {}.", picture.getAbsolutePath());
-            return cached;
-        } else {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            Thumbnails.of(picture)
-                    .size(size, size)
-                    .crop(Positions.CENTER)
-                    .keepAspectRatio(true)
-                    .outputFormat("jpg")
-                    .toOutputStream(out);
-            byte[] res = out.toByteArray();
+            byte[] cached = jedis.get(picture.getAbsolutePath().getBytes());
+            if (cached != null) {
+                LOGGER.info("Return cached thumbnail for {}.", picture.getAbsolutePath());
+                return cached;
+            } else {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                Thumbnails.of(picture)
+                        .size(size, size)
+                        .crop(Positions.CENTER)
+                        .keepAspectRatio(true)
+                        .outputFormat("jpg")
+                        .toOutputStream(out);
+                byte[] res = out.toByteArray();
 
-            LOGGER.info("Caching the thumbnail for {}.", picture.getAbsolutePath());
-            jedis.set(picture.getAbsolutePath().getBytes(), res);
-            return out.toByteArray();
+                LOGGER.info("Caching the thumbnail for {}.", picture.getAbsolutePath());
+                jedis.set(picture.getAbsolutePath().getBytes(), res);
+                return out.toByteArray();
+            }
         }
+        
     }
 
     /**
