@@ -28,6 +28,7 @@ public class StatisticsService {
 
     private static final long GB = 1024l*1024l*1024l;
     private static final String WAIT_FOR_PROCESSING = "A_TRIER";
+    private static final String REDIS = "redis";
 
     @Autowired
     private SizePerYearRepository sizePerYearRepository;
@@ -106,6 +107,8 @@ public class StatisticsService {
      * @return the number of thumbnails that are cached in the redis database.
      */
     public Long getCachedThumbnails() {
-        return new Jedis("redis").dbSize();
+        try (Jedis db = new Jedis(REDIS)) {
+            return db.dbSize();
+        }
     }
 }
