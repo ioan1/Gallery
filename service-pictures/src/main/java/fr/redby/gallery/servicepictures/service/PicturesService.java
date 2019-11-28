@@ -12,9 +12,11 @@ import redis.clients.jedis.Jedis;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Service dedicated to the management of pictures.
@@ -33,26 +35,29 @@ public class PicturesService {
      * @param category the category
      * @param album the album name
      * @return a list of Picture objects.
-     * @throws IOException any error is returned to the calling method.
      */
-    public List<Picture> listPictures(final String category, final String album)
-            throws IOException {
+    public List<Picture> listPictures(final String category, final String album) {
         File directory = new File(System.getProperty(GALLERY_PATH));
         LOGGER.info("gallery directory: {}", directory);
         File folder = new File(directory, category + File.separator + album);
         LOGGER.info("Listing all pictures located in {}, exists={}.", folder.getAbsolutePath(), folder.exists());
 
         if (folder.isDirectory()) {
-            return Files.walk(folder.toPath())
-                    .map(p -> p.toFile())
-                    .filter(f -> f.isFile())
-                    .filter(f->f.getName().toLowerCase().endsWith(".jpg"))
-                    .peek(f -> LOGGER.debug(f.getAbsolutePath()))
-                    .map(f -> new Picture(category, album, f))
-                    .collect(Collectors.toList());
+            try (Stream<Path> stream = Files.walk(folder.toPath())) {
+                return stream
+                        .map(p -> p.toFile())
+                        .filter(f -> f.isFile())
+                        .filter(f->f.getName().toLowerCase().endsWith(".jpg"))
+                        .peek(f -> LOGGER.debug(f.getAbsolutePath()))
+                        .map(f -> new Picture(category, album, f))
+                        .collect(Collectors.toList());
+            } catch (IOException e) {
+                LOGGER.error("Error when listing pictures.", e);
+                return new ArrayList<>();
+            }
         } else {
             return new ArrayList<>();
-        }
+    }
     }
 
     /**
