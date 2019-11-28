@@ -26,7 +26,7 @@ public class StatisticsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( StatisticsService.class );
 
-    private static final long GB = 1024*1024*1024;
+    private static final long GB = 1024l*1024l*1024l;
     private static final String WAIT_FOR_PROCESSING = "A_TRIER";
 
     @Autowired
