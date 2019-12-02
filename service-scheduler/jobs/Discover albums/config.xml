@@ -16,7 +16,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>curl http://192.168.0.63:8084/albums/discover</command>
+      <command>curl http://service-albums:8084/albums/discover</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

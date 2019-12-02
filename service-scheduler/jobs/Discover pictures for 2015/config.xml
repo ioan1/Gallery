@@ -16,7 +16,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>curl http://192.168.0.63:8085/exif/discover/2015</command>
+      <command>curl http://service-pictures:8085/exif/discover/2015</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
