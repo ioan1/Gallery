@@ -3,15 +3,27 @@ package fr.redby.gallery.service.statistics.beans;
 import java.io.Serializable;
 import java.util.Calendar;
 
+/**
+ * Class wrapping a X and Y data for 2d graphics visualization.
+ */
 public class DataType implements Serializable, Comparable<DataType> {
-    public long x;
-    public int y;
 
+    private long x;
+    private int y;
+
+    /**
+     * Default constructor.
+     */
     public DataType() {
         super();
     }
 
-    public DataType(int year, int folderSize) {
+    /**
+     * Default constructor taking as parameter a year (x axis) and a folder size (Y axis).
+     * @param year X axis
+     * @param folderSize Y axis
+     */
+    public DataType(final int year, final int folderSize) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, year);
         cal.set(Calendar.DAY_OF_YEAR, 1);
@@ -20,23 +32,8 @@ public class DataType implements Serializable, Comparable<DataType> {
         this.y = folderSize;
     }
 
-    public long getX() {
-        return x;
-    }
-
-    public void setX(long x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    @Override public int compareTo(DataType o) {
+    @Override
+    public int compareTo(DataType o) {
         return new Long(x).compareTo(new Long(o.x));
     }
 }

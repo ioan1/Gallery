@@ -14,6 +14,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
 /**
+ * Class wrapping an album.
  * @author Ioan Bernevig
  * @version $Revision$
  */
@@ -33,10 +34,18 @@ public class Album implements Comparable{
     private int videos;
     private int others;
 
+    /**
+     * Default constructor.
+     */
     public Album() {
         super();
     }
 
+    /**
+     * Copy constructor considering a category and a folder.
+     * @param category the year
+     * @param directory the folder of the current album
+     */
     public Album(final String category, final File directory) {
         this.category = category;
         this.name = directory.getName();
@@ -65,51 +74,27 @@ public class Album implements Comparable{
     /**
      * Returns ALL files within the album.
      *
-     * @param directory
-     * @return
+     * @param directory the directory to parse
+     * @return a list of directories
      */
     private List<File> parseDirectory(File directory) {
-        List<File> files = new ArrayList<>();
+        List<File> items = new ArrayList<>();
         LOGGER.info("parseDirectory in {}, exists={}.", directory.getPath(), directory.exists());
         for (File file : directory.listFiles()) {
-            files.add(file);
+            items.add(file);
             if (file.isDirectory()) {
-                files.addAll(parseDirectory(file));
+                items.addAll(parseDirectory(file));
             }
         }
-        return files;
-    }
-
-    public String getCategory() {
-        return category;
+        return items;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
     public Date getDate() {
         return date;
-    }
-
-    public int getPictures() {
-        return pictures;
-    }
-
-    public int getVideos() {
-        return videos;
-    }
-
-    public int getOthers() {
-        return others;
     }
 
     @Override
