@@ -98,6 +98,34 @@ public class Album implements Comparable{
         return date;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public List<File> getFiles() {
+        return files;
+    }
+
+    public int getPictures() {
+        return pictures;
+    }
+
+    public int getVideos() {
+        return videos;
+    }
+
+    public int getOthers() {
+        return others;
+    }
+
     @Override
     public int compareTo(Object o) {
         Album other = (Album) o;
