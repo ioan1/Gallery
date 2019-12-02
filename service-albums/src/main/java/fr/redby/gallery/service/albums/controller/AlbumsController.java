@@ -2,20 +2,11 @@ package fr.redby.gallery.service.albums.controller;
 
 import fr.redby.gallery.service.albums.bean.Album;
 import fr.redby.gallery.service.albums.service.AlbumService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Service dedicated to the management of albums.
@@ -25,8 +16,12 @@ import java.util.stream.Collectors;
 @RestController
 public class AlbumsController {
 
+    private final AlbumService service;
+
     @Autowired
-    private AlbumService service;
+    public AlbumsController(AlbumService service) {
+        this.service = service;
+    }
 
     /**
      * Discovers all existing albums and basic statistics over them.
@@ -34,7 +29,7 @@ public class AlbumsController {
      * This will be cached into the database allowing the search by example.
      * @return result of the discovery.
      */
-    @RequestMapping(value = "/albums/discover", method = RequestMethod.GET)
+    @GetMapping("/albums/discover")
     public Map<String, List<Album>> discoverAlbums() {
         return service.discoverAlbums();
     }
@@ -42,7 +37,7 @@ public class AlbumsController {
     /**
      * @return Service retrieving all albums (folder names) and returns them as-is.
      */
-    @RequestMapping(value = "/albums/list/{category}", method = RequestMethod.GET)
+    @GetMapping("/albums/list/{category}")
     public List<Album> listAlbums(final @PathVariable String category) {
         return service.listAlbums(category);
     }
@@ -50,7 +45,7 @@ public class AlbumsController {
     /**
      * @return Service searching for all albums matching the keyword.
      */
-    @RequestMapping(value = "/albums/search/{keyword}", method = RequestMethod.GET)
+    @GetMapping("/albums/search/{keyword}")
     public List<Album> searchAlbums(final @PathVariable String keyword) {
         return service.searchAlbums(keyword);
     }
