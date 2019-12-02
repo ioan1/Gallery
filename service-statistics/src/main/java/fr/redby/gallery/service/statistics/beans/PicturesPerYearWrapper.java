@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@SuppressWarnings("squid:S1068")
 public class PicturesPerYearWrapper implements Serializable {
 
     @JsonFormat(pattern = "dd/MM/yyyy")
@@ -19,15 +20,8 @@ public class PicturesPerYearWrapper implements Serializable {
         this.data = data;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
     public List<PicturesPerYear> getData() {
         return data;
     }
 
-    public String getName() {
-        return name;
-    }
 }

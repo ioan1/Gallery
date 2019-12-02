@@ -8,6 +8,7 @@ import java.util.Calendar;
 /**
  * Wrapper class for the pictures per year statistics graph.
  */
+@SuppressWarnings("squid:S1068")
 public class PicturesPerYear implements Serializable, Comparable<PicturesPerYear> {
 
     @Id

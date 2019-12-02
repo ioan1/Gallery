@@ -9,6 +9,7 @@ import java.util.Objects;
 /**
  * Class wrapping a category (year).
  */
+@SuppressWarnings("squid:S1068")
 public class Category implements Serializable, Comparable {
     @Id
     private String name;

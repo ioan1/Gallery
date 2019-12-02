@@ -6,6 +6,7 @@ import java.util.Calendar;
 /**
  * Class wrapping a X and Y data for 2d graphics visualization.
  */
+@SuppressWarnings("squid:S1068")
 public class DataType implements Serializable, Comparable<DataType> {
 
     private long x;

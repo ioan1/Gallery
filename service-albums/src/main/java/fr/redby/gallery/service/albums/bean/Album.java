@@ -18,6 +18,7 @@ import org.springframework.data.annotation.Transient;
  * @author Ioan Bernevig
  * @version $Revision$
  */
+@SuppressWarnings("squid:S1068")
 public class Album implements Comparable{
 
     private static final Logger LOGGER = LoggerFactory.getLogger( Album.class );

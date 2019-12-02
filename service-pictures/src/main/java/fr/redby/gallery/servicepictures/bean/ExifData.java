@@ -13,6 +13,11 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * Class wrapping the Exif data of a picture.
+ * Extracted from all JPEG files.
+ */
+@SuppressWarnings("squid:S1068")
 public class ExifData implements Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ExifData.class );
@@ -83,16 +88,6 @@ public class ExifData implements Serializable {
         return null;
     }
 
-    public String getId() { return id; }
-
-    public HashMap<String, List<ExifTag>> getDirectories() {
-        return directories;
-    }
-
-    public Date getDateDiscovery() {
-        return dateDiscovery;
-    }
-
     public String getCameraMake() {
         return cameraMake;
     }
@@ -105,7 +100,4 @@ public class ExifData implements Serializable {
         return dateTaken;
     }
 
-    public void setDirectories(HashMap<String, List<ExifTag>> directories) {
-        this.directories = directories;
-    }
 }

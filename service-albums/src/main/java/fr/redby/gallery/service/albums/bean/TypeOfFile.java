@@ -7,12 +7,22 @@ package fr.redby.gallery.service.albums.bean;
 import java.io.File;
 
 /**
+ * Enumeration providing the list of files supported by the gallery.
  * @author FITSDEV3
  * @version $Revision$
  */
 public enum TypeOfFile {
+    /**
+     * any kind of picture.
+     */
     PICTURE ("jpg", "png"),
+    /**
+     * any kind of videos.
+     */
     VIDEO ("avi"),
+    /**
+     * other kind of files, including raw pictures.
+     */
     OTHER;
 
     private String[] extensions;

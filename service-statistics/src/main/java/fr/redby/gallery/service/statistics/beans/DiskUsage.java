@@ -5,6 +5,7 @@ package fr.redby.gallery.service.statistics.beans;
  * @author FITSDEV3
  * @version $Revision$
  */
+@SuppressWarnings("squid:S1068")
 public class DiskUsage {
 
     private int used, available;
