@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,8 +39,8 @@ public class AlbumService {
         } else {
             LOGGER.info("Parsing {} and saving the albums to the database.", directory.getAbsolutePath());
             if (directory.isDirectory()) {
-                List<Album> res = Arrays.stream(directory.listFiles(f -> f.isDirectory()))
-                        .peek(f -> LOGGER.debug(f.getAbsolutePath())).map(f -> new Album(category, f))
+                List<Album> res = Arrays.stream(directory.listFiles(File::isDirectory))
+                        .map(f -> new Album(category, f))
                         .collect(Collectors.toList());
                 repository.saveAll(res);
                 return res;
@@ -113,7 +112,7 @@ public class AlbumService {
      */
     private boolean isNumeric(String strNum) {
         try {
-            Integer i = Integer.parseInt(strNum);
+            Integer.parseInt(strNum);
         } catch (NumberFormatException | NullPointerException nfe) {
             return false;
         }

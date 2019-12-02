@@ -139,4 +139,18 @@ public class Album implements Comparable{
             }
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Album album = (Album) o;
+        return category.equals(album.category) && id.equals(album.id);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(category, id);
+    }
 }

@@ -60,7 +60,7 @@ public class CategoriesService {
      */
     private boolean isNumeric(String strNum) {
         try {
-            Integer i = Integer.parseInt(strNum);
+            Integer.parseInt(strNum);
         } catch (NumberFormatException | NullPointerException nfe) {
             return false;
         }
