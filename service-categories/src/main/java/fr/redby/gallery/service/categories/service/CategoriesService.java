@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,17 +26,16 @@ public class CategoriesService {
     /**
      * @return Service retrieving all categories (folder names) and returns them as-is.
      */
-    @RequestMapping(method = RequestMethod.GET)
     public List<Category> getCategories() {
         List<Category> cached = repository.findAll();
-        if (cached != null && !cached.isEmpty()) {
+        if (cached.isEmpty()) {
             LOGGER.info("Return {} categories from database.", cached.size());
             return cached;
         } else {
             File directory = new File(System.getProperty(GALLERY_PATH));
             if (directory.isDirectory()) {
-                cached = Arrays.stream(directory.listFiles(f -> f.isDirectory()))
-                        .map(f -> new Category(f))
+                cached = Arrays.stream(directory.listFiles(File::isDirectory))
+                        .map(Category::new)
                         .filter(f -> isNumeric(f.getName()))
                         .sorted((o1, o2) -> o2.compareTo(o1))
                         .collect(Collectors.toList());

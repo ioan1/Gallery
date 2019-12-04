@@ -1,5 +1,6 @@
 package fr.redby.gallery.service.categories;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ public class ServiceCategoriesApplicationTests {
 
     @Test
     public void contextLoads() {
+        Assert.assertNotNull(this);
     }
 
 }
