@@ -28,7 +28,7 @@ public class CategoriesService {
      */
     public List<Category> getCategories() {
         List<Category> cached = repository.findAll();
-        if (cached.isEmpty()) {
+        if (!cached.isEmpty()) {
             LOGGER.info("Return {} categories from database.", cached.size());
             return cached;
         } else {
