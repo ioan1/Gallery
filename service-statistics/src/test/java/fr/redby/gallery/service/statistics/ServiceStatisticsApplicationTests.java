@@ -26,21 +26,8 @@ public class ServiceStatisticsApplicationTests {
 	private StatisticsService service;
 
 	@Test
-	public void testDiskUsage() {
-		System.setProperty("GALLERY_PATH", File.listRoots()[0].getAbsolutePath());
-		LOGGER.debug("Start testing disk usage.");
-		DiskUsage diskUsage = service.getDiskUsage();
-		Assert.assertTrue(diskUsage.getAvailable() > 0);
-		Assert.assertTrue(diskUsage.getUsed() > 0);
-		Assert.assertNotNull(diskUsage.getUnit());
-	}
-
-	@Test
-	public void testDiskUsagePerYear() throws IOException {
-		System.setProperty("GALLERY_PATH", File.listRoots()[0].getAbsolutePath());
-		SizePerYear sizePerYear = service.getSizePerYear();
-		Assert.assertEquals("GB", sizePerYear.getUnit());
-		Assert.assertNotNull(sizePerYear.getDate());
+	public void testExample() {
+		// TODO.
 	}
 
 }
