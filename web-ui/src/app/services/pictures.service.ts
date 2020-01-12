@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class PicturesService {
 
   listPictures(category, album) {
     console.log("Listing pictures from category="+category+" and album="+album);
-    return this.http.get('https://gallery.redby.fr/rest/pictures/'+category+'/'+album);
+    return this.http.get(environment.service.pictures.url + '/' + category + '/' + album);
   }
 
 }
