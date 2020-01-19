@@ -18,6 +18,7 @@ import {DashboardPicturesPerYearChartComponent} from "../../components/dashboard
 import {DashboardDiskUsageSummaryComponent} from "../../components/dashboard-disk-usage-summary/dashboard-disk-usage-summary.component";
 import {DashboardProcessingSummaryComponent} from "../../components/dashboard-processing-summary/dashboard-processing-summary.component";
 import {DashboardThumbnailsCacheComponent} from "../../components/dashboard-thumbnails-cache/dashboard-thumbnails-cache.component";
+import {DashboardVersionsComponent} from "../../components/dashboard-versions/dashboard-versions.component";
 
 import {
   MatButtonModule,
@@ -48,6 +49,7 @@ import {
     DashboardDiskUsageSummaryComponent,
     DashboardProcessingSummaryComponent,
     DashboardThumbnailsCacheComponent,
+    DashboardVersionsComponent,
     UserProfileComponent,
     CategoryComponent,
     SearchComponent,
