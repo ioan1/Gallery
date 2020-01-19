@@ -13,5 +13,5 @@ EXPOSE 4200/tcp
 COPY . /app/
 RUN ls -l /app/
 RUN npm install --verbose
-ENTRYPOINT ng serve --host 0.0.0.0 --disableHostCheck --env=prod
+ENTRYPOINT ng serve --host 0.0.0.0 --disableHostCheck
 
