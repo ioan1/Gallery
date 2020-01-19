@@ -12,11 +12,11 @@
       <th>Started since</th>
       </thead>
       <tbody>
-      <tr>
-        <td>service-albums</td>
-        <td>1.0.0-SNAPSHOT</td>
-        <td>25/12/2019 23:12:34</td>
-        <td>24 minutes</td>
+      <tr *ngFor="let item of versions">
+        <td>{{item.id}}</td>
+        <td>{{item.version}}</td>
+        <td>{{item.buildTimestamp}}</td>
+        <td>{{item.uptime}}</td>
       </tr>
       </tbody>
     </table>
