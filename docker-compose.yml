@@ -3,43 +3,53 @@ services:
   service-categories:
     image: "docker.redby.fr/gallery/service-categories:latest"
     volumes:
-      - /gallery:/gallery
+      - ${GALLERY_PATH}:/gallery
     ports:
-      - "8083:8083"
+      - "8083"
   service-albums:
     image: "docker.redby.fr/gallery/service-albums:latest"
     volumes:
-      - /gallery:/gallery
+      - ${GALLERY_PATH}:/gallery
     ports:
-      - "8084:8084"
+      - "8084"
   service-pictures:
     image: "docker.redby.fr/gallery/service-pictures:latest"
     volumes:
-      - /gallery:/gallery
+      - ${GALLERY_PATH}:/gallery
     ports:
-      - "8085:8085"
+      - "8085"
     deploy:
-      replicas: 5
+      replicas: 2
   service-statistics:
     image: "docker.redby.fr/gallery/service-statistics:latest"
     volumes:
-      - /gallery:/gallery
+      - ${GALLERY_PATH}:/gallery
     ports:
-      - "8086:8086"
+      - "8086"
   web-ui:
     image: "docker.redby.fr/gallery/web-ui:latest"
+    #build:
+    #    context: ./web-ui
+    #    dockerfile: Dockerfile
     ports:
-      - "4200:4200"
+      - "4200"
   mongo:
     image: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
-      - "27017:27017"
+      - "27017"
   redis:
     image: redis
   service-scheduler:
     image: "docker.redby.fr/gallery/service-scheduler:latest"
     ports:
-      - "8080:8080"
+      - "8080"
+  reverse-proxy:
+    image: "docker.redby.fr/gallery/reverse-proxy:latest"
+    #build:
+    #  context: ./reverse-proxy
+    #  dockerfile: Dockerfile
+    ports:
+      - "${GALLERY_PORT}:80"

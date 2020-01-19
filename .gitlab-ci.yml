@@ -75,3 +75,14 @@ web-ui:
       - web-ui/**/*
   after_script:
     - rm -rf .git
+
+reverse-proxy:
+  script:
+    - cd reverse-proxy
+    - docker build -t docker.redby.fr/gallery/reverse-proxy .
+    - docker push docker.redby.fr/gallery/reverse-proxy
+  only:
+    changes:
+      - reverse-proxy/**/*
+  after_script:
+    - rm -rf .git
