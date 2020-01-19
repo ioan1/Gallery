@@ -7,16 +7,16 @@ export const environment = {
   production: false,
   service: {
     albums: {
-      url: 'todo'
+      url: '/rest/albums'
     },
     categories: {
-      url: 'todo'
+      url: '/rest/categories'
     },
     pictures: {
-      url: 'todo'
+      url: '/rest/pictures'
     },
     statistics: {
-      url: 'todo'
+      url: '/rest/statistics'
     }
   }
 };
