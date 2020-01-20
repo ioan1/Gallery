@@ -19,13 +19,14 @@ export class MenuComponent implements OnInit {
   constructor(private categoriesService : CategoriesService) { }
 
   ngOnInit() {
-    console.log('on init menu');
-    this.categoriesService.getCategories().forEach(value => {
-      console.log(value);
-      this.appPages.push({
-        title: value.name,
-        url: '/category/' + value.name,
-        icon: 'list'
+    this.categoriesService.getCategories().subscribe(value => {
+      value.forEach(value => {
+        console.log(value);
+        this.appPages.push({
+          title: value.name,
+          url: '/category/' + value.name,
+          icon: 'camera'
+        });
       });
     });
   }
