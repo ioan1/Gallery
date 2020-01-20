@@ -28,11 +28,12 @@ services:
       - "8086"
   web-ui:
     image: "docker.redby.fr/gallery/web-ui:latest"
-    #build:
-    #    context: ./web-ui
-    #    dockerfile: Dockerfile
     ports:
       - "4200"
+  ionic-app:
+    image: "docker.redby.fr/gallery/ionic-app:latest"
+    ports:
+      - "4201"
   mongo:
     image: mongo
     environment:

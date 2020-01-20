@@ -76,6 +76,17 @@ web-ui:
   after_script:
     - rm -rf .git
 
+ionic-app:
+  script:
+    - cd ionic-app
+    - docker build -t docker.redby.fr/gallery/ionic-app .
+    - docker push docker.redby.fr/gallery/ionic-app
+  only:
+    changes:
+      - ionic-app/**/*
+  after_script:
+    - rm -rf .git
+
 reverse-proxy:
   script:
     - cd reverse-proxy
