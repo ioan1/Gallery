@@ -1,0 +1,30 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>
+            Dashboard
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+    <ion-card>
+        <ion-card-header>
+            <ion-card-subtitle>Disk space used</ion-card-subtitle>
+            <ion-card-title>{{diskUsage?.used}} / {{diskUsage?.available}} <small>{{diskUsage?.unit}}</small></ion-card-title>
+        </ion-card-header>
+    </ion-card>
+    <ion-card>
+        <ion-card-header>
+            <ion-card-subtitle>Wait for processing</ion-card-subtitle>
+            <ion-card-title>{{waitForProcessing}} files</ion-card-title>
+        </ion-card-header>
+    </ion-card>
+    <ion-card>
+        <ion-card-header>
+            <ion-card-subtitle>Cache status</ion-card-subtitle>
+            <ion-card-title>{{cachedThumbnails}} <small>thumbnails</small></ion-card-title>
+        </ion-card-header>
+    </ion-card>
+</ion-content>
