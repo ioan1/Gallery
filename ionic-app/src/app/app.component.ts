@@ -14,8 +14,8 @@ export class AppComponent implements OnInit {
 
   categoriesMenu = [
     {
-      title: 'Home',
-      url: '/home',
+      title: 'Dashboard',
+      url: '/dashboard',
       icon: 'home'
     }
   ];
