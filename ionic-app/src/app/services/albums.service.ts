@@ -10,7 +10,7 @@ export class AlbumsService {
 
     constructor(private http: HttpClient) { }
 
-    public getAlbums(category): Observable<Album[]> {
+    public getAlbums(category: Number): Observable<Album[]> {
         return this.http.get<Album[]>('https://gallery.redby.fr/rest/albums/list/' + category);
     }
 
@@ -20,13 +20,13 @@ export class AlbumsService {
 }
 
 export class Album {
-    date: Date;
-    category: Number;
-    name: string;
-    id: string;
-    path: string;
-    files: Number;
-    pictures: Number;
-    videos: Number;
-    others: Number;
+    public date: Date;
+    public category: Number;
+    public name: string;
+    public id: string;
+    public path: string;
+    public files: Number;
+    public pictures: Number;
+    public videos: Number;
+    public others: Number;
 }

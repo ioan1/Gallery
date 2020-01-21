@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
       value.forEach(value => {
         this.categoriesMenu.push({
           title: value.name,
-          url: '/category/' + value.name,
+          url: '/album/' + value.name,
           icon: 'camera'
         });
       });
