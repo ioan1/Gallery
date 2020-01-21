@@ -1,5 +1,5 @@
-import {Injectable, OnInit} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 import {Observable} from "rxjs";
 
 @Injectable({
@@ -7,9 +7,7 @@ import {Observable} from "rxjs";
 })
 export class CategoriesService {
 
-  constructor(private http: HttpClient) {
-
-  }
+  constructor(private http: HttpClient) { }
 
   public getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>('https://gallery.redby.fr/rest/categories');
