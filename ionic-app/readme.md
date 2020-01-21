@@ -1,7 +1,7 @@
 
 ## 1. Build the apk
 
-- Run : `sudo ionic cordova build --release android`
+- Run : `ionic cordova build --release android`
 
 ## 2. Build a keystore
 

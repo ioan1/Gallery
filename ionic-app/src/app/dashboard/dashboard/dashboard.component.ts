@@ -8,9 +8,9 @@ import {DiskUsage, StatisticsService} from "../../services/statistics.service";
 })
 export class DashboardComponent implements OnInit {
 
-  private diskUsage: DiskUsage;
-  private waitForProcessing: Number;
-  private cachedThumbnails: Number;
+  diskUsage: DiskUsage;
+  waitForProcessing: Number;
+  cachedThumbnails: Number;
 
   constructor(private statisticsService: StatisticsService) { }
 
