@@ -33,8 +33,7 @@ import java.net.URLDecoder;
     private PicturesService service;
 
     @RequestMapping(value = "/pictures/{category}/{album}", method = RequestMethod.GET)
-    public List<Picture> listPictures(final @PathVariable String category, final @PathVariable String album)
-            throws IOException {
+    public List<Picture> listPictures(final @PathVariable String category, final @PathVariable String album) {
         return service.listPictures(category, album);
     }
 
@@ -62,7 +61,14 @@ import java.net.URLDecoder;
     public byte[] getSmall(final HttpServletRequest request) throws IOException {
         String requestURL = request.getRequestURL().toString();
         String file = URLDecoder.decode(requestURL.split("/picture/small/")[1], "UTF-8");
-        return service.getSmall(new File(file), 300);
+        return service.getSmall(new File(file), 100);
+    }
+
+    @RequestMapping(value = "/picture/micro/**", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    public byte[] getMicro(final HttpServletRequest request) throws IOException {
+        String requestURL = request.getRequestURL().toString();
+        String file = URLDecoder.decode(requestURL.split("/picture/micro/")[1], "UTF-8");
+        return service.getSmall(new File(file), 75);
     }
 
 }

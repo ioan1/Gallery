@@ -25,6 +25,7 @@ export class Album {
     public name: string;
     public id: string;
     public path: string;
+    public thumbnail: string;
     public files: Number;
     public pictures: Number;
     public videos: Number;

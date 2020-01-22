@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class Album implements Comparable{
     private int pictures;
     private int videos;
     private int others;
+    private File thumbnail;
 
     /**
      * Default constructor.
@@ -70,6 +72,15 @@ public class Album implements Comparable{
         this.pictures = (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.PICTURE)).count();
         this.videos = (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.VIDEO)).count();
         this.others = (int) this.files.stream().filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.OTHER)).count();
+
+        // Promote one picture as thumbnail
+        if (this.pictures > 0) {
+            this.thumbnail = this.files
+                    .stream()
+                    .filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.PICTURE))
+                    .collect(Collectors.toList())
+                    .get(new Random().nextInt(this.pictures));
+        }
     }
 
     /**

@@ -19,9 +19,10 @@
       <ion-item-options side="start">
         <ion-item-option [routerLink]="['/album', this.category, album.id]">Visualize pictures</ion-item-option>
       </ion-item-options>
-      <ion-item>
+      <ion-item [routerLink]="['/album', this.category, album.id]">
         <ion-thumbnail slot="start">
-          <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y TODO">
+          <img alt="thumbnail for {{album.id}}"
+               src="https://gallery.redby.fr/rest/picture/micro/{{album.thumbnail}}" />
         </ion-thumbnail>
         <ion-label>{{album.id}}</ion-label>
       </ion-item>
