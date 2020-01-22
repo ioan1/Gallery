@@ -35,7 +35,7 @@ public class Album implements Comparable{
     private int pictures;
     private int videos;
     private int others;
-    private File thumbnail;
+    private String thumbnail;
 
     /**
      * Default constructor.
@@ -79,7 +79,8 @@ public class Album implements Comparable{
                     .stream()
                     .filter(f -> TypeOfFile.defineFor(f).equals(TypeOfFile.PICTURE))
                     .collect(Collectors.toList())
-                    .get(new Random().nextInt(this.pictures));
+                    .get(new Random().nextInt(this.pictures))
+                    .getAbsolutePath();
         }
     }
 
@@ -135,6 +136,10 @@ public class Album implements Comparable{
 
     public int getOthers() {
         return others;
+    }
+
+    public String getThumbnail() {
+        return this.thumbnail;
     }
 
     @Override
