@@ -17,7 +17,7 @@ export class AlbumListComponent implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe(pageParameters => {
-      this.category = Number.parseInt(pageParameters.get('id'));
+      this.category = Number.parseInt(pageParameters.get('category'));
       // Fetch the albums within this category
       this.albumsService.getAlbums(this.category).subscribe((data: Album[]) => {
         this.albums = data;

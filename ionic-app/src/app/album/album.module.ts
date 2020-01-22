@@ -4,9 +4,10 @@ import {FormsModule} from "@angular/forms";
 import {IonicModule} from "@ionic/angular";
 import {RouterModule} from "@angular/router";
 import {AlbumListComponent} from "./album-list/album-list.component";
+import {AlbumDetailsComponent} from "./album-details/album-details.component";
 
 @NgModule({
-  declarations: [AlbumListComponent],
+  declarations: [AlbumListComponent, AlbumDetailsComponent],
   imports: [
     CommonModule,
     CommonModule,
@@ -14,8 +15,12 @@ import {AlbumListComponent} from "./album-list/album-list.component";
     IonicModule,
     RouterModule.forChild([
       {
-        path: ':id',
+        path: ':category',
         component: AlbumListComponent
+      },
+      {
+        path: ':category/:albumId',
+        component: AlbumDetailsComponent
       }
     ])
   ]
