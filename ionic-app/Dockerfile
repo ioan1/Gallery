@@ -10,7 +10,7 @@ RUN npm install @angular/cli -g --verbose
 RUN npm install @angular/core -g --verbose
 RUN npm install -g typescript --verbose
 RUN npm install -g ionic cordova --verbose
-EXPOSE 4201/tcp
+EXPOSE 4200/tcp
 COPY . /app/
 RUN ls -l /app/
 RUN npm install --verbose

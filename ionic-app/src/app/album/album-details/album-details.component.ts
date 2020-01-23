@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {Picture} from "../../../../../web-ui/src/app/models/picture";
-import {PicturesService} from "../../services/pictures.service";
+import {Picture, PicturesService} from "../../services/pictures.service";
 
 @Component({
   selector: 'app-album-details',
