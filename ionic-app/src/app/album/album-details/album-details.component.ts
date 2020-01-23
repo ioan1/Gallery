@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {Picture} from "../../../../../web-ui/src/app/models/picture";
 import {PicturesService} from "../../services/pictures.service";
-import {AlbumsService} from "../../services/albums.service";
 
 @Component({
   selector: 'app-album-details',
@@ -16,8 +15,7 @@ export class AlbumDetailsComponent implements OnInit {
   pictures    : Picture [];
 
   constructor(private route: ActivatedRoute,
-              private picturesService: PicturesService,
-              private albumService: AlbumsService) { }
+              private picturesService: PicturesService) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(pageParameters => {
@@ -26,7 +24,6 @@ export class AlbumDetailsComponent implements OnInit {
       // Fetch the pictures within this album
       this.picturesService.listPictures(this.year, this.albumId).subscribe((data: Picture[]) => {
         this.pictures = data;
-        console.log(data);
       })
     });
   }
