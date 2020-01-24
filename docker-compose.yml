@@ -26,12 +26,12 @@ services:
       - ${GALLERY_PATH}:/gallery
     ports:
       - "8086"
-  web-ui:
-    image: "docker.redby.fr/gallery/web-ui:latest"
-  ionic-app:
-    image: "docker.redby.fr/gallery/ionic-app:latest"
-    ports:
-      - "4200"
+  #web-ui:
+  #  image: "docker.redby.fr/gallery/web-ui:latest"
+  #ionic-app:
+  #  image: "docker.redby.fr/gallery/ionic-app:latest"
+  #  ports:
+  #    - "4200"
   mongo:
     image: mongo
     environment:
@@ -47,8 +47,6 @@ services:
       - "8080"
   reverse-proxy:
     image: "docker.redby.fr/gallery/reverse-proxy:latest"
-    #build:
-    #  context: ./reverse-proxy
     #  dockerfile: Dockerfile
     ports:
       - "${GALLERY_PORT}:80"
