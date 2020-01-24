@@ -18,6 +18,8 @@ public class AlbumService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AlbumService.class );
     public static final String GALLERY_PATH = "GALLERY_PATH";
+    public static final String[] FOLDERS_TO_IGNORE = new String[] {"@eaDir"};
+
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     @Autowired
@@ -40,6 +42,7 @@ public class AlbumService {
             LOGGER.info("Parsing {} and saving the albums to the database.", directory.getAbsolutePath());
             if (directory.isDirectory()) {
                 List<Album> res = Arrays.stream(directory.listFiles(File::isDirectory))
+                        .filter(f -> !Arrays.asList(FOLDERS_TO_IGNORE).contains(f.getName()))
                         .map(f -> new Album(category, f))
                         .collect(Collectors.toList());
                 repository.saveAll(res);
