@@ -48,7 +48,7 @@ public class PicturesService {
                 return stream
                         .map(p -> p.toFile())
                         .filter(f -> f.isFile())
-                        .filter(f->f.getName().toLowerCase().endsWith(".jpg"))
+                        .filter(f->f.getName().toLowerCase().endsWith(".jpg") && !"@eaDirf".equals(f.getParent()))
                         .peek(f -> LOGGER.debug(f.getAbsolutePath()))
                         .map(f -> new Picture(category, album, f))
                         .collect(Collectors.toList());
