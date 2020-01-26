@@ -50,9 +50,7 @@ export class AlbumDetailsComponent implements OnInit {
 
         // define options (if needed)
         var options = {
-            // optionName: 'option value'
-            // for example:
-            index: 0 // start at first slide
+            index: pictureIndex
         };
 
         // Initializes and opens PhotoSwipe
