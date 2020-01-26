@@ -22,5 +22,8 @@ export class Picture {
   album: string;
   file: string;
   path: string;
+  width: number;
+  height: number;
+  size: number;
 
 }

@@ -3,6 +3,7 @@ import {ActivatedRoute} from "@angular/router";
 import {Picture, PicturesService} from "../../services/pictures.service";
 import * as PhotoSwipe from "photoswipe";
 import * as PhotoSwipeUI_Default from "photoswipe/dist/photoswipe-ui-default";
+import {formatNumber} from "@angular/common";
 
 @Component({
     selector: 'app-album-details',
@@ -38,18 +39,14 @@ export class AlbumDetailsComponent implements OnInit {
         var pswpElement = document.querySelectorAll('.pswp')[0];
 
         // build items array
-        var items = [
-            {
-                src: 'https://placekitten.com/600/400',
-                w: 600,
-                h: 400
-            },
-            {
-                src: 'https://placekitten.com/1200/900',
-                w: 1200,
-                h: 900
-            }
-        ];
+        var items = [];
+        this.pictures.forEach(picture => {
+            items.push({
+                src: 'https://gallery.redby.fr/rest/picture/medium/'+picture.path,
+                w: picture.width,
+                h: picture.height
+            });
+        });
 
         // define options (if needed)
         var options = {
