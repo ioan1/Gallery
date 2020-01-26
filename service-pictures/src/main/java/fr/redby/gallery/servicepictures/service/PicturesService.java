@@ -50,7 +50,7 @@ public class PicturesService {
                         .filter(f -> f.isFile())
                         .filter(f->f.getName().toLowerCase().endsWith(".jpg") && !"@eaDirf".equals(f.getParent()))
                         .peek(f -> LOGGER.debug(f.getAbsolutePath()))
-                        .map(f -> new Picture(category, album, f))
+                        .map(f -> new Picture(category, album, f, exifDataRepository.findById(f.getAbsolutePath())))
                         .collect(Collectors.toList());
             } catch (IOException e) {
                 LOGGER.error("Error when listing pictures.", e);

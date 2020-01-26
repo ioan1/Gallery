@@ -1,14 +1,11 @@
 package fr.redby.gallery.servicepictures.bean;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.util.Optional;
 
 /**
  *
  * TODO: add lombok
- * TODO: move logic from constructor to service.
  *
  * @author Ioan Bernevig
  * @version $Revision$
@@ -18,22 +15,14 @@ public class Picture {
     private String category;
     private String album;
     private File file;
-    private Long size;
-    private Integer width, height;
+    private ExifData exifData;
 
-    public Picture(String category, String album, File f) {
+    public Picture(String category, String album, File f, Optional<ExifData> ed) {
         this.album = album;
         this.category = category;
         this.file = f;
-        this.size = f.length();
-
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(f);
-            this.height = image.getHeight();
-            this.width = image.getWidth();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (ed.isPresent()) {
+            this.exifData = ed.get();
         }
     }
 
@@ -57,15 +46,5 @@ public class Picture {
         return file.getAbsolutePath();
     }
 
-    public Long getSize() {
-        return size;
-    }
-
-    public Integer getWidth() {
-        return width;
-    }
-
-    public Integer getHeight() {
-        return height;
-    }
+    public ExifData getExifData() { return exifData; }
 }

@@ -9,7 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -26,6 +29,8 @@ public class ExifData implements Serializable {
     private String id;
     private String cameraMake, cameraModel;
     private Date dateDiscovery, dateTaken;
+    private Integer width, height;
+    private Long size;
 
     private HashMap<String, List<ExifTag>> directories;
 
@@ -42,16 +47,25 @@ public class ExifData implements Serializable {
     public ExifData(final File picture, final Metadata metadata) {
         this.id = picture.getAbsolutePath();
         this.dateDiscovery = new Date();
+        this.size = picture.length();
         this.dateTaken = getImageCreationDate(metadata);
         this.cameraMake = getStringValue(metadata, ExifSubIFDDirectory.TAG_MAKE);
         this.cameraModel = getStringValue(metadata, ExifSubIFDDirectory.TAG_MODEL);
-        this.directories = new HashMap<String, List<ExifTag>>();
+        this.directories = new HashMap<>();
         for (Directory directory : metadata.getDirectories()) {
             List<ExifTag> tags = new ArrayList<>();
             for (Tag tag : directory.getTags())  {
                 tags.add(new ExifTag(tag));
             }
             this.directories.put(directory.getName(), tags);
+        }
+
+        try {
+            BufferedImage image = ImageIO.read(picture);
+            this.height = image.getHeight();
+            this.width = image.getWidth();
+        } catch (IOException e) {
+            LOGGER.error("Cannot read image width and height from {}.", picture);
         }
         LOGGER.info("Created ExifData object holding {} EXIF directories.", this.directories.size());
     }
@@ -100,4 +114,19 @@ public class ExifData implements Serializable {
         return dateTaken;
     }
 
+    public Integer getWidth() {
+        return width;
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public Date getDateDiscovery() {
+        return dateDiscovery;
+    }
 }
