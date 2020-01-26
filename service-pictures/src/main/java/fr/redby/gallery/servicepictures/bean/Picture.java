@@ -17,15 +17,20 @@ public class Picture {
     private Long size;
     private Integer width, height;
 
-    public Picture(String category, String album, File f) throws IOException {
+    public Picture(String category, String album, File f) {
         this.album = album;
         this.category = category;
         this.file = f;
         this.size = f.length();
 
-        BufferedImage image = ImageIO.read(f);
-        this.height = image.getHeight();
-        this.width = image.getWidth();
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(f);
+            this.height = image.getHeight();
+            this.width = image.getWidth();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getCategory() {
