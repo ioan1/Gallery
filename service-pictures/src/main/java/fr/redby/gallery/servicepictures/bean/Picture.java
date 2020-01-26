@@ -6,6 +6,10 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ *
+ * TODO: add lombok
+ * TODO: move logic from constructor to service.
+ *
  * @author Ioan Bernevig
  * @version $Revision$
  */
