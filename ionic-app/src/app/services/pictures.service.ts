@@ -13,6 +13,14 @@ export class PicturesService {
     return this.http.get('https://gallery.redby.fr/rest/pictures/' + category + '/' + album);
   }
 
+  deleteThumbnailsCache() {
+    return this.http.delete('https://gallery.redby.fr/rest/pictures/thumbnailsCache');
+  }
+
+  deleteExifData() {
+    return this.http.delete('https://gallery.redby.fr/rest/exif');
+  }
+
 }
 
 export class Picture {

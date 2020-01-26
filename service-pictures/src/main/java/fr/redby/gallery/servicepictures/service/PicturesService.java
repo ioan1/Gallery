@@ -114,4 +114,14 @@ public class PicturesService {
 
         return out.toByteArray();
     }
+
+    /**
+     * Drops entirely the thumbnails cache.
+     */
+    public void deleteThumbnailsCache() {
+        try (Jedis jedis = new Jedis(REDIS)) {
+            LOGGER.info("Deleting all thumbnails from the cache");
+            jedis.flushDB();
+        }
+    }
 }

@@ -46,6 +46,11 @@ export class AppComponent implements OnInit {
           icon: 'camera'
         });
       });
+      this.categoriesMenu.push({
+        title: 'Settings',
+        url: '/settings',
+        icon: 'settings'
+      });
     });
   }
 

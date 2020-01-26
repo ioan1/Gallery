@@ -99,4 +99,10 @@ public class ExifService {
         }
     }
 
+    /**
+     * Drops all exif data stored in the database.
+     */
+    public void delete() {
+        exifDataRepository.deleteAll();
+    }
 }

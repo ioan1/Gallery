@@ -32,6 +32,12 @@ import java.net.URLDecoder;
     @Autowired
     private PicturesService service;
 
+    @RequestMapping(value = "/pictures/thumbnailsCache", method = RequestMethod.DELETE)
+    public Boolean deleteThumbnailsCache() {
+        service.deleteThumbnailsCache();
+        return true;
+    }
+
     @RequestMapping(value = "/pictures/{category}/{album}", method = RequestMethod.GET)
     public List<Picture> listPictures(final @PathVariable String category, final @PathVariable String album) {
         return service.listPictures(category, album);

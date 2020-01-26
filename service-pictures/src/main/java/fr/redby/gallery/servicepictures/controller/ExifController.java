@@ -47,4 +47,10 @@ import java.util.List;
         return service.discoverCategory(category);
     }
 
+    @RequestMapping(value = "/exif", method = RequestMethod.DELETE)
+    public boolean delete() {
+        service.delete();
+        return true;
+    }
+
 }
