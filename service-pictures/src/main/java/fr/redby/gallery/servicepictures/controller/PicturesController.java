@@ -61,7 +61,7 @@ import java.net.URLDecoder;
     public byte[] getSmall(final HttpServletRequest request) throws IOException {
         String requestURL = request.getRequestURL().toString();
         String file = URLDecoder.decode(requestURL.split("/picture/small/")[1], "UTF-8");
-        return service.getSmall(new File(file), 100);
+        return service.getSmall(new File(file), 125);
     }
 
     @RequestMapping(value = "/picture/micro/**", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
