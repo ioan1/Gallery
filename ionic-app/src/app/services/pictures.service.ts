@@ -22,8 +22,15 @@ export class Picture {
   album: string;
   file: string;
   path: string;
+  exifData: PictureExifData;
+
+}
+
+/**
+ * There are actually more than that, but for now these are the only ones used.
+ */
+export class PictureExifData {
   width: number;
   height: number;
   size: number;
-
 }

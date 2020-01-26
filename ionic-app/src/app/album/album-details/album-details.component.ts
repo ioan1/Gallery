@@ -43,8 +43,8 @@ export class AlbumDetailsComponent implements OnInit {
         this.pictures.forEach(picture => {
             items.push({
                 src: 'https://gallery.redby.fr/rest/picture/medium/'+picture.path,
-                w: picture.width,
-                h: picture.height
+                w: picture.exifData.width,
+                h: picture.exifData.height
             });
         });
 
