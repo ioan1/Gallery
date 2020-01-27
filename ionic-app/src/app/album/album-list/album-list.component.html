@@ -21,7 +21,7 @@
       </ion-item-options>
       <ion-item [routerLink]="['/album', this.category, album.id]">
         <ion-thumbnail slot="start">
-          <img alt="thumbnail for {{album.id}}"
+          <img *ngIf="album.thumbnail" alt="thumbnail for {{album.id}}"
                src="https://gallery.redby.fr/rest/picture/micro/{{album.thumbnail}}" />
         </ion-thumbnail>
         <ion-label>{{album.id}}</ion-label>

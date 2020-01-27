@@ -74,7 +74,7 @@ public class PicturesService {
         try (Jedis jedis = new Jedis(REDIS)) {
             LOGGER.info("Getting response from the cache server: {}", jedis.ping());
 
-            byte[] cached = jedis.get(picture.getAbsolutePath().getBytes());
+            byte[] cached = jedis.get((size + "_" + picture.getAbsolutePath()).getBytes());
             if (cached != null) {
                 LOGGER.info("Return cached thumbnail for {}.", picture.getAbsolutePath());
                 return cached;
