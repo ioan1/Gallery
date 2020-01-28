@@ -9,19 +9,19 @@
     </ion-toolbar>
 </ion-header>
 <ion-content>
-    <ion-card>
+    <ion-card *ngIf="diskUsage">
         <ion-card-header>
             <ion-card-subtitle>Disk space used</ion-card-subtitle>
             <ion-card-title>{{diskUsage?.used}} / {{diskUsage?.available}} <small>{{diskUsage?.unit}}</small></ion-card-title>
         </ion-card-header>
     </ion-card>
-    <ion-card>
+    <ion-card *ngIf="waitForProcessing">
         <ion-card-header>
             <ion-card-subtitle>Wait for processing</ion-card-subtitle>
             <ion-card-title>{{waitForProcessing}} files</ion-card-title>
         </ion-card-header>
     </ion-card>
-    <ion-card>
+    <ion-card *ngIf="cachedThumbnails">
         <ion-card-header>
             <ion-card-subtitle>Cache status</ion-card-subtitle>
             <ion-card-title>{{cachedThumbnails}} <small>thumbnails</small></ion-card-title>

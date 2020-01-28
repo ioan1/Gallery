@@ -14,11 +14,11 @@ export class PicturesService {
   }
 
   deleteThumbnailsCache() {
-    return this.http.delete('https://gallery.redby.fr/rest/pictures/thumbnailsCache');
+    return this.http.delete('https://gallery.redby.fr/rest/pictures/thumbnailsCache').subscribe();
   }
 
   deleteExifData() {
-    return this.http.delete('https://gallery.redby.fr/rest/exif');
+    return this.http.delete('https://gallery.redby.fr/rest/exif').subscribe();
   }
 
 }
