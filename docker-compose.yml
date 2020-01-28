@@ -28,10 +28,10 @@ services:
       - "8086"
   #web-ui:
   #  image: "docker.redby.fr/gallery/web-ui:latest"
-  #ionic-app:
-  #  image: "docker.redby.fr/gallery/ionic-app:latest"
-  #  ports:
-  #    - "4200"
+  ionic-app:
+    image: "docker.redby.fr/gallery/ionic-app:latest"
+    ports:
+      - "81"
   mongo:
     image: mongo
     environment:

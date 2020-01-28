@@ -79,6 +79,8 @@ web-ui:
 ionic-app:
   script:
     - cd ionic-app
+    - npm install
+    - ng build --prod --output-path=htdocs
     - docker build -t docker.redby.fr/gallery/ionic-app .
     - docker push docker.redby.fr/gallery/ionic-app
   only:
