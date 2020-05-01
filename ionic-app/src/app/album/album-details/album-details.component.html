@@ -11,7 +11,7 @@
 <ion-content>
   <ion-list>
     <ion-thumbnail slot="start" *ngFor="let picture of this.pictures; index as i">
-      <img alt="{{picture.name}}"
+      <img alt=""
            src="https://gallery.redby.fr/rest/picture/small/{{picture.path}}"
            (click)="this.openGallery(i);" />
     </ion-thumbnail>

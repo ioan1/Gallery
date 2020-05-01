@@ -14,10 +14,6 @@ const routes: Routes = [
   {
     path: 'album',
     loadChildren: () => import('./album/album.module').then(m => m.AlbumModule)
-  },
-  {
-    path: 'settings',
-    loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule)
   }
 ];
 
