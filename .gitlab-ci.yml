@@ -64,17 +64,6 @@ service-pictures:
       - service-pictures/**/*
   after_script:
     - rm -rf .git
-    
-web-ui:
-  script:
-    - cd web-ui
-    - docker build -t docker.redby.fr/gallery/web-ui .
-    - docker push docker.redby.fr/gallery/web-ui
-  only:
-    changes:
-      - web-ui/**/*
-  after_script:
-    - rm -rf .git
 
 ionic-app:
   script:
