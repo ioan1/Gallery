@@ -7,11 +7,10 @@ export class BasicAuthInterceptor implements HttpInterceptor {
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         // add authorization header with basic auth credentials if available
-        const currentUser = window.btoa( 'ioan:kenzofaitduski');
+        const currentUser = window.btoa( 'user:user');
         request = request.clone({
             setHeaders: {
                 Authorization: 'Basic ${currentUser}',
-                Bidule: 'truc'
             }
         });
         return next.handle(request);
