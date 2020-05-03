@@ -49,4 +49,4 @@ services:
     image: "docker.redby.fr/gallery/reverse-proxy:latest"
     #  dockerfile: Dockerfile
     ports:
-      - "${GALLERY_PORT}:80"
+      - "${GALLERY_PORT}:7000"
