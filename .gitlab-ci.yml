@@ -20,7 +20,7 @@ service-scheduler:
 service-categories:
   script:
     - cd service-categories
-    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-categories -Dsonar.host.url=https://sonar.redby.fr -Dsonar.login=8d82a0f69c4e86d0a7b03c5c078308fef1ec2726
+    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-categories
     - docker build -t docker.redby.fr/gallery/service-categories .
     - docker push docker.redby.fr/gallery/service-categories
   only:
@@ -32,7 +32,7 @@ service-categories:
 service-albums:
   script:
     - cd service-albums
-    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-albums -Dsonar.host.url=https://sonar.redby.fr -Dsonar.login=8d82a0f69c4e86d0a7b03c5c078308fef1ec2726
+    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-albums
     - docker build -t docker.redby.fr/gallery/service-albums .
     - docker push docker.redby.fr/gallery/service-albums
   only:
@@ -44,7 +44,7 @@ service-albums:
 service-statistics:
   script:
     - cd service-statistics
-    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-statistics -Dsonar.host.url=https://sonar.redby.fr -Dsonar.login=8d82a0f69c4e86d0a7b03c5c078308fef1ec2726
+    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-statistics
     - docker build -t docker.redby.fr/gallery/service-statistics .
     - docker push docker.redby.fr/gallery/service-statistics
   only:
@@ -56,7 +56,7 @@ service-statistics:
 service-pictures:
   script:
     - cd service-pictures
-    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-pictures -Dsonar.host.url=https://sonar.redby.fr -Dsonar.login=8d82a0f69c4e86d0a7b03c5c078308fef1ec2726
+    - mvn clean compile test package sonar:sonar -Dsonar.projectKey=service-pictures
     - docker build -t docker.redby.fr/gallery/service-pictures .
     - docker push docker.redby.fr/gallery/service-pictures
   only:
