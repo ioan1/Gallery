@@ -1,6 +1,6 @@
 <ion-app>
   <ion-split-pane when="lg" contentId="main-content">
-    <ion-menu contentId="main-content" type="overlay" *ngIf="authenticationService.currentUserValue">
+    <ion-menu contentId="main-content" type="overlay" *ngIf="this.authenticationService.currentUserValue">
       <ion-header>
         <ion-toolbar>
           <ion-title>Menu</ion-title>
