@@ -9,14 +9,19 @@ import {StatusBar} from '@ionic-native/status-bar/ngx';
 import {AppComponent} from './app.component';
 import {AppRoutingModule} from './app-routing.module';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {BasicAuthInterceptor} from './shared/interceptor/basic-auth-interceptor';
 
 import {HashLocationStrategy, LocationStrategy} from '@angular/common';
+import {LoginComponent} from "./login/login.component";
+import {JwtInterceptor} from "./shared/jwt.interceptor";
+import {ErrorInterceptor} from "./shared/error.interceptor";
+import {fakeBackendProvider} from "./shared/fake-backend";
+import {ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
-    declarations: [AppComponent],
+    declarations: [AppComponent, LoginComponent],
     entryComponents: [],
     imports: [
+        ReactiveFormsModule,
         BrowserModule,
         HttpClientModule,
         IonicModule.forRoot(),
@@ -26,7 +31,12 @@ import {HashLocationStrategy, LocationStrategy} from '@angular/common';
         StatusBar,
         SplashScreen,
         HttpClientModule,
-        {provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true},
+        { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+
+        // provider used to create fake backend
+        fakeBackendProvider,
+
         {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
         {provide: LocationStrategy, useClass: HashLocationStrategy}
     ],
