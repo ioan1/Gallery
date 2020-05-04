@@ -3,6 +3,8 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {first} from "rxjs/operators";
 import {AuthenticationService} from "../services/authentication.service";
+import {CategoriesService} from "../services/categories.service";
+import {AppComponent} from "../app.component";
 
 @Component({
     selector: 'app-login',
@@ -21,7 +23,9 @@ export class LoginComponent implements OnInit {
         private formBuilder: FormBuilder,
         private route: ActivatedRoute,
         private router: Router,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private categoriesService : CategoriesService,
+        private appComponent: AppComponent
     ) {
         // redirect to home if already logged in
         if (this.authenticationService.currentUserValue) {
@@ -56,7 +60,17 @@ export class LoginComponent implements OnInit {
         this.authenticationService.login(this.f.username.value, this.f.password.value)
             .pipe(first())
             .subscribe(
-                data => {
+                () => {
+                    // Loads the years in the main menu
+                    this.categoriesService.getCategories().subscribe(value => {
+                        value.forEach(value => {
+                            this.appComponent.categoriesMenu.push({
+                                title: value.name,
+                                url: '/album/' + value.name,
+                                icon: 'camera'
+                            });
+                        });
+                    });
                     this.router.navigate([this.returnUrl]);
                 },
                 error => {
