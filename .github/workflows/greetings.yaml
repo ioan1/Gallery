@@ -8,13 +8,8 @@ jobs:
   first_issue_message:
     runs-on: ubuntu-latest
     steps:
-      - name: Send welcome message
-        uses: actions/github-script@v6
+      - name: Print to Log
+        id: print-to-log
+        uses: actions/hello-world-docker-action@main
         with:
-          script: |
-              github.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issueNumber,
-                body: 'Congratulations on opening the first issue! 🎉 We appreciate your contribution.'
-              });
+          who-to-greet: Stranger
