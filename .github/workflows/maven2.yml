@@ -28,14 +28,6 @@ jobs:
         cache: maven
     - name: Build parent
       run: mvn -B package --file pom.xml
-      
-    - name: Build service categories
-      working-directory: service-categories
-      run: mvn -B install --file pom.xml
-
-    - name: Build service albums
-      working-directory: service-albums
-      run: mvn -B install --file pom.xml
 
     - name: Archive artifacts
       uses: actions/upload-artifact@v4
