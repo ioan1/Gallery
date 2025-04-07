@@ -99,7 +99,7 @@ jobs:
       - name: Use the outputs from job1
         run: | 
           echo "The output1 from job1 was ${{ needs.job1.outputs.output1 }}"
-          echo "The output2 from job1 was ${{ needs.job1.outputs.output2 }}"
+          echo "The secret value is ${{ secrets.DB_PASSWORD }}"
       - name: Generate random number
         id: gen1
         uses: yakubique/random-number@v1.1
