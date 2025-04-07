@@ -1,0 +1,31 @@
+name: Debug the Mess
+on: workflow_dispatch
+
+env:
+  MY_VAR: "🔵 Workflow Level Value"
+
+jobs:
+  debug-vars:
+    runs-on: ubuntu-latest
+    env:
+      MY_VAR: "🟤 Job Level Value"
+
+    steps:
+      - name: Print the Variable
+        env:
+          MY_VAR: "🟡 Step Level Value"
+        run: echo "MY_VAR is $MY_VAR" # What do we print?
+
+      - name: Print the Variable again
+        run: echo "MY_VAR is $MY_VAR" # And here?
+
+      - name: Override with GITHUB_ENV
+        run: |
+          echo "MY_VAR=Overridden via GITHUB_ENV" >> $GITHUB_ENV
+
+      - name: Print the final value
+        run: echo "Final MY_VAR value is $MY_VAR"  # And there?
+
+      - name: Print Secret-Based Variable
+        run:
+          echo "Final Secret Value is ${{ secrets.MY_VAR }}"  # And there?
