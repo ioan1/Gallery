@@ -7,18 +7,14 @@ on:
 jobs:
   first_issue_message:
     runs-on: ubuntu-latest
-    if: github.event.issue.number == 1
     steps:
       - name: Send welcome message
         uses: actions/github-script@v6
         with:
           script: |
-            const issueNumber = context.issue.number;
-            if (issueNumber === 1) {
               github.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueNumber,
                 body: 'Congratulations on opening the first issue! 🎉 We appreciate your contribution.'
               });
-            }
