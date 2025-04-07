@@ -108,4 +108,4 @@ jobs:
           max: 100
       - name: Show the number from the previous step
         run: | 
-          echo "The output1 from gen1 was ${{ gen1.outputs }}"
+          echo "The output from gen1 was ... ${{ steps.gen1.outputs.result }}""
