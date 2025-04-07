@@ -22,6 +22,14 @@
 		<java.version>1.8</java.version>
 	</properties>
 
+	<distributionManagement>
+	    <repository>
+	        <id>github</id>
+	        <name>GitHub Packages</name>
+	        <url>https://maven.pkg.github.com/ioan1/gallery</url>
+	    </repository>
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
