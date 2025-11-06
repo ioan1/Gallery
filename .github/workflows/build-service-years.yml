@@ -1,0 +1,27 @@
+name: Build and Push Docker Image - Service Years
+
+on:
+  push:
+    branches:
+      - main
+    directories:
+      - 'services/service-years/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image
+        run: |
+          docker build -t docker.redby.fr/gallery/service-years:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push docker.redby.fr/gallery/service-years:latest
