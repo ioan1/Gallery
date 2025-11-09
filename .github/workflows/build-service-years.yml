@@ -19,12 +19,12 @@ jobs:
       - name: Build Docker image - years
         working-directory: services/years/
         run: |
-          docker build --platform linux/arm64 -t docker.redby.fr/gallery/service-years:latest .
+          docker build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-years:latest .
 
       - name: Build Docker image - albums
         working-directory: services/albums/
         run: |
-          docker build --platform linux/arm64 -t docker.redby.fr/gallery/service-albums:latest .
+          docker build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-albums:latest .
 
       - name: Push Docker image - years
         working-directory: services/years/
