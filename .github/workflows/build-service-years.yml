@@ -17,21 +17,21 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Build Docker image - years
-        working-directory: services/service-years/
+        working-directory: services/years/
         run: |
           docker build -t docker.redby.fr/gallery/service-years:latest .
 
       - name: Build Docker image - albums
-        working-directory: services/service-albums/
+        working-directory: services/albums/
         run: |
           docker build -t docker.redby.fr/gallery/service-albums:latest .
 
       - name: Push Docker image - years
-        working-directory: services/service-years/
+        working-directory: services/years/
         run: |
           docker push docker.redby.fr/gallery/service-years:latest
 
       - name: Push Docker image - albums
-        working-directory: services/service-albums/
+        working-directory: services/albums/
         run: |
           docker push docker.redby.fr/gallery/service-albums:latest
