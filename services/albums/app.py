@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pathlib import Path
 import os
 import re
+import hashlib
 from datetime import datetime
 
 app = FastAPI(title="Albums service")
@@ -38,7 +39,8 @@ def list_albums_for_year(year: int):
                 try:
                     # Convert YYYYMMDD to YYYY-MM-DD
                     formatted_date = datetime.strptime(date_str, "%Y%m%d").date().isoformat()
-                    albums.append({"date": formatted_date, "name": name})
+                    id = hashlib.blake2b(item.name.encode(), digest_size=4).hexdigest()
+                    albums.append({"date": formatted_date, "name": name, "id": id})
                 except ValueError:
                     # Skip invalid date formats
                     continue
