@@ -1,5 +1,5 @@
 # Étape 1 : Builder l'application React
-FROM arm32v7/node:20-bullseye AS builder
+FROM nginx:stable-bullseye AS builder
 
 # Créer le répertoire de travail
 WORKDIR /app
