@@ -10,7 +10,7 @@ COPY . .
 RUN npm run build
 
 # Étape 2 : Serveur Nginx pour servir les fichiers statiques
-FROM nginx:stable-bullseye
+FROM nginx:alpine
 
 #COPY --from=builder /app/build /usr/share/nginx/html
 
