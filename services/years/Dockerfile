@@ -1,9 +1,14 @@
 # Image légère Python
-FROM python:3.12-slim
+FROM arm32v7/python:3.12-slim-bullseye
+
+RUN apt-get update && \
+    apt-get install -y build-essential zlib1g zlib1g-dev libssl-dev curl && \
+    rm -rf /var/lib/apt/lists/*
 
 # Installer dépendances
 WORKDIR /app
 COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le code
