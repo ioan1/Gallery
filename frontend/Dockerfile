@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Étape 2 : Serveur Nginx pour servir les fichiers statiques
-FROM arm32v7/nginx:stable-bullseye
+FROM nginx:stable-bullseye
 
 # Copier les fichiers build dans le dossier Nginx
 COPY --from=builder /app/build /usr/share/nginx/html
