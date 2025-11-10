@@ -58,4 +58,4 @@ jobs:
       - name: Build Docker image - frontend
         working-directory: frontend/
         run: |
-          docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/frontend:latest --push .
+          docker buildx build --platform linux/arm/v7,linux/arm64 -t docker.redby.fr/gallery/frontend:latest --push .
