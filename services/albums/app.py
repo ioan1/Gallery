@@ -67,10 +67,18 @@ def list_album_content(year: int, albumId: str):
     if not album_folder.exists() or not album_folder.is_dir():
         raise HTTPException(status_code=404, detail="Album folder not found")
 
-    def walk_dir(path: Path):
-        result = {"name": path.name, "type": "dir" if path.is_dir() else "file"}
-        if path.is_dir():
-            result["children"] = [walk_dir(child) for child in sorted(path.iterdir())]
-        return result
+def walk_dir(path: Path):
+    # Ignore les dossiers/fichiers .DS_Store et @eaDir
+    if path.name in [".DS_Store", "@eaDir"]:
+        return None
+    result = {"name": path.name, "type": "dir" if path.is_dir() else "file"}
+    if path.is_dir():
+        children = [
+            walk_dir(child)
+            for child in sorted(path.iterdir())
+            if child.name not in [".DS_Store", "@eaDir"]
+        ]
+        result["children"] = [c for c in children if c is not None]
+    return result
 
     return JSONResponse(walk_dir(album_folder))
