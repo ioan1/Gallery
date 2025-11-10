@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AlbumContent from "./AlbumContent";
 
 export default function AlbumThumbnail({ album }) {
