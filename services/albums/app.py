@@ -4,7 +4,6 @@ import os
 import re
 import hashlib
 from datetime import datetime
-import requests
 from fastapi.responses import JSONResponse
 
 app = FastAPI(title="Albums service")
