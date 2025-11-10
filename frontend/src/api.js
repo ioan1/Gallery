@@ -9,3 +9,9 @@ export async function fetchAlbums(year) {
   const response = await fetch(`${API_BASE}/albums/${year}`);
   return response.json();
 }
+
+export async function fetchAlbumContent(year, albumId) {
+  const response = await fetch(`${API_BASE}/albums/${year}/${albumId}`);
+  if (!response.ok) throw new Error("Erreur lors du chargement du contenu de l'album");
+  return response.json();
+}

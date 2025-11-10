@@ -4,6 +4,8 @@ import os
 import re
 import hashlib
 from datetime import datetime
+import requests
+from fastapi.responses import JSONResponse
 
 app = FastAPI(title="Albums service")
 
@@ -49,3 +51,27 @@ def list_albums_for_year(year: int):
     albums.sort(key=lambda a: a["date"])
 
     return albums
+
+@app.get("/albums/{year}/{albumId}")
+def list_album_content(year: int, albumId: str):
+    albums = list_albums_for_year(year)
+    album = next((a for a in albums if a["id"] == albumId), None)
+    if not album:
+        raise HTTPException(status_code=404, detail="Album not found")
+
+    date_str = album["date"].replace("-", "")
+    folder_name = f"{date_str} - {album['name']}"
+
+    target_dir = os.getenv("TARGET_DIR", "/data")
+    album_folder = Path(target_dir) / str(year) / folder_name
+
+    if not album_folder.exists() or not album_folder.is_dir():
+        raise HTTPException(status_code=404, detail="Album folder not found")
+
+    def walk_dir(path: Path):
+        result = {"name": path.name, "type": "dir" if path.is_dir() else "file"}
+        if path.is_dir():
+            result["children"] = [walk_dir(child) for child in sorted(path.iterdir())]
+        return result
+
+    return JSONResponse(walk_dir(album_folder))

@@ -1,29 +1,21 @@
 import React from "react";
+import AlbumContent from "./AlbumContent";
 
 export default function AlbumThumbnail({ album }) {
-  return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "8px",
-        width: "150px",
-        textAlign: "center",
-      }}
-    >
-      <div
-        style={{
-          height: "100px",
-          backgroundColor: "#f0f0f0",
-          borderRadius: "4px",
-          marginBottom: "8px",
-        }}
-      >
-        {/* Ici on affichera la miniature plus tard */}
-        <span style={{ lineHeight: "100px", color: "#999" }}>Image</span>
+  const [showContent, setShowContent] = useState(false);
+  const handleClick = () => setShowContent((v) => !v);
+
+return (
+    <div style={{ border: "1px solid #ccc", padding: 8, borderRadius: 4, width: 200 }}>
+      <div onClick={handleClick} style={{ cursor: "pointer" }}>
+        <strong>{album.name}</strong>
+        <div>{album.date}</div>
       </div>
-      <div>{album.name}</div>
-      <div style={{ fontSize: "0.8em", color: "#666" }}>{album.date}</div>
+      {showContent && (
+        <div style={{ marginTop: 8 }}>
+          <AlbumContent year={album.date.slice(0, 4)} albumId={album.id} />
+        </div>
+      )}
     </div>
   );
 }
