@@ -21,10 +21,10 @@ export default function AlbumThumbnail({ album }) {
       >
         <div
           style={{
-            width: 48,
-            height: 48,
+            width: 35,
+            height: 35,
             background: "#ccc",
-            borderRadius: 6,
+            borderRadius: 4,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

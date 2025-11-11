@@ -7,7 +7,7 @@ export default function AlbumList({ albums }) {
   }
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       {albums.map((album) => (
         <AlbumThumbnail key={album.id} album={album} />
       ))}
