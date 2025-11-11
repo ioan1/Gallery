@@ -6,10 +6,25 @@ function renderTree(node, path = "") {
     return <li key={path + node.name}>{node.name}</li>;
   }
   return (
-    <li key={path + node.name}>
+    <li key={path + node.name} style={{
+      display: "block",
+      textDecoration: "none",
+      border: "1px dashed gray",
+      padding: "5px",
+      margin: "5px",
+      height: "50px",
+      width: "50px"
+    }}>
       <strong>{node.name}/</strong>
       {node.children && node.children.length > 0 && (
-        <ul>
+        <ul style={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          alignContent: "flex-start",
+          alignItems: "flex-start",
+          justifyContent: "flex-start"
+        }}>
           {node.children.map((child) =>
             renderTree(child, path + node.name + "/")
           )}
