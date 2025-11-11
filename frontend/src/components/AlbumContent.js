@@ -72,7 +72,6 @@ export default function AlbumContent({ year, albumId }) {
 
   return (
     <div>
-      <h3>Album Content</h3>
       {renderList(tree)}
     </div>
   );
