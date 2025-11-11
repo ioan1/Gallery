@@ -1,36 +1,54 @@
 import React, { useEffect, useState } from "react";
 import { fetchAlbumContent } from "../api";
 
-function renderTree(node, path = "") {
-  if (node.type === "file") {
-    return <li key={path + node.name}>{node.name}</li>;
-  }
+// Render a list of items (files or directories)
+function renderList(items, path = "") {
+  if (!items || items.length === 0) return null;
+
   return (
-    <li key={path + node.name} style={{
-      display: "block",
-      textDecoration: "none",
-      border: "1px dashed gray",
-      padding: "5px",
-      margin: "5px",
-      height: "50px",
-      width: "50px"
+    <div style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "10px",
+      marginBottom: "10px"
     }}>
-      <strong>{node.name}/</strong>
-      {node.children && node.children.length > 0 && (
-        <ul style={{
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          alignContent: "flex-start",
-          alignItems: "flex-start",
-          justifyContent: "flex-start"
-        }}>
-          {node.children.map((child) =>
-            renderTree(child, path + node.name + "/")
-          )}
-        </ul>
-      )}
-    </li>
+      {items.map((item) => {
+        if (item.type === "file") {
+          return (
+            <div
+              key={path + item.name}
+              style={{
+                width: 50,
+                height: 50,
+                background: "#ccc",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 6,
+                fontSize: 10,
+                overflow: "hidden"
+              }}
+              title={item.name}
+            >
+              {/* Optionally show file name or icon */}
+            </div>
+          );
+        } else if (item.type === "dir") {
+          return (
+            <div key={path + item.name} style={{ minWidth: 120 }}>
+              <div style={{ fontWeight: "bold", marginBottom: 4 }}>{item.name}/</div>
+              {item.children && item.children.length > 0 && (
+                <div style={{ marginLeft: 10 }}>
+                  {renderList(item.children, path + item.name + "/")}
+                </div>
+              )}
+            </div>
+          );
+        } else {
+          return null;
+        }
+      })}
+    </div>
   );
 }
 
@@ -50,12 +68,12 @@ export default function AlbumContent({ year, albumId }) {
 
   if (loading) return <p>Loading album content...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!tree) return <p>No content found.</p>;
+  if (!tree || !Array.isArray(tree) || tree.length === 0) return <p>No content found.</p>;
 
   return (
     <div>
       <h3>Album Content</h3>
-      <ul>{renderTree(tree)}</ul>
+      {renderList(tree)}
     </div>
   );
 }
