@@ -11,9 +11,8 @@ export default function AlbumThumbnail({ album }) {
         onClick={handleClick}
         style={{
           display: "grid",
-          gridTemplateColumns: "60px 120px 1fr",
+          gridTemplateColumns: "60px 90px 1fr",
           alignItems: "center",
-          gap: "16px",
           padding: "8px",
           borderBottom: "1px solid #eee",
           cursor: "pointer",
