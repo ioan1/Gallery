@@ -3,19 +3,29 @@ from pathlib import Path
 import os
 import re
 import hashlib
+import redis
+import json
 from datetime import datetime
 from fastapi.responses import JSONResponse
 
 app = FastAPI(title="Albums service")
 
+# Connexion Redis
+REDIS_HOST = os.getenv("REDIS_HOST", "service-cache")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_TTL = int(os.getenv("REDIS_TTL", "300"))
+CACHE_KEY_ALBUMS = "albums"
+CACHE_KEY_FILES = "album_files"
+
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
 
 @app.get("/albums/{year}")
 def list_albums_for_year(year: int):
-    """
-    List all albums for a given year.
-    Each subfolder has the structure: 'YYYYMMDD - <name>'
-    Returns a list of { "date": "YYYY-MM-DD", "name": "<name>" } objects, sorted by date asc.
-    """
+    cache_key = f"{CACHE_KEY_ALBUMS}:{year}"
+    cached = redis_client.get(cache_key)
+    if cached:
+        return json.loads(cached)
+    
     # Read the target directory from environment variable
     target_dir = os.getenv("TARGET_DIR", "/data")
 
@@ -49,10 +59,17 @@ def list_albums_for_year(year: int):
     # Sort albums by date ascending
     albums.sort(key=lambda a: a["date"])
 
+    redis_client.set(cache_key, json.dumps(albums), ex=REDIS_TTL)
+
     return albums
 
 @app.get("/albums/{year}/{albumId}")
 def list_album_content(year: int, albumId: str):
+    cache_key = f"{CACHE_KEY_FILES}:{year}:{albumId}"
+    cached = redis_client.get(cache_key)
+    if cached:
+        return JSONResponse(content=json.loads(cached))
+
     albums = list_albums_for_year(year)
     album = next((a for a in albums if a["id"] == albumId), None)
     if not album:
@@ -67,18 +84,19 @@ def list_album_content(year: int, albumId: str):
     if not album_folder.exists() or not album_folder.is_dir():
         raise HTTPException(status_code=404, detail="Album folder not found")
 
-def walk_dir(path: Path):
-    # Ignore les dossiers/fichiers .DS_Store et @eaDir
-    if path.name in [".DS_Store", "@eaDir"]:
-        return None
-    result = {"name": path.name, "type": "dir" if path.is_dir() else "file"}
-    if path.is_dir():
-        children = [
-            walk_dir(child)
-            for child in sorted(path.iterdir())
-            if child.name not in [".DS_Store", "@eaDir"]
-        ]
-        result["children"] = [c for c in children if c is not None]
-    return result
+    def walk_dir(path: Path):
+        if path.name in [".DS_Store", "@eaDir"]:
+            return None
+        result = {"name": path.name, "type": "dir" if path.is_dir() else "file"}
+        if path.is_dir():
+            children = [
+                walk_dir(child)
+                for child in sorted(path.iterdir())
+                if child.name not in [".DS_Store", "@eaDir"]
+            ]
+            result["children"] = [c for c in children if c is not None]
+        return result
 
-    return JSONResponse(walk_dir(album_folder))
+    tree = walk_dir(album_folder)
+    redis_client.set(cache_key, json.dumps(tree), ex=REDIS_TTL)
+    return JSONResponse(content=tree)
