@@ -84,19 +84,21 @@ def list_album_content(year: int, albumId: str):
     if not album_folder.exists() or not album_folder.is_dir():
         raise HTTPException(status_code=404, detail="Album folder not found")
 
-    def walk_dir(path: Path):
-        if path.name in [".DS_Store", "@eaDir"]:
-            return None
-        result = {"name": path.name, "type": "dir" if path.is_dir() else "file"}
-        if path.is_dir():
-            children = [
-                walk_dir(child)
-                for child in sorted(path.iterdir())
-                if child.name not in [".DS_Store", "@eaDir"]
-            ]
-            result["children"] = [c for c in children if c is not None]
-        return result
-
     tree = walk_dir(album_folder)
     redis_client.set(cache_key, json.dumps(tree), ex=REDIS_TTL)
     return JSONResponse(content=tree)
+
+def walk_dir(path: Path):
+    # Retourne une liste d'objets représentant les fichiers et dossiers du dossier courant
+    entries = []
+    for child in sorted(path.iterdir()):
+        if child.name in [".DS_Store", "@eaDir"]:
+            continue
+        entry = {"name": child.name, "type": "dir" if child.is_dir() else "file"}
+        if child.is_dir():
+            entry["children"] = [
+                c for c in walk_dir(child)
+            ]
+        entries.append(entry)
+    return entries
+
