@@ -8,7 +8,7 @@ from datetime import datetime
 from fastapi.responses import JSONResponse, FileResponse
 import httpx
 
-ALBUM_SERVICE_URL = os.getenv("ALBUM_SERVICE_URL", "http://album-service")
+ALBUM_SERVICE_URL = os.getenv("ALBUM_SERVICE_URL", "http://service-albums:8000")
 
 app = FastAPI(title="Pictures service")
 
