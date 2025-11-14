@@ -36,8 +36,7 @@ def list_albums_for_year(year: int):
 def get_picture(
     year: int,
     albumId: str,
-    pictureName: str = Path(..., regex=r"^[\w\-. ]+$")  # autorise lettres, chiffres, underscore, dash, point et espace
-):
+    pictureName: str):
     albums = list_albums_for_year(year)
     album = next((a for a in albums if a["id"] == albumId), None)
     if not album:
