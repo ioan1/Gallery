@@ -15,8 +15,8 @@ function renderList(items, path = "") {
       {items.map((item) => {
         if (item.type === "file") {
           return (
-            <div
-              key={path + item.name}
+            <img 
+              src={`/picture/${year}/${albumId}/${item.name}`}
               style={{
                 width: 50,
                 height: 50,
@@ -29,9 +29,7 @@ function renderList(items, path = "") {
                 overflow: "hidden"
               }}
               title={item.name}
-            >
-              {/* Optionally show file name or icon */}
-            </div>
+            />
           );
         } else if (item.type === "dir") {
           return (
