@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fetchAlbumContent } from "../api";
 
 // Render a list of items (files or directories)
-function renderList(items, path = "") {
+function renderList(items, year, albumId, path = "") {
   if (!items || items.length === 0) return null;
 
   return (
@@ -70,7 +70,7 @@ export default function AlbumContent({ year, albumId }) {
 
   return (
     <div>
-      {renderList(tree)}
+      {renderList(tree, year, albumId)}
     </div>
   );
 }
