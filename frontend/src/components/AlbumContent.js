@@ -18,8 +18,9 @@ function renderList(items, year, albumId, path = "") {
             <img 
               src={`/picture/${year}/${albumId}/${item.name}`}
               style={{
-                width: 50,
-                height: 50,
+                width: 200,
+                height: 150,
+                objectFit: "cover",
                 background: "#ccc",
                 display: "flex",
                 alignItems: "center",
