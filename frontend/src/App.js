@@ -8,7 +8,6 @@ function App() {
   const [years, setYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState(null);
   const [albums, setAlbums] = useState([]);
-
   const auth = useAuth();
 
   // Configurer le contexte d'authentification pour l'API
@@ -38,8 +37,6 @@ function App() {
     }
     loadAlbums();
   }, [selectedYear]);
-
-  const auth = useAuth();
 
   const signOutRedirect = () => {
     const clientId = "4cm803bb86anli21j7nf29lvhh";
