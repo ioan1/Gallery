@@ -15,28 +15,24 @@ function App() {
     setAuthContext(auth);
   }, [auth]);
 
-  // Configurer le contexte d'authentification pour l'API
   useEffect(() => {
-    setAuthContext(auth);
-  }, [auth]);
-
-  useEffect(() => {
+    if (!auth.isAuthenticated || !auth.user) return;
     async function loadYears() {
       const data = await fetchYears();
       setYears(data);
       if (data.length > 0) setSelectedYear(data[data.length - 1]); // dernière année par défaut
     }
     loadYears();
-  }, []);
+  }, [auth.isAuthenticated, auth.user]);
 
   useEffect(() => {
-    if (!selectedYear) return;
+    if (!selectedYear || !auth.isAuthenticated || !auth.user) return;
     async function loadAlbums() {
       const data = await fetchAlbums(selectedYear);
       setAlbums(data);
     }
     loadAlbums();
-  }, [selectedYear]);
+  }, [selectedYear, auth.isAuthenticated, auth.user]);
 
   const signOutRedirect = () => {
     const clientId = "4cm803bb86anli21j7nf29lvhh";
