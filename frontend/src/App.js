@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "react-oidc-context";
-import { fetchYears, fetchAlbums } from "./api";
+import { fetchYears, fetchAlbums, setAuthContext } from "./api";
 import YearList from "./components/YearList";
 import AlbumList from "./components/AlbumList";
 
@@ -8,6 +8,18 @@ function App() {
   const [years, setYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState(null);
   const [albums, setAlbums] = useState([]);
+
+  const auth = useAuth();
+
+  // Configurer le contexte d'authentification pour l'API
+  useEffect(() => {
+    setAuthContext(auth);
+  }, [auth]);
+
+  // Configurer le contexte d'authentification pour l'API
+  useEffect(() => {
+    setAuthContext(auth);
+  }, [auth]);
 
   useEffect(() => {
     async function loadYears() {
