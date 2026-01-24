@@ -5,7 +5,8 @@ web-ui/node_modules
 web-ui/platforms
 web-ui/www
 
-ionic-app/node_modules
+frontend/node_modules
+
 ionic-app/platforms
 ionic-app/www
 
