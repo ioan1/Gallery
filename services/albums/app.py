@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from pathlib import Path
 import os
 import re
@@ -7,6 +7,7 @@ import redis
 import json
 from datetime import datetime
 from fastapi.responses import JSONResponse
+from auth import verify_token
 
 app = FastAPI(title="Albums service")
 
@@ -20,7 +21,7 @@ CACHE_KEY_FILES = "album_files"
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
 
 @app.get("/albums/{year}")
-def list_albums_for_year(year: int):
+def list_albums_for_year(year: int, claims: dict = Depends(verify_token)):
     cache_key = f"{CACHE_KEY_ALBUMS}:{year}"
     cached = redis_client.get(cache_key)
     if cached:
@@ -64,7 +65,7 @@ def list_albums_for_year(year: int):
     return albums
 
 @app.get("/albums/{year}/{albumId}")
-def list_album_content(year: int, albumId: str):
+def list_album_content(year: int, albumId: str, claims: dict = Depends(verify_token)):
     cache_key = f"{CACHE_KEY_FILES}:{year}:{albumId}"
     cached = redis_client.get(cache_key)
     if cached:

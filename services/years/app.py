@@ -1,8 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from pathlib import Path
 import os
 import redis
 import json
+from auth import verify_token
 
 app = FastAPI(title="Years service")
 
@@ -15,7 +16,7 @@ CACHE_KEY = "years"
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
 
 @app.get("/years")
-def list_integer_folders():
+def list_integer_folders(claims: dict = Depends(verify_token)):
     
     cached = redis_client.get(CACHE_KEY)
     if cached:
