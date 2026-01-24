@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchAlbumContent } from "../api";
+import AuthImage from "./AuthImage";
 
 // Render a list of items (files or directories)
 function renderList(items, year, albumId, path = "") {
@@ -15,16 +16,14 @@ function renderList(items, year, albumId, path = "") {
       {items.map((item) => {
         if (item.type === "file") {
           return (
-            <img 
+            <AuthImage
+              key={path + item.name}
               src={`/picture/${year}/${albumId}/${item.name}`}
               style={{
                 width: 200,
                 height: 150,
                 objectFit: "cover",
                 background: "#ccc",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 borderRadius: 6,
                 fontSize: 10,
                 overflow: "hidden"
