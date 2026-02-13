@@ -1,4 +1,9 @@
 from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi.responses import Response
+from PIL import Image
+import pyheif
+import cv2
+import io
 from pathlib import Path as PathLib
 import os
 import re
@@ -64,5 +69,42 @@ def get_picture(
 
     if not picture_path.exists() or not picture_path.is_file():
         raise HTTPException(status_code=404, detail="Picture not found")
-    
-    return FileResponse(path=picture_path.absolute())
+
+    # Générer une miniature pour JPEG, HEIC ou vidéo
+    ext = picture_path.suffix.lower()
+    try:
+        buf = io.BytesIO()
+        if ext in ['.jpg', '.jpeg', '.png', '.bmp', '.gif']:
+            with Image.open(picture_path) as img:
+                img.thumbnail((256, 256))
+                img.save(buf, format=img.format or 'JPEG')
+                mime_type = Image.MIME.get(img.format, 'image/jpeg')
+        elif ext == '.heic':
+            heif_file = pyheif.read(picture_path)
+            img = Image.frombytes(
+                heif_file.mode,
+                heif_file.size,
+                heif_file.data,
+                "raw"
+            )
+            img.thumbnail((256, 256))
+            img.save(buf, format='JPEG')
+            mime_type = 'image/jpeg'
+        elif ext in ['.mp4', '.mov', '.avi', '.mkv', '.webm']:
+            vidcap = cv2.VideoCapture(str(picture_path))
+            success, frame = vidcap.read()
+            if not success:
+                raise Exception("Impossible de lire la vidéo pour générer la miniature.")
+            # Convertir BGR (OpenCV) en RGB (Pillow)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(frame)
+            img.thumbnail((256, 256))
+            img.save(buf, format='JPEG')
+            mime_type = 'image/jpeg'
+            vidcap.release()
+        else:
+            raise Exception(f"Format de fichier non supporté pour la miniature : {ext}")
+        buf.seek(0)
+        return Response(content=buf.read(), media_type=mime_type)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors de la création de la miniature : {str(e)}")
