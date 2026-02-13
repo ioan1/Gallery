@@ -2,8 +2,25 @@
 FROM arm32v7/python:3.12-slim-bullseye
 
 RUN apt-get update && \
-    apt-get install -y build-essential zlib1g zlib1g-dev libssl-dev libffi-dev curl && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        git \
+        libgtk2.0-dev \
+        pkg-config \
+        libavcodec-dev \
+        libavformat-dev \
+        libswscale-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libdc1394-22-dev \
+        zlib1g \
+        zlib1g-dev \
+        libssl-dev \
+        libffi-dev \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Installer dépendances
 WORKDIR /app
