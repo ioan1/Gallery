@@ -1,45 +1,25 @@
-# Image légère Python
-FROM arm32v7/python:3.12-slim-bullseye
+FROM maven:3.9.5-eclipse-temurin-21 AS build
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
-        cmake \
-        git \
-        libgtk2.0-dev \
-        pkg-config \
-        libavcodec-dev \
-        libavformat-dev \
-        libswscale-dev \
-        libjpeg-dev \
-        libpng-dev \
-        libtiff-dev \
-        libdc1394-22-dev \
-        zlib1g \
-        zlib1g-dev \
-        libssl-dev \
-        libffi-dev \
-        curl \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
 
-# Installer dépendances
+# Copier le code source et pom.xml
+COPY pom.xml .
+COPY src ./src
+
+# Builder le JAR
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jdk AS runtime
+
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier le code
-COPY app.py .
-COPY auth.py .
+# Copier le JAR depuis l'étape de build
+COPY --from=build /build/target/pictures-service-0.0.1-SNAPSHOT.jar .
 
-# Définir variable d'environnement par défaut
-ENV TARGET_DIR=/data
+# Exposer le port (adapter si besoin)
+EXPOSE 8080
 
-# Créer le dossier par défaut
-RUN mkdir -p /data
+# Commande pour lancer le JAR
+CMD ["java", "-jar", "pictures-service-0.0.1-SNAPSHOT.jar"]
 
-# Exposer le port
-EXPOSE 8000
-
-# Lancer le serveur
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# ...fin du Dockerfile multi-stage Java/Maven...

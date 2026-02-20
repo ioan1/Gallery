@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: fr.redby.gallery.pictures.pictures_service.PicturesServiceApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.266 s -- in fr.redby.gallery.pictures.pictures_service.PicturesServiceApplicationTests
