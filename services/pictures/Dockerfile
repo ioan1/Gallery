@@ -1,4 +1,4 @@
-FROM maven:3.9.5-eclipse-temurin-21 AS build
+FROM maven:3.8.8-openjdk-17-slim AS build
 
 WORKDIR /build
 
@@ -6,10 +6,9 @@ WORKDIR /build
 COPY pom.xml .
 COPY src ./src
 
-# Builder le JAR
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:21-jdk AS runtime
+FROM arm32v7/openjdk:17-jdk-slim AS runtime
 
 WORKDIR /app
 
