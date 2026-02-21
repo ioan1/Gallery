@@ -5,7 +5,7 @@ WORKDIR /build
 # Copier le code source et pom.xml
 COPY * .
 
-RUN mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM arm32v7/eclipse-temurin:17-jdk AS runtime
 
