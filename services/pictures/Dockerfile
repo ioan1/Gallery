@@ -3,10 +3,9 @@ FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /build
 
 # Copier le code source et pom.xml
-COPY pom.xml .
-COPY src ./src
+COPY * .
 
-RUN mvn clean package -DskipTests
+RUN mvnw clean package -DskipTests
 
 FROM arm32v7/eclipse-temurin:17-jdk AS runtime
 
