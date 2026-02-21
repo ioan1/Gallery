@@ -1,15 +1,4 @@
-FROM arm32v7/openjdk:17-jdk-slim AS build
-
-# Installer Maven manuellement
-ENV MAVEN_VERSION=3.8.8
-ENV MAVEN_HOME=/opt/maven
-RUN apt-get update && apt-get install -y wget tar && \
-	wget https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
-	tar xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /opt && \
-	mv /opt/apache-maven-${MAVEN_VERSION} ${MAVEN_HOME} && \
-	ln -s ${MAVEN_HOME}/bin/mvn /usr/bin/mvn && \
-	rm apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
-	apt-get clean && rm -rf /var/lib/apt/lists/*
+FROM arm32v7/eclipse-temurin:17-jdk AS build
 
 WORKDIR /build
 
@@ -19,7 +8,7 @@ COPY src ./src
 
 RUN mvn clean package -DskipTests
 
-FROM arm32v7/openjdk:17-jdk-slim AS runtime
+FROM arm32v7/eclipse-temurin:17-jdk AS runtime
 
 WORKDIR /app
 
