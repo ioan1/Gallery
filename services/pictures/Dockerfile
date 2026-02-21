@@ -1,4 +1,4 @@
-FROM FROM arm32v7/maven:3.9.6-eclipse-temurin-17 AS build AS build
+FROM arm32v7/maven:3.9.6-eclipse-temurin-17 AS build AS build
 
 WORKDIR /build
 
