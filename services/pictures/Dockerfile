@@ -1,4 +1,4 @@
-FROM arm32v7/maven:3.9.6-eclipse-temurin-17 AS build
+FROM maven:3.8.6-openjdk-17 AS build
 
 WORKDIR /build
 
