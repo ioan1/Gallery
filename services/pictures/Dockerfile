@@ -12,6 +12,6 @@ COPY target/pictures-service-0.0.1-SNAPSHOT.jar .
 EXPOSE 8080
 
 # Commande pour lancer le JAR
-CMD ["java", "-jar", "pictures-service-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-version"]
 
 # ...fin du Dockerfile multi-stage Java/Maven...
