@@ -1,4 +1,4 @@
-FROM arm32v7/eclipse-temurin:25
+FROM arm32v7/eclipse-temurin:17
 
 #WORKDIR /app
 
