@@ -1,17 +1,45 @@
-FROM arm32v7/eclipse-temurin:17
+# Image légère Python
+FROM arm32v7/python:3.12-slim-bullseye
 
-#WORKDIR /app
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        git \
+        libgtk2.0-dev \
+        pkg-config \
+        libavcodec-dev \
+        libavformat-dev \
+        libswscale-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libdc1394-22-dev \
+        zlib1g \
+        zlib1g-dev \
+        libssl-dev \
+        libffi-dev \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Configuration JVM pour containers
-#ENV JAVA_TOOL_OPTIONS="-XX:+UseSerialGC -Xms128m -Xmx256m -XX:+UseContainerSupport"
+# Installer dépendances
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Si le JAR est déjà buildé par le workflow, décommentez la ligne suivante et commentez celle du dessus :
-#COPY target/pictures-service-0.0.1-SNAPSHOT.jar .
+# Copier le code
+COPY app.py .
+COPY auth.py .
 
-# Exposer le port (adapter si besoin)
-#EXPOSE 8080
+# Définir variable d'environnement par défaut
+ENV TARGET_DIR=/data
 
-# Commande pour lancer le JAR
-CMD ["java", "-version"]
+# Créer le dossier par défaut
+RUN mkdir -p /data
 
-# ...fin du Dockerfile multi-stage Java/Maven...
+# Exposer le port
+EXPOSE 8000
+
+# Lancer le serveur
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

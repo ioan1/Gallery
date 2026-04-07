@@ -1,0 +1,9 @@
+Pillow
+pyheif
+opencv-python
+fastapi
+uvicorn
+redis
+httpx
+PyJWT[crypto]
+cryptography
