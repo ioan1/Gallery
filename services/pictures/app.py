@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi.responses import FileResponse
 from pathlib import Path as PathLib
 import os
 import httpx
@@ -60,5 +61,4 @@ def get_picture(
     if not picture_path.exists() or not picture_path.is_file():
         raise HTTPException(status_code=404, detail="Picture not found")
 
-    ext = picture_path.suffix.lower()
-    raise HTTPException(status_code=415, detail=f"Miniatures non supportées pour le format : {ext}")
+    return FileResponse(str(picture_path))
