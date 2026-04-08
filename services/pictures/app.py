@@ -1,7 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.responses import Response
-from PIL import Image
-import pyheif
 import cv2
 import io
 from pathlib import Path as PathLib
@@ -70,36 +68,23 @@ def get_picture(
     if not picture_path.exists() or not picture_path.is_file():
         raise HTTPException(status_code=404, detail="Picture not found")
 
-    # Générer une miniature pour JPEG, HEIC ou vidéo
+    # Générer une miniature pour vidéo
     ext = picture_path.suffix.lower()
     try:
         buf = io.BytesIO()
         if ext in ['.jpg', '.jpeg', '.png', '.bmp', '.gif']:
-            with Image.open(picture_path) as img:
-                img.thumbnail((256, 256))
-                img.save(buf, format=img.format or 'JPEG')
-                mime_type = Image.MIME.get(img.format, 'image/jpeg')
-        elif ext == '.heic':
-            heif_file = pyheif.read(picture_path)
-            img = Image.frombytes(
-                heif_file.mode,
-                heif_file.size,
-                heif_file.data,
-                "raw"
-            )
-            img.thumbnail((256, 256))
-            img.save(buf, format='JPEG')
-            mime_type = 'image/jpeg'
+            raise Exception(f"Format de fichier non supporté pour la miniature : {ext}")
         elif ext in ['.mp4', '.mov', '.avi', '.mkv', '.webm']:
             vidcap = cv2.VideoCapture(str(picture_path))
             success, frame = vidcap.read()
             if not success:
                 raise Exception("Impossible de lire la vidéo pour générer la miniature.")
-            # Convertir BGR (OpenCV) en RGB (Pillow)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            img = Image.fromarray(frame)
-            img.thumbnail((256, 256))
-            img.save(buf, format='JPEG')
+            # Redimensionner l'image avec OpenCV
+            frame = cv2.resize(frame, (256, 256))
+            success, encoded_img = cv2.imencode('.jpg', frame)
+            if not success:
+                raise Exception("Erreur lors de l'encodage de la miniature.")
+            buf.write(encoded_img.tobytes())
             mime_type = 'image/jpeg'
             vidcap.release()
         else:
