@@ -39,7 +39,7 @@ ENV TARGET_DIR=/data
 RUN mkdir -p /data
 
 # Exposer le port
-EXPOSE 8000
+EXPOSE 8080
 
 # Lancer le serveur
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
