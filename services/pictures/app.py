@@ -1,14 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Header
-from fastapi.responses import Response
-import cv2
-import io
 from pathlib import Path as PathLib
 import os
-import re
-import hashlib
-import json
-from datetime import datetime
-from fastapi.responses import JSONResponse, FileResponse
 import httpx
 from auth import verify_token
 
@@ -68,28 +60,5 @@ def get_picture(
     if not picture_path.exists() or not picture_path.is_file():
         raise HTTPException(status_code=404, detail="Picture not found")
 
-    # Générer une miniature pour vidéo
     ext = picture_path.suffix.lower()
-    try:
-        buf = io.BytesIO()
-        if ext in ['.jpg', '.jpeg', '.png', '.bmp', '.gif']:
-            raise Exception(f"Format de fichier non supporté pour la miniature : {ext}")
-        elif ext in ['.mp4', '.mov', '.avi', '.mkv', '.webm']:
-            vidcap = cv2.VideoCapture(str(picture_path))
-            success, frame = vidcap.read()
-            if not success:
-                raise Exception("Impossible de lire la vidéo pour générer la miniature.")
-            # Redimensionner l'image avec OpenCV
-            frame = cv2.resize(frame, (256, 256))
-            success, encoded_img = cv2.imencode('.jpg', frame)
-            if not success:
-                raise Exception("Erreur lors de l'encodage de la miniature.")
-            buf.write(encoded_img.tobytes())
-            mime_type = 'image/jpeg'
-            vidcap.release()
-        else:
-            raise Exception(f"Format de fichier non supporté pour la miniature : {ext}")
-        buf.seek(0)
-        return Response(content=buf.read(), media_type=mime_type)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erreur lors de la création de la miniature : {str(e)}")
+    raise HTTPException(status_code=415, detail=f"Miniatures non supportées pour le format : {ext}")
