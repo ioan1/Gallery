@@ -42,23 +42,7 @@ jobs:
         run: |
           docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-albums:latest --push .
 
-  pictures:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Build Docker image - pictures
-        working-directory: services/pictures/
-        run: |
-          docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-pictures:latest --push .
+  # pictures job removed — service deleted
 
   thumbnails:
     runs-on: ubuntu-latest
