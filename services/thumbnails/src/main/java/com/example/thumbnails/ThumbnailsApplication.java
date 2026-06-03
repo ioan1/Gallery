@@ -2,12 +2,15 @@ package com.example.thumbnails;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -53,6 +56,7 @@ public class ThumbnailsApplication {
 
     @GetMapping(value = "/thumbnails/small/{year}/{albumId}/{name}", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> smallPath(@PathVariable String year, @PathVariable String albumId, @PathVariable String name,
+                                            @RequestHeader(value = "Authorization", required = false) String authorization,
                                             @RequestParam(required = false) String note) throws IOException {
         try {
             // Fetch album info from albums service to get album name
@@ -62,7 +66,13 @@ public class ThumbnailsApplication {
             }
 
             String url = albumsServiceUrl + "/albums/" + year;
-            Album[] albums = restTemplate.getForObject(url, Album[].class);
+            HttpHeaders requestHeaders = new HttpHeaders();
+            if (authorization != null && !authorization.isEmpty()) {
+                requestHeaders.set("Authorization", authorization);
+            }
+            HttpEntity<Void> requestEntity = new HttpEntity<>(requestHeaders);
+            ResponseEntity<Album[]> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Album[].class);
+            Album[] albums = response.getBody();
 
             if (albums == null || albums.length == 0) {
                 return fallbackThumbnail(note);
