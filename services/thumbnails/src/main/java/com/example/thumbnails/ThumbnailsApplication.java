@@ -89,8 +89,9 @@ public class ThumbnailsApplication {
                 return fallbackThumbnail(note);
             }
 
-            // Reconstruct path: /photos/<year>/<album_name>/<name>
-            Path imagePath = Paths.get("/photos", year, album.name, name);
+            String albumFolderName = album.date + " - " + album.name;
+            // Reconstruct path: /photos/<year>/<album-date> - <albumName>/<name>
+            Path imagePath = Paths.get("/photos", year, albumFolderName, name);
 
             // Check if file exists
             if (!Files.exists(imagePath)) {
