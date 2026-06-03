@@ -60,6 +60,35 @@ jobs:
         run: |
           docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-pictures:latest --push .
 
+  thumbnails:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        working-directory: services/thumbnails/
+        run: mvn clean package -DskipTests
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image - thumbnails
+        working-directory: services/thumbnails/
+        run: |
+          docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-thumbnails:latest --push .
+
   frontend:
     runs-on: ubuntu-latest
 
