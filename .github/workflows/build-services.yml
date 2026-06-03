@@ -87,7 +87,7 @@ jobs:
       - name: Build Docker image - thumbnails
         working-directory: services/thumbnails/
         run: |
-          docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-thumbnails:latest --push .
+          docker buildx build --platform linux/amd64,linux/arm64 -t docker.redby.fr/gallery/service-thumbnails:latest --push .
 
   frontend:
     runs-on: ubuntu-latest
