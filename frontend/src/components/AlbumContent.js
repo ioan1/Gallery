@@ -18,7 +18,9 @@ function renderList(items, year, albumId, path = "") {
           return (
             <AuthImage
               key={path + item.name}
-              src={`/picture/${year}/${albumId}/${item.name}`}
+              // For now the thumbnails service will serve a placeholder image.
+              // Parameters will be added later.
+              src={`/thumbnails/small/${year}/${albumId}/${item.name}`}
               style={{
                 width: 200,
                 height: 150,
