@@ -56,7 +56,7 @@ public class ThumbnailsApplication {
     }
 
     private byte[] renderImage(String note) throws IOException {
-        int width = 100;
+        int width = 150;
         int height = 100;
 
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

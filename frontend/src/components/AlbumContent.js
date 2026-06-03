@@ -22,8 +22,8 @@ function renderList(items, year, albumId, path = "") {
               // Parameters will be added later.
               src={`/thumbnails/small/${year}/${albumId}/${item.name}`}
               style={{
-                width: 200,
-                height: 150,
+                width: 150,
+                height: 100,
                 objectFit: "cover",
                 background: "#ccc",
                 borderRadius: 6,
