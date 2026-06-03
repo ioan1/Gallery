@@ -1,5 +1,6 @@
 package com.example.thumbnails;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpEntity;
@@ -19,7 +20,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 
 @SpringBootApplication
 @RestController
+@Slf4j
 public class ThumbnailsApplication {
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -92,10 +93,12 @@ public class ThumbnailsApplication {
 
             // Check if file exists
             if (!Files.exists(imagePath)) {
+                log.warn("Image not found: " + imagePath);
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
             // Read and return the real image
+            log.info("Serving real image: " + imagePath);
             byte[] imageBytes = Files.readAllBytes(imagePath);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_JPEG);
@@ -103,7 +106,7 @@ public class ThumbnailsApplication {
             return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
 
         } catch (Exception e) {
-            System.err.println("Error loading image: " + e.getMessage());
+            log.error("Error loading image", e);
             return fallbackThumbnail(note);
         }
     }
