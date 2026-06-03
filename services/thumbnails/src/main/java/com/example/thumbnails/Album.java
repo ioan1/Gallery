@@ -1,10 +1,14 @@
 package com.example.thumbnails;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.time.LocalDate;
 
 public class Album {
     @JsonProperty("date")
-    public String date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    public LocalDate date;
     
     @JsonProperty("name")
     public String name;
@@ -14,7 +18,7 @@ public class Album {
 
     public Album() {}
 
-    public Album(String date, String name, String id) {
+    public Album(LocalDate date, String name, String id) {
         this.date = date;
         this.name = name;
         this.id = id;

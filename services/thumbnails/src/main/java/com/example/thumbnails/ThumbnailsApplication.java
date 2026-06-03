@@ -20,11 +20,14 @@ import org.springframework.web.client.RestTemplate;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.RenderingHints;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 
 @SpringBootApplication
 @RestController
@@ -89,24 +92,33 @@ public class ThumbnailsApplication {
                 return fallbackThumbnail(note);
             }
 
-            String albumDate = album.date != null ? album.date.replace("-", "") : "";
+            String albumDate = album.date != null ? album.date.format(DateTimeFormatter.BASIC_ISO_DATE) : "";
             String albumFolderName = albumDate + " - " + album.name;
+            String safeName = Paths.get(name).getFileName().toString();
             // Reconstruct path: /photos/<year>/<album-date> - <albumName>/<name>
-            Path imagePath = Paths.get("/photos", year, albumFolderName, name);
+            Path imagePath = Paths.get("/photos", year, albumFolderName, safeName);
 
-            // Check if file exists
             if (!Files.exists(imagePath)) {
                 log.warn("Image not found: " + imagePath);
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
-            // Read and return the real image
-            log.info("Serving real image: " + imagePath);
-            byte[] imageBytes = Files.readAllBytes(imagePath);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            headers.setContentLength(imageBytes.length);
-            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+            String lowerName = safeName.toLowerCase();
+            if (!lowerName.endsWith(".jpg") && !lowerName.endsWith(".jpeg") && !lowerName.endsWith(".heic")) {
+                log.warn("Unsupported image type for thumbnail: " + safeName);
+                return fallbackThumbnail(album.name + " - " + name);
+            }
+
+            try {
+                byte[] imageBytes = generateThumbnail(imagePath);
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.IMAGE_JPEG);
+                headers.setContentLength(imageBytes.length);
+                return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+            } catch (IOException e) {
+                log.error("Error generating thumbnail for " + imagePath, e);
+                return fallbackThumbnail(album.name + " - " + name);
+            }
 
         } catch (Exception e) {
             log.error("Error loading image", e);
@@ -165,5 +177,50 @@ public class ThumbnailsApplication {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(img, "jpeg", baos);
         return baos.toByteArray();
+    }
+
+    private byte[] generateThumbnail(Path imagePath) throws IOException {
+        BufferedImage source = readImage(imagePath);
+        BufferedImage thumbnail = createThumbnail(source, 300, 200);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(thumbnail, "jpeg", baos);
+        return baos.toByteArray();
+    }
+
+    private BufferedImage readImage(Path imagePath) throws IOException {
+        try (InputStream is = Files.newInputStream(imagePath)) {
+            BufferedImage image = ImageIO.read(is);
+            if (image == null) {
+                throw new IOException("Unable to read image: " + imagePath);
+            }
+            return image;
+        }
+    }
+
+    private BufferedImage createThumbnail(BufferedImage source, int width, int height) {
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
+        double scale = Math.min((double) width / sourceWidth, (double) height / sourceHeight);
+        int targetWidth = Math.max(1, (int) Math.round(sourceWidth * scale));
+        int targetHeight = Math.max(1, (int) Math.round(sourceHeight * scale));
+
+        BufferedImage thumbnail = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = thumbnail.createGraphics();
+        try {
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g.setColor(Color.WHITE);
+            g.fillRect(0, 0, width, height);
+
+            int x = (width - targetWidth) / 2;
+            int y = (height - targetHeight) / 2;
+            g.drawImage(source, x, y, targetWidth, targetHeight, null);
+        } finally {
+            g.dispose();
+        }
+        return thumbnail;
     }
 }
