@@ -2,7 +2,6 @@ package com.example.thumbnails;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,16 +26,7 @@ import java.nio.file.Paths;
 @RestController
 public class ThumbnailsApplication {
 
-    private final RestTemplate restTemplate;
-
-    public ThumbnailsApplication(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public static void main(String[] args) {
         SpringApplication.run(ThumbnailsApplication.class, args);
