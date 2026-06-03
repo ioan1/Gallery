@@ -89,7 +89,8 @@ public class ThumbnailsApplication {
                 return fallbackThumbnail(note);
             }
 
-            String albumFolderName = album.date + " - " + album.name;
+            String albumDate = album.date != null ? album.date.replace("-", "") : "";
+            String albumFolderName = albumDate + " - " + album.name;
             // Reconstruct path: /photos/<year>/<album-date> - <albumName>/<name>
             Path imagePath = Paths.get("/photos", year, albumFolderName, name);
 
