@@ -2,6 +2,7 @@ package com.example.thumbnails;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,16 +11,32 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @SpringBootApplication
 @RestController
 public class ThumbnailsApplication {
+
+    private final RestTemplate restTemplate;
+
+    public ThumbnailsApplication(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(ThumbnailsApplication.class, args);
@@ -47,8 +64,52 @@ public class ThumbnailsApplication {
     @GetMapping(value = "/thumbnails/small/{year}/{albumId}/{name}", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> smallPath(@PathVariable String year, @PathVariable String albumId, @PathVariable String name,
                                             @RequestParam(required = false) String note) throws IOException {
-        String display = (note != null && !note.isEmpty()) ? note : (year + "/" + albumId + "/" + name);
-        byte[] bytes = renderImage(display);
+        try {
+            // Fetch album info from albums service to get album name
+            String albumsServiceUrl = System.getenv("ALBUMS_SERVICE_URL");
+            if (albumsServiceUrl == null) {
+                albumsServiceUrl = "http://service-albums:8000";
+            }
+
+            String url = albumsServiceUrl + "/albums/" + year;
+            Album[] albums = restTemplate.getForObject(url, Album[].class);
+
+            if (albums == null || albums.length == 0) {
+                return fallbackThumbnail(note);
+            }
+
+            Album album = java.util.Arrays.stream(albums)
+                    .filter(a -> a.id.equals(albumId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (album == null) {
+                return fallbackThumbnail(note);
+            }
+
+            // Reconstruct path: /photos/<year>/<album_name>/<name>
+            Path imagePath = Paths.get("/photos", year, album.name, name);
+
+            // Check if file exists
+            if (!Files.exists(imagePath)) {
+                return fallbackThumbnail(album.name + " - " + name);
+            }
+
+            // Read and return the real image
+            byte[] imageBytes = Files.readAllBytes(imagePath);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            headers.setContentLength(imageBytes.length);
+            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            System.err.println("Error loading image: " + e.getMessage());
+            return fallbackThumbnail(note);
+        }
+    }
+
+    private ResponseEntity<byte[]> fallbackThumbnail(String note) throws IOException {
+        byte[] bytes = renderImage(note);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         headers.setContentLength(bytes.length);

@@ -10,5 +10,9 @@ FROM eclipse-temurin:25-jdk
 WORKDIR /app
 COPY --from=builder /app/target/thumbnails-1.0.0.jar app.jar
 
+# Mount point for photos
+VOLUME /photos
+
 EXPOSE 8080
+ENV ALBUMS_SERVICE_URL=http://service-albums:8000
 ENTRYPOINT ["java", "-jar", "app.jar"]
