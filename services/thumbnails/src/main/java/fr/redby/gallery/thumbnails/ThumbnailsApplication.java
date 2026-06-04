@@ -80,8 +80,8 @@ public class ThumbnailsApplication {
         }
     }
 
-    @GetMapping(value = "/thumbnails/small/{year}/{albumId}/{name:.+}", produces = MediaType.IMAGE_JPEG_VALUE)
-    public ResponseEntity<byte[]> smallPath(@PathVariable String year, @PathVariable String albumId, @PathVariable String name,
+    @GetMapping(value = "/thumbnails/small/{year}/{albumId}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> smallPath(@PathVariable String year, @PathVariable String albumId, @RequestParam(required = true) String name,
                                             @RequestHeader(value = "Authorization", required = false) String authorization,
                                             @RequestParam(required = false) String note) throws IOException {
         try {
@@ -146,8 +146,8 @@ public class ThumbnailsApplication {
         }
     }
 
-    @GetMapping(value = "/thumbnails/original/{year}/{albumId}/{name:.+}")
-    public ResponseEntity<byte[]> originalPath(@PathVariable String year, @PathVariable String albumId, @PathVariable String name,
+    @GetMapping(value = "/thumbnails/original/{year}/{albumId}")
+    public ResponseEntity<byte[]> originalPath(@PathVariable String year, @PathVariable String albumId, @RequestParam(required = true) String name,
                                                @RequestHeader(value = "Authorization", required = false) String authorization) throws IOException {
         try {
             // Fetch album info from albums service to get album name

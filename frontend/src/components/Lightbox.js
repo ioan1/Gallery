@@ -43,9 +43,7 @@ export default function Lightbox({ open, files = [], startIndex = 0, year, album
         return;
       }
 
-      const itemPath = file.path;
-      const encoded = itemPath.split("/").map(encodeURIComponent).join("/");
-      const url = `https://gallery.redby.fr/thumbnails/original/${year}/${albumId}/${encoded}`;
+      const url = `https://gallery.redby.fr/thumbnails/original/${year}/${albumId}?file=${file.path}`;
 
       try {
         const resp = await fetch(url, {
