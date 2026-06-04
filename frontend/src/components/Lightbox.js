@@ -43,7 +43,7 @@ export default function Lightbox({ open, files = [], startIndex = 0, year, album
         return;
       }
 
-      const url = `https://gallery.redby.fr/thumbnails/original/${year}/${albumId}?file=${file.path}`;
+      const url = `https://gallery.redby.fr/thumbnails/original/${year}/${albumId}?name=${file.path}`;
 
       try {
         const resp = await fetch(url, {

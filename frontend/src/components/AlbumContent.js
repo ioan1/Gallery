@@ -34,7 +34,7 @@ function renderList(items, year, albumId, path = "", onOpen) {
                 key={itemPath}
               // For now the thumbnails service will serve a placeholder image.
               // Parameters will be added later.
-              src={`/thumbnails/small/${year}/${albumId}?file=${encodedItemPath}`}
+              src={`/thumbnails/small/${year}/${albumId}?name=${encodedItemPath}`}
               style={{
                 width: 150,
                 height: 100,
