@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "react-oidc-context";
 
-export default function AuthImage({ src, style, title }) {
+export default function AuthImage({ src, style, title, onClick }) {
   const [imageSrc, setImageSrc] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -94,13 +94,15 @@ export default function AuthImage({ src, style, title }) {
     return (
       <div 
         ref={imgRef}
+        onClick={onClick}
         style={{ 
           ...style, 
           display: "flex", 
           alignItems: "center", 
           justifyContent: "center", 
           backgroundColor: "#f0f0f0",
-          color: "#999"
+          color: "#999",
+          cursor: onClick ? "pointer" : undefined
         }}
       >
         ❌
@@ -112,6 +114,7 @@ export default function AuthImage({ src, style, title }) {
     return (
       <div 
         ref={imgRef}
+        onClick={onClick}
         style={{ 
           ...style, 
           display: "flex", 
@@ -119,7 +122,8 @@ export default function AuthImage({ src, style, title }) {
           justifyContent: "center",
           backgroundColor: "#f5f5f5",
           color: "#999",
-          fontSize: "12px"
+          fontSize: "12px",
+          cursor: onClick ? "pointer" : undefined
         }}
       >
         {loading ? "⏳" : ""}
@@ -127,5 +131,5 @@ export default function AuthImage({ src, style, title }) {
     );
   }
 
-  return <img ref={imgRef} src={imageSrc} style={style} alt={title} title={title} />;
+  return <img ref={imgRef} onClick={onClick} src={imageSrc} style={{ ...style, cursor: onClick ? "pointer" : undefined }} alt={title} title={title} />;
 }

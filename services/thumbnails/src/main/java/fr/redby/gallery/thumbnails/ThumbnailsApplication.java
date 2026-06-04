@@ -80,7 +80,7 @@ public class ThumbnailsApplication {
         }
     }
 
-    @GetMapping(value = "/thumbnails/small/{year}/{albumId}/{name}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/thumbnails/small/{year}/{albumId}/{name:.+}", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> smallPath(@PathVariable String year, @PathVariable String albumId, @PathVariable String name,
                                             @RequestHeader(value = "Authorization", required = false) String authorization,
                                             @RequestParam(required = false) String note) throws IOException {
@@ -115,12 +115,12 @@ public class ThumbnailsApplication {
 
             String albumDate = album.date != null ? album.date.format(DateTimeFormatter.BASIC_ISO_DATE) : "";
             String albumFolderName = albumDate + " - " + album.name;
-            String safeName = Paths.get(name).getFileName().toString();
-            // Reconstruct path: /photos/<year>/<album-date> - <albumName>/<name>
-            Path imagePath = Paths.get("/photos", year, albumFolderName, safeName);
+            // Resolve the requested name (may contain nested folders). Prevent path traversal.
+            Path albumBase = Paths.get("/photos", year, albumFolderName).toAbsolutePath().normalize();
+            Path imagePath = albumBase.resolve(name).normalize();
 
-            if (!Files.exists(imagePath)) {
-                log.warn("Image not found: " + imagePath);
+            if (!imagePath.startsWith(albumBase) || !Files.exists(imagePath)) {
+                log.warn("Image not found or invalid path: " + imagePath);
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
@@ -143,6 +143,65 @@ public class ThumbnailsApplication {
         } catch (Exception e) {
             log.error("Error loading image", e);
             return fallbackThumbnail(note);
+        }
+    }
+
+    @GetMapping(value = "/thumbnails/original/{year}/{albumId}/{name:.+}")
+    public ResponseEntity<byte[]> originalPath(@PathVariable String year, @PathVariable String albumId, @PathVariable String name,
+                                               @RequestHeader(value = "Authorization", required = false) String authorization) throws IOException {
+        try {
+            // Fetch album info from albums service to get album name
+            String albumsServiceUrl = System.getenv("ALBUMS_SERVICE_URL");
+            if (albumsServiceUrl == null) {
+                albumsServiceUrl = "http://service-albums:8000";
+            }
+
+            String url = albumsServiceUrl + "/albums/" + year;
+            HttpHeaders requestHeaders = new HttpHeaders();
+            if (authorization != null && !authorization.isEmpty()) {
+                requestHeaders.set("Authorization", authorization);
+            }
+            HttpEntity<Void> requestEntity = new HttpEntity<>(requestHeaders);
+            ResponseEntity<Album[]> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Album[].class);
+            Album[] albums = response.getBody();
+
+            if (albums == null || albums.length == 0) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Album album = java.util.Arrays.stream(albums)
+                    .filter(a -> a.id.equals(albumId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (album == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String albumDate = album.date != null ? album.date.format(DateTimeFormatter.BASIC_ISO_DATE) : "";
+            String albumFolderName = albumDate + " - " + album.name;
+            Path albumBase = Paths.get("/photos", year, albumFolderName).toAbsolutePath().normalize();
+            Path imagePath = albumBase.resolve(name).normalize();
+
+            if (!imagePath.startsWith(albumBase) || !Files.exists(imagePath)) {
+                log.warn("Original not found or invalid path: " + imagePath);
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = Files.probeContentType(imagePath);
+            byte[] data = Files.readAllBytes(imagePath);
+            HttpHeaders headers = new HttpHeaders();
+            if (contentType != null) {
+                headers.setContentType(MediaType.parseMediaType(contentType));
+            } else {
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            }
+            headers.setContentLength(data.length);
+            return new ResponseEntity<>(data, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("Error loading original image", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
