@@ -189,7 +189,7 @@ public class ThumbnailsApplication {
                 return ResponseEntity.notFound().build();
             }
 
-            String contentType = Files.probeContentType(imagePath);
+            String contentType = detectMimeType(imagePath);
             log.info("Serving original image: " + imagePath + " with content type: " + contentType);
             byte[] data = Files.readAllBytes(imagePath);
             HttpHeaders headers = new HttpHeaders();
@@ -205,6 +205,26 @@ public class ThumbnailsApplication {
             log.error("Error loading original image", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    public static String detectMimeType(Path path) throws IOException {
+        String mime = Files.probeContentType(path);
+
+        if (mime != null) {
+            return mime;
+        }
+
+        String filename = path.getFileName().toString();
+
+        if (filename.toLowerCase(Locale.ROOT).endsWith(".heic")) {
+            return "image/heic";
+        }
+
+        if (filename.toLowerCase(Locale.ROOT).endsWith(".heif")) {
+            return "image/heif";
+        }
+
+        return "application/octet-stream";
     }
 
     private ResponseEntity<byte[]> fallbackThumbnail(String note) throws IOException {
