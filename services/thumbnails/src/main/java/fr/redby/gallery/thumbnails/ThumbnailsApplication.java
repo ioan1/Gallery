@@ -1,10 +1,6 @@
 package fr.redby.gallery.thumbnails;
 
-import fr.redby.gallery.thumbnails.strategy.ThumbnailStrategy;
-import fr.redby.gallery.thumbnails.strategy.image.HeicThumbnailStrategy;
-import fr.redby.gallery.thumbnails.strategy.image.JpegThumbnailStrategy;
-import fr.redby.gallery.thumbnails.strategy.video.MovThumbnailStrategy;
-import fr.redby.gallery.thumbnails.strategy.video.Mp4ThumbnailStrategy;
+import fr.redby.gallery.thumbnails.service.ThumbnailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -25,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import javax.imageio.ImageIO;
-import java.util.List;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.RenderingHints;
@@ -44,12 +39,11 @@ public class ThumbnailsApplication {
 
     private static final Logger log = LoggerFactory.getLogger(ThumbnailsApplication.class);
     private final RestTemplate restTemplate = new RestTemplate();
-    private final List<ThumbnailStrategy> thumbnailStrategies = List.of(
-            new JpegThumbnailStrategy(),
-            new HeicThumbnailStrategy(),
-            new Mp4ThumbnailStrategy(),
-            new MovThumbnailStrategy()
-    );
+    private final ThumbnailService thumbnailService;
+
+    public ThumbnailsApplication(ThumbnailService thumbnailService) {
+        this.thumbnailService = thumbnailService;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(ThumbnailsApplication.class, args);
@@ -118,13 +112,7 @@ public class ThumbnailsApplication {
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
-            ThumbnailStrategy strategy = selectStrategy(imagePath);
-            if (strategy == null) {
-                log.warn("Unsupported media type for thumbnail: " + safeName);
-                return fallbackThumbnail(album.name + " - " + name);
-            }
-
-            byte[] imageBytes = generateCachedThumbnail(year, albumId, name, imagePath);
+            byte[] imageBytes = thumbnailService.getThumbnail(year, albumId, name, imagePath);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_JPEG);
             headers.setContentLength(imageBytes.length);
@@ -134,11 +122,6 @@ public class ThumbnailsApplication {
             log.error("Error loading image", e);
             return fallbackThumbnail(note);
         }
-    }
-
-    @Cacheable(value = "thumbnails", key = "#year + ':' + #albumId + ':' + #name")
-    private byte[] generateCachedThumbnail(String year, String albumId, String name, Path imagePath) throws IOException {
-        return generateThumbnail(imagePath);
     }
 
     private ResponseEntity<byte[]> fallbackThumbnail(String note) throws IOException {
@@ -192,20 +175,5 @@ public class ThumbnailsApplication {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(img, "jpeg", baos);
         return baos.toByteArray();
-    }
-
-    private byte[] generateThumbnail(Path imagePath) throws IOException {
-        ThumbnailStrategy strategy = selectStrategy(imagePath);
-        if (strategy == null) {
-            throw new IOException("No thumbnail strategy found for " + imagePath);
-        }
-        return strategy.generate(imagePath);
-    }
-
-    private ThumbnailStrategy selectStrategy(Path imagePath) {
-        return thumbnailStrategies.stream()
-                .filter(strategy -> strategy.supports(imagePath))
-                .findFirst()
-                .orElse(null);
     }
 }
