@@ -1,5 +1,10 @@
-package com.example.thumbnails;
+package fr.redby.gallery.thumbnails;
 
+import fr.redby.gallery.thumbnails.strategy.ThumbnailStrategy;
+import fr.redby.gallery.thumbnails.strategy.image.HeicThumbnailStrategy;
+import fr.redby.gallery.thumbnails.strategy.image.JpegThumbnailStrategy;
+import fr.redby.gallery.thumbnails.strategy.video.MovThumbnailStrategy;
+import fr.redby.gallery.thumbnails.strategy.video.Mp4ThumbnailStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -20,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import javax.imageio.ImageIO;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -41,6 +44,12 @@ public class ThumbnailsApplication {
 
     private static final Logger log = LoggerFactory.getLogger(ThumbnailsApplication.class);
     private final RestTemplate restTemplate = new RestTemplate();
+    private final List<ThumbnailStrategy> thumbnailStrategies = List.of(
+            new JpegThumbnailStrategy(),
+            new HeicThumbnailStrategy(),
+            new Mp4ThumbnailStrategy(),
+            new MovThumbnailStrategy()
+    );
 
     public static void main(String[] args) {
         SpringApplication.run(ThumbnailsApplication.class, args);
@@ -109,9 +118,9 @@ public class ThumbnailsApplication {
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
-            String lowerName = safeName.toLowerCase();
-            if (!lowerName.endsWith(".jpg") && !lowerName.endsWith(".jpeg") && !lowerName.endsWith(".heic")) {
-                log.warn("Unsupported image type for thumbnail: " + safeName);
+            ThumbnailStrategy strategy = selectStrategy(imagePath);
+            if (strategy == null) {
+                log.warn("Unsupported media type for thumbnail: " + safeName);
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
@@ -186,116 +195,17 @@ public class ThumbnailsApplication {
     }
 
     private byte[] generateThumbnail(Path imagePath) throws IOException {
-        try {
-            return generateThumbnailWithImageMagick(imagePath);
-        } catch (IOException e) {
-            log.warn("ImageMagick thumbnail generation failed, falling back to Java resize", e);
-            BufferedImage source = readImage(imagePath);
-            BufferedImage thumbnail = createThumbnail(source, 300, 200);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(thumbnail, "jpeg", baos);
-            return baos.toByteArray();
+        ThumbnailStrategy strategy = selectStrategy(imagePath);
+        if (strategy == null) {
+            throw new IOException("No thumbnail strategy found for " + imagePath);
         }
+        return strategy.generate(imagePath);
     }
 
-    private byte[] generateThumbnailWithImageMagick(Path imagePath) throws IOException {
-        // Try multiple external converters in order: ImageMagick (magick), ImageMagick (convert), ffmpeg
-        return tryExternalConverters(imagePath);
-    }
-
-    private byte[] tryExternalConverters(Path imagePath) throws IOException {
-        List<String[]> cmds = new ArrayList<>();
-
-        // ImageMagick 7 style: magick <input> <operations> jpeg:-
-        cmds.add(new String[]{"magick", imagePath.toString(), "-auto-orient", "-resize", "300x200^", "-gravity", "center", "-extent", "300x200", "-quality", "90", "jpeg:-"});
-        // ImageMagick 6 style: convert <input> <operations> jpeg:-
-        cmds.add(new String[]{"convert", imagePath.toString(), "-auto-orient", "-resize", "300x200^", "-gravity", "center", "-extent", "300x200", "-quality", "90", "jpeg:-"});
-        // Fallback: ffmpeg to produce a single JPEG frame to stdout
-        cmds.add(new String[]{"ffmpeg", "-y", "-i", imagePath.toString(), "-vframes", "1", "-vf", "scale=300:200:force_original_aspect_ratio=decrease,pad=300:200:(ow-iw)/2:(oh-ih)/2", "-f", "image2", "-q:v", "2", "pipe:1"});
-
-        IOException lastEx = null;
-        for (String[] cmd : cmds) {
-            try {
-                return runProcessToBytes(Arrays.asList(cmd));
-            } catch (IOException e) {
-                lastEx = e;
-                log.warn("Converter failed: " + String.join(" ", cmd) + ", error: " + e.getMessage());
-            }
-        }
-
-        if (lastEx != null) {
-            throw new IOException("All external converters failed: " + lastEx.getMessage(), lastEx);
-        }
-        throw new IOException("No external converter attempted");
-    }
-
-    private byte[] runProcessToBytes(List<String> cmd) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(cmd);
-        pb.redirectError(ProcessBuilder.Redirect.PIPE);
-        Process process;
-        try {
-            process = pb.start();
-        } catch (IOException e) {
-            throw new IOException("Failed to start process: " + String.join(" ", cmd), e);
-        }
-
-        try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream(); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = stdout.read(buffer)) != -1) {
-                baos.write(buffer, 0, read);
-            }
-
-            String errorText = new String(stderr.readAllBytes());
-            int exitCode;
-            try {
-                exitCode = process.waitFor();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                throw new IOException("External converter interrupted", ie);
-            }
-
-            if (exitCode != 0) {
-                throw new IOException("Converter failed (exit " + exitCode + "): " + errorText);
-            }
-
-            return baos.toByteArray();
-        }
-    }
-
-    private BufferedImage readImage(Path imagePath) throws IOException {
-        try (InputStream is = Files.newInputStream(imagePath)) {
-            BufferedImage image = ImageIO.read(is);
-            if (image == null) {
-                throw new IOException("Unable to read image: " + imagePath);
-            }
-            return image;
-        }
-    }
-
-    private BufferedImage createThumbnail(BufferedImage source, int width, int height) {
-        int sourceWidth = source.getWidth();
-        int sourceHeight = source.getHeight();
-        double scale = Math.min((double) width / sourceWidth, (double) height / sourceHeight);
-        int targetWidth = Math.max(1, (int) Math.round(sourceWidth * scale));
-        int targetHeight = Math.max(1, (int) Math.round(sourceHeight * scale));
-
-        BufferedImage thumbnail = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = thumbnail.createGraphics();
-        try {
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, width, height);
-
-            int x = (width - targetWidth) / 2;
-            int y = (height - targetHeight) / 2;
-            g.drawImage(source, x, y, targetWidth, targetHeight, null);
-        } finally {
-            g.dispose();
-        }
-        return thumbnail;
+    private ThumbnailStrategy selectStrategy(Path imagePath) {
+        return thumbnailStrategies.stream()
+                .filter(strategy -> strategy.supports(imagePath))
+                .findFirst()
+                .orElse(null);
     }
 }
