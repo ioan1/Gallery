@@ -12,8 +12,12 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractImageThumbnailStrategy implements ThumbnailStrategy {
     private final List<String> supportedExtensions;
+    private static final Logger log = LoggerFactory.getLogger(AbstractImageThumbnailStrategy.class);
 
     protected AbstractImageThumbnailStrategy(String... supportedExtensions) {
         this.supportedExtensions = Arrays.asList(supportedExtensions);
@@ -30,6 +34,7 @@ public abstract class AbstractImageThumbnailStrategy implements ThumbnailStrateg
         try {
             return generateViaExternalConverter(filePath);
         } catch (IOException e) {
+            log.warn("External converter failed for {}, falling back to Java resize: {}", filePath, e.getMessage());
             BufferedImage source = readImage(filePath);
             BufferedImage thumbnail = createThumbnail(source, 300, 200);
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
