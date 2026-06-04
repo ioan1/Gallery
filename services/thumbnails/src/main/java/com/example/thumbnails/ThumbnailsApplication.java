@@ -180,12 +180,55 @@ public class ThumbnailsApplication {
     }
 
     private byte[] generateThumbnail(Path imagePath) throws IOException {
-        BufferedImage source = readImage(imagePath);
-        BufferedImage thumbnail = createThumbnail(source, 300, 200);
+        try {
+            return generateThumbnailWithImageMagick(imagePath);
+        } catch (IOException e) {
+            log.warn("ImageMagick thumbnail generation failed, falling back to Java resize", e);
+            BufferedImage source = readImage(imagePath);
+            BufferedImage thumbnail = createThumbnail(source, 600, 400);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(thumbnail, "jpeg", baos);
+            return baos.toByteArray();
+        }
+    }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(thumbnail, "jpeg", baos);
-        return baos.toByteArray();
+    private byte[] generateThumbnailWithImageMagick(Path imagePath) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder(
+                "magick", "convert",
+                imagePath.toString(),
+                "-auto-orient",
+                "-resize", "600x400^",
+                "-gravity", "center",
+                "-extent", "600x400",
+                "-quality", "90",
+                "jpeg:-"
+        );
+        pb.redirectError(ProcessBuilder.Redirect.PIPE);
+
+        Process process = pb.start();
+        try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = stdout.read(buffer)) != -1) {
+                baos.write(buffer, 0, read);
+            }
+
+            String errorText = new String(stderr.readAllBytes());
+            int exitCode;
+            try {
+                exitCode = process.waitFor();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                throw new IOException("ImageMagick thumbnail generation interrupted", ie);
+            }
+
+            if (exitCode != 0) {
+                throw new IOException("ImageMagick convert failed (exit " + exitCode + "): " + errorText);
+            }
+
+            return baos.toByteArray();
+        }
     }
 
     private BufferedImage readImage(Path imagePath) throws IOException {

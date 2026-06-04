@@ -9,13 +9,13 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:25-jdk
 WORKDIR /app
 
-# Install ImageMagick
+# Install ImageMagick and HEIC support
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends imagemagick \
-	&& rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends imagemagick libheif1 libde265-0
+    && apt-get install -y --no-install-recommends \
+       imagemagick \
+       libheif1 \
+       libde265-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/target/thumbnails-1.0.0.jar app.jar
 
