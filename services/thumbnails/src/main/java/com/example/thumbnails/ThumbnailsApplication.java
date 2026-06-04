@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 
 @SpringBootApplication
 @RestController
+@EnableCaching
 public class ThumbnailsApplication {
 
     private static final Logger log = LoggerFactory.getLogger(ThumbnailsApplication.class);
@@ -109,21 +112,21 @@ public class ThumbnailsApplication {
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
-            try {
-                byte[] imageBytes = generateThumbnail(imagePath);
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.IMAGE_JPEG);
-                headers.setContentLength(imageBytes.length);
-                return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-            } catch (IOException e) {
-                log.error("Error generating thumbnail for " + imagePath, e);
-                return fallbackThumbnail(album.name + " - " + name);
-            }
+            byte[] imageBytes = generateCachedThumbnail(year, albumId, name, imagePath);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            headers.setContentLength(imageBytes.length);
+            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
 
         } catch (Exception e) {
             log.error("Error loading image", e);
             return fallbackThumbnail(note);
         }
+    }
+
+    @Cacheable(value = "thumbnails", key = "#year + ':' + #albumId + ':' + #name")
+    private byte[] generateCachedThumbnail(String year, String albumId, String name, Path imagePath) throws IOException {
+        return generateThumbnail(imagePath);
     }
 
     private ResponseEntity<byte[]> fallbackThumbnail(String note) throws IOException {
