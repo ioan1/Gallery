@@ -41,7 +41,7 @@ public class ThumbnailsApplication {
     private static final Logger log = LoggerFactory.getLogger(ThumbnailsApplication.class);
     private final RestTemplate restTemplate = new RestTemplate();
     private final ThumbnailService thumbnailService;
-    private final Semaphore requestSemaphore = new Semaphore(2);
+    private final Semaphore requestSemaphore = new Semaphore(2, true);
 
     public ThumbnailsApplication(ThumbnailService thumbnailService) {
         this.thumbnailService = thumbnailService;
@@ -63,9 +63,11 @@ public class ThumbnailsApplication {
 
     @GetMapping(value = "/thumbnails/small", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> small(@RequestParam(required = false) String note) throws IOException {
-        if (!requestSemaphore.tryAcquire()) {
-            log.warn("Too many concurrent requests, rejecting /thumbnails/small request");
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(new byte[0]);
+        try {
+            requestSemaphore.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Interrupted while waiting for request processing slot", e);
         }
         try {
             byte[] bytes = renderImage(note);
@@ -122,9 +124,11 @@ public class ThumbnailsApplication {
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
-            if (!requestSemaphore.tryAcquire()) {
-                log.warn("Too many concurrent requests, rejecting /thumbnails/small/{year}/{albumId}/{name} request");
-                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(new byte[0]);
+            try {
+                requestSemaphore.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Interrupted while waiting for request processing slot", e);
             }
             try {
                 byte[] imageBytes = thumbnailService.getThumbnail(year, albumId, name, imagePath);
