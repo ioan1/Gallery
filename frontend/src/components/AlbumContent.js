@@ -24,12 +24,15 @@ function renderList(items, year, albumId, path = "") {
       {items.map((item) => {
         if (item.type === "file") {
           const itemPath = basePath ? `${basePath}/${item.name}` : item.name;
+          // Encode each path segment but preserve slashes so the thumbnails
+          // service can receive nested paths like "gopro/GH011066.MP4".
+          const encodedItemPath = itemPath.split("/").map(encodeURIComponent).join("/");
           return (
             <AuthImage
               key={itemPath}
               // For now the thumbnails service will serve a placeholder image.
               // Parameters will be added later.
-              src={`/thumbnails/small/${year}/${albumId}/${itemPath}`}
+              src={`/thumbnails/small/${year}/${albumId}/${encodedItemPath}`}
               style={{
                 width: 150,
                 height: 100,
