@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.Semaphore;
 
 @SpringBootApplication
 @RestController
@@ -40,6 +41,7 @@ public class ThumbnailsApplication {
     private static final Logger log = LoggerFactory.getLogger(ThumbnailsApplication.class);
     private final RestTemplate restTemplate = new RestTemplate();
     private final ThumbnailService thumbnailService;
+    private final Semaphore requestSemaphore = new Semaphore(2);
 
     public ThumbnailsApplication(ThumbnailService thumbnailService) {
         this.thumbnailService = thumbnailService;
@@ -61,11 +63,19 @@ public class ThumbnailsApplication {
 
     @GetMapping(value = "/thumbnails/small", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> small(@RequestParam(required = false) String note) throws IOException {
-        byte[] bytes = renderImage(note);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        headers.setContentLength(bytes.length);
-        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        if (!requestSemaphore.tryAcquire()) {
+            log.warn("Too many concurrent requests, rejecting /thumbnails/small request");
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(new byte[0]);
+        }
+        try {
+            byte[] bytes = renderImage(note);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            headers.setContentLength(bytes.length);
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        } finally {
+            requestSemaphore.release();
+        }
     }
 
     @GetMapping(value = "/thumbnails/small/{year}/{albumId}/{name}", produces = MediaType.IMAGE_JPEG_VALUE)
@@ -112,11 +122,19 @@ public class ThumbnailsApplication {
                 return fallbackThumbnail(album.name + " - " + name);
             }
 
-            byte[] imageBytes = thumbnailService.getThumbnail(year, albumId, name, imagePath);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            headers.setContentLength(imageBytes.length);
-            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+            if (!requestSemaphore.tryAcquire()) {
+                log.warn("Too many concurrent requests, rejecting /thumbnails/small/{year}/{albumId}/{name} request");
+                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(new byte[0]);
+            }
+            try {
+                byte[] imageBytes = thumbnailService.getThumbnail(year, albumId, name, imagePath);
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.IMAGE_JPEG);
+                headers.setContentLength(imageBytes.length);
+                return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+            } finally {
+                requestSemaphore.release();
+            }
 
         } catch (Exception e) {
             log.error("Error loading image", e);
