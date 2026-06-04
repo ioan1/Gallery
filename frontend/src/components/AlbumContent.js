@@ -6,6 +6,14 @@ import AuthImage from "./AuthImage";
 function renderList(items, year, albumId, path = "") {
   if (!items || items.length === 0) return null;
 
+  // Normalize path to avoid leading slashes (we want "sub/dir", not "/sub/dir")
+  const normalize = (p) => {
+    if (!p) return "";
+    return p.startsWith("/") ? p.slice(1) : p;
+  };
+
+  const basePath = normalize(path);
+
   return (
     <div style={{
       display: "flex",
@@ -15,12 +23,13 @@ function renderList(items, year, albumId, path = "") {
     }}>
       {items.map((item) => {
         if (item.type === "file") {
+          const itemPath = basePath ? `${basePath}/${item.name}` : item.name;
           return (
             <AuthImage
-              key={path + item.name}
+              key={itemPath}
               // For now the thumbnails service will serve a placeholder image.
               // Parameters will be added later.
-              src={`/thumbnails/small/${year}/${albumId}/${item.name}`}
+              src={`/thumbnails/small/${year}/${albumId}/${itemPath}`}
               style={{
                 width: 150,
                 height: 100,
@@ -34,12 +43,13 @@ function renderList(items, year, albumId, path = "") {
             />
           );
         } else if (item.type === "dir") {
+          const dirPath = basePath ? `${basePath}/${item.name}` : item.name;
           return (
-            <div key={path + item.name} style={{ minWidth: 120 }}>
+            <div key={dirPath} style={{ minWidth: 120 }}>
               <div style={{ fontWeight: "bold", marginBottom: 4 }}>{item.name}/</div>
               {item.children && item.children.length > 0 && (
                 <div style={{ marginLeft: 10 }}>
-                  {renderList(item.children, year, albumId, path + '/' + item.name)}
+                  {renderList(item.children, year, albumId, dirPath)}
                 </div>
               )}
             </div>
