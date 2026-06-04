@@ -8,6 +8,15 @@ RUN mvn clean package -DskipTests
 # Runtime stage
 FROM eclipse-temurin:25-jdk
 WORKDIR /app
+
+# Install ImageMagick
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends imagemagick \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends imagemagick libheif1 libde265-0
+
 COPY --from=builder /app/target/thumbnails-1.0.0.jar app.jar
 
 # Mount point for photos
