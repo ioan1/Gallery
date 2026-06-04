@@ -103,7 +103,7 @@ export default function Lightbox({ open, files = [], startIndex = 0, year, album
           {loading && <div>Chargement...</div>}
           {error && <div style={{ color: "red" }}>{error}</div>}
           {!loading && !error && imageUrl && (
-            <img src={imageUrl} alt={files[index]?.name} style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 6 }} />
+            <img src={imageUrl} alt={files[index]?.name} style={{ maxWidth: "100vw", maxHeight: "100vh", borderRadius: 6 }} />
           )}
         </div>
         <div style={{ marginTop: 8, textAlign: "center", fontSize: 12 }}>{files[index]?.path}</div>
