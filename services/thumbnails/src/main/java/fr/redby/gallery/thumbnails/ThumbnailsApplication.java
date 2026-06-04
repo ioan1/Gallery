@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -150,7 +152,7 @@ public class ThumbnailsApplication {
     }
 
     @GetMapping(value = "/thumbnails/original/{year}/{albumId}")
-    public ResponseEntity<byte[]> originalPath(@PathVariable String year, @PathVariable String albumId, @RequestParam(required = true) String name,
+    public ResponseEntity<Resource>  originalPath(@PathVariable String year, @PathVariable String albumId, @RequestParam(required = true) String name,
                                                @RequestHeader(value = "Authorization", required = false) String authorization) throws IOException {
         try {
             // Fetch album info from albums service to get album name
@@ -193,15 +195,19 @@ public class ThumbnailsApplication {
 
             String contentType = detectMimeType(imagePath);
             log.info("Serving original image: " + imagePath + " with content type: " + contentType);
-            byte[] data = Files.readAllBytes(imagePath);
+
             HttpHeaders headers = new HttpHeaders();
             if (contentType != null) {
                 headers.setContentType(MediaType.parseMediaType(contentType));
             } else {
                 headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             }
-            headers.setContentLength(data.length);
-            return new ResponseEntity<>(data, headers, HttpStatus.OK);
+
+            Resource resource = new FileSystemResource(imagePath);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
 
         } catch (Exception e) {
             log.error("Error loading original image", e);
