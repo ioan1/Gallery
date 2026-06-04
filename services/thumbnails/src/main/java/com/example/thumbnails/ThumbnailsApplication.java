@@ -188,7 +188,7 @@ public class ThumbnailsApplication {
         } catch (IOException e) {
             log.warn("ImageMagick thumbnail generation failed, falling back to Java resize", e);
             BufferedImage source = readImage(imagePath);
-            BufferedImage thumbnail = createThumbnail(source, 600, 400);
+            BufferedImage thumbnail = createThumbnail(source, 300, 200);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(thumbnail, "jpeg", baos);
             return baos.toByteArray();
@@ -202,7 +202,7 @@ public class ThumbnailsApplication {
                 "-auto-orient",
                 "-resize", "300x200^",
                 "-gravity", "center",
-                "-extent", "600x400",
+                "-extent", "300x200",
                 "-quality", "90",
                 "jpeg:-"
         );
