@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import javax.imageio.ImageIO;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.RenderingHints;
@@ -196,21 +199,47 @@ public class ThumbnailsApplication {
     }
 
     private byte[] generateThumbnailWithImageMagick(Path imagePath) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(
-                "magick", "convert",
-                imagePath.toString(),
-                "-auto-orient",
-                "-resize", "300x200^",
-                "-gravity", "center",
-                "-extent", "300x200",
-                "-quality", "90",
-                "jpeg:-"
-        );
-        pb.redirectError(ProcessBuilder.Redirect.PIPE);
+        // Try multiple external converters in order: ImageMagick (magick), ImageMagick (convert), ffmpeg
+        return tryExternalConverters(imagePath);
+    }
 
-        Process process = pb.start();
-        try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream();
-             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+    private byte[] tryExternalConverters(Path imagePath) throws IOException {
+        List<String[]> cmds = new ArrayList<>();
+
+        // ImageMagick 7 style: magick <input> <operations> jpeg:-
+        cmds.add(new String[]{"magick", imagePath.toString(), "-auto-orient", "-resize", "300x200^", "-gravity", "center", "-extent", "300x200", "-quality", "90", "jpeg:-"});
+        // ImageMagick 6 style: convert <input> <operations> jpeg:-
+        cmds.add(new String[]{"convert", imagePath.toString(), "-auto-orient", "-resize", "300x200^", "-gravity", "center", "-extent", "300x200", "-quality", "90", "jpeg:-"});
+        // Fallback: ffmpeg to produce a single JPEG frame to stdout
+        cmds.add(new String[]{"ffmpeg", "-y", "-i", imagePath.toString(), "-vframes", "1", "-vf", "scale=300:200:force_original_aspect_ratio=decrease,pad=300:200:(ow-iw)/2:(oh-ih)/2", "-f", "image2", "-q:v", "2", "pipe:1"});
+
+        IOException lastEx = null;
+        for (String[] cmd : cmds) {
+            try {
+                return runProcessToBytes(Arrays.asList(cmd));
+            } catch (IOException e) {
+                lastEx = e;
+                log.warn("Converter failed: " + String.join(" ", cmd) + ", error: " + e.getMessage());
+            }
+        }
+
+        if (lastEx != null) {
+            throw new IOException("All external converters failed: " + lastEx.getMessage(), lastEx);
+        }
+        throw new IOException("No external converter attempted");
+    }
+
+    private byte[] runProcessToBytes(List<String> cmd) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder(cmd);
+        pb.redirectError(ProcessBuilder.Redirect.PIPE);
+        Process process;
+        try {
+            process = pb.start();
+        } catch (IOException e) {
+            throw new IOException("Failed to start process: " + String.join(" ", cmd), e);
+        }
+
+        try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream(); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[8192];
             int read;
             while ((read = stdout.read(buffer)) != -1) {
@@ -223,11 +252,11 @@ public class ThumbnailsApplication {
                 exitCode = process.waitFor();
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
-                throw new IOException("ImageMagick thumbnail generation interrupted", ie);
+                throw new IOException("External converter interrupted", ie);
             }
 
             if (exitCode != 0) {
-                throw new IOException("ImageMagick convert failed (exit " + exitCode + "): " + errorText);
+                throw new IOException("Converter failed (exit " + exitCode + "): " + errorText);
             }
 
             return baos.toByteArray();
