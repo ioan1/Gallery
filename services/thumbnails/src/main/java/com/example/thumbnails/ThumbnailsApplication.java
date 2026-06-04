@@ -197,7 +197,7 @@ public class ThumbnailsApplication {
                 "magick", "convert",
                 imagePath.toString(),
                 "-auto-orient",
-                "-resize", "600x400^",
+                "-resize", "300x200^",
                 "-gravity", "center",
                 "-extent", "600x400",
                 "-quality", "90",
