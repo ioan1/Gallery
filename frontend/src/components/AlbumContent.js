@@ -39,7 +39,7 @@ function renderList(items, year, albumId, path = "") {
               <div style={{ fontWeight: "bold", marginBottom: 4 }}>{item.name}/</div>
               {item.children && item.children.length > 0 && (
                 <div style={{ marginLeft: 10 }}>
-                  {renderList(item.children, path + item.name + "/")}
+                  {renderList(item.children, year, albumId, path + '/' + item.name)}
                 </div>
               )}
             </div>
