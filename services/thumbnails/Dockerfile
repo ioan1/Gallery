@@ -15,6 +15,7 @@ RUN apt-get update \
          imagemagick \
          libheif1 \
          libde265-0 \
+         libheif-plugin-libde265 \
          ffmpeg \
      && rm -rf /var/lib/apt/lists/*
 
@@ -27,24 +28,6 @@ RUN ldconfig || true \
 ENV LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu
 
 COPY --from=builder /app/target/thumbnails-1.0.0.jar app.jar
-
-# Increase ImageMagick policy limits so large HEIC images are accepted
-# Some distributions place the policy at /etc/ImageMagick/policy.xml or /etc/ImageMagick-6/policy.xml
-RUN mkdir -p /etc/ImageMagick \
-        && cat > /etc/ImageMagick/policy.xml <<'POLICY'\
-<?xml version="1.0" encoding="UTF-8"?>\
-<policies>\
-    <!-- Increase maximum dimensions and area to allow large images -->\
-    <policy domain="resource" name="width" value="100000"/>\
-    <policy domain="resource" name="height" value="100000"/>\
-    <policy domain="resource" name="area" value="100000000"/>\
-    <!-- Increase memory/map limits to reasonable amounts for conversion -->\
-    <policy domain="resource" name="memory" value="2GiB"/>\
-    <policy domain="resource" name="map" value="4GiB"/>\
-</policies>\
-POLICY\
-        && mkdir -p /etc/ImageMagick-6 || true \
-        && ln -sf /etc/ImageMagick/policy.xml /etc/ImageMagick-6/policy.xml || true
 
 # Mount point for photos
 VOLUME /photos
