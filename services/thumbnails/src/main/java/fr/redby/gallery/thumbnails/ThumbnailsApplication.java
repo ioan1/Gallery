@@ -61,6 +61,7 @@ public class ThumbnailsApplication {
         return "{\"service\":\"Thumbnails\",\"version\":\"1.0.0\"}";
     }
 
+    // TODO: probably not used, to remove
     @GetMapping(value = "/thumbnails/small", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> small(@RequestParam(required = false) String note) throws IOException {
         try {
@@ -189,6 +190,7 @@ public class ThumbnailsApplication {
             }
 
             String contentType = Files.probeContentType(imagePath);
+            log.info("Serving original image: " + imagePath + " with content type: " + contentType);
             byte[] data = Files.readAllBytes(imagePath);
             HttpHeaders headers = new HttpHeaders();
             if (contentType != null) {
