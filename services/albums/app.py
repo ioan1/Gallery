@@ -5,11 +5,15 @@ import re
 import hashlib
 import redis
 import json
+import random
 from datetime import datetime
 from fastapi.responses import JSONResponse
 from auth import verify_token
 
 app = FastAPI(title="Albums service")
+
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic"}
+VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".webm"}
 
 # Connexion Redis
 REDIS_HOST = os.getenv("REDIS_HOST", "service-cache")
@@ -19,6 +23,38 @@ CACHE_KEY_ALBUMS = "albums"
 CACHE_KEY_FILES = "album_files"
 
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
+
+def find_random_thumbnail(album_path: Path) -> str | None:
+    images = []
+    videos = []
+
+    try:
+        for file in album_path.rglob("*"):
+            if not file.is_file():
+                continue
+
+            if ".DS_Store" in file.parts or "@eaDir" in file.parts:
+                continue
+
+            ext = file.suffix.lower()
+
+            rel_path = file.relative_to(album_path).as_posix()
+
+            if ext in IMAGE_EXTENSIONS:
+                images.append(rel_path)
+            elif ext in VIDEO_EXTENSIONS:
+                videos.append(rel_path)
+
+    except OSError:
+        return None
+
+    if images:
+        return random.choice(images)
+
+    if videos:
+        return random.choice(videos)
+
+    return None
 
 @app.get("/albums/{year}")
 def list_albums_for_year(year: int, claims: dict = Depends(verify_token)):
@@ -52,7 +88,7 @@ def list_albums_for_year(year: int, claims: dict = Depends(verify_token)):
                     # Convert YYYYMMDD to YYYY-MM-DD
                     formatted_date = datetime.strptime(date_str, "%Y%m%d").date().isoformat()
                     id = hashlib.blake2b(item.name.encode(), digest_size=4).hexdigest()
-                    albums.append({"date": formatted_date, "name": name, "id": id})
+                    albums.append({"date": formatted_date, "name": name, "id": id, "thumbnail": find_random_thumbnail(item)})
                 except ValueError:
                     # Skip invalid date formats
                     continue
