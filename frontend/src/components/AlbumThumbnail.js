@@ -12,7 +12,7 @@ export default function AlbumThumbnail({ album }) {
         onClick={handleClick}
         style={{
           display: "grid",
-          gridTemplateColumns: "60px 90px 1fr",
+          gridTemplateColumns: "50px 90px 1fr",
           alignItems: "center",
           padding: "8px",
           borderBottom: "1px solid #eee",
@@ -24,8 +24,8 @@ export default function AlbumThumbnail({ album }) {
                     key={album.thumbnail}
                     src={`/thumbnails/small/${album.date.slice(0, 4)}/${album.id}?name=${album.thumbnail}`}
                     style={{
-                      width: "35",
-                      height: "35",
+                      width: "35px",
+                      height: "35px",
                       objectFit: "cover",
                       background: "#ccc",
                       borderRadius: 4,
