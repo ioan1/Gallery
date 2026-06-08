@@ -33,7 +33,7 @@ export default function AlbumThumbnail({ album }) {
         >
           {album.thumbnail ? ( <AuthImage
                           key={album.thumbnail}
-                        src={`/thumbnails/small/${year}/${albumId}?name=${album.thumbnail}`}
+                        src={`/thumbnails/small/${album.date.slice(0, 4)}/${album.id}?name=${album.thumbnail}`}
                         style={{
                           width: "35",
                           height: "35",
