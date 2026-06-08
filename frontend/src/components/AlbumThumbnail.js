@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AlbumContent from "./AlbumContent";
+import AuthImage from "./AuthImage";
 
 export default function AlbumThumbnail({ album }) {
   const [showContent, setShowContent] = useState(false);
@@ -29,7 +30,22 @@ export default function AlbumThumbnail({ album }) {
             alignItems: "center",
             justifyContent: "center",
           }}
-        />
+        >
+          {album.thumbnail ? ( <AuthImage
+                          key={album.thumbnail}
+                        src={`/thumbnails/small/${year}/${albumId}?name=${album.thumbnail}`}
+                        style={{
+                          width: "35",
+                          height: "35",
+                          objectFit: "cover",
+                          background: "#ccc",
+                          borderRadius: 4,
+                          fontSize: 10,
+                          overflow: "hidden"
+                        }}
+                        title={album.name}
+                        /> ) : null}
+        </div>
         <div style={{ fontFamily: "monospace" }}>{album.date}</div>
         <div>
           <strong>{album.name}</strong>
