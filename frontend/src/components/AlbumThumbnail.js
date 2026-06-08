@@ -20,32 +20,22 @@ export default function AlbumThumbnail({ album }) {
           background: showContent ? "#f8f8f8" : "white",
         }}
       >
-        <div
-          style={{
-            width: 35,
-            height: 35,
-            background: "#ccc",
-            borderRadius: 4,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {album.thumbnail ? ( <AuthImage
-                          key={album.thumbnail}
-                        src={`/thumbnails/small/${album.date.slice(0, 4)}/${album.id}?name=${album.thumbnail}`}
-                        style={{
-                          width: "35",
-                          height: "35",
-                          objectFit: "cover",
-                          background: "#ccc",
-                          borderRadius: 4,
-                          fontSize: 10,
-                          overflow: "hidden"
-                        }}
-                        title={album.name}
-                        /> ) : null}
-        </div>
+      {album.thumbnail ? ( <AuthImage
+                    key={album.thumbnail}
+                    src={`/thumbnails/small/${album.date.slice(0, 4)}/${album.id}?name=${album.thumbnail}`}
+                    style={{
+                      width: "35",
+                      height: "35",
+                      objectFit: "cover",
+                      background: "#ccc",
+                      borderRadius: 4,
+                      fontSize: 10,
+                      overflow: "hidden",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                    title={album.name}
+                    /> ) : null}
         <div style={{ fontFamily: "monospace" }}>{album.date}</div>
         <div>
           <strong>{album.name}</strong>
