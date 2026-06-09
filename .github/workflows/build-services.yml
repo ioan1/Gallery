@@ -90,3 +90,22 @@ jobs:
         working-directory: frontend/
         run: |
           docker buildx build --platform linux/arm/v7,linux/arm64 -t docker.redby.fr/gallery/frontend:latest --push .
+
+
+  random:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image - random
+        working-directory: services/random/
+        run: |
+          docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-random:latest --push .
