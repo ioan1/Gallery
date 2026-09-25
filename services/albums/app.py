@@ -14,13 +14,14 @@ app = FastAPI(title="Albums service")
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic"}
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".webm"}
+IGNORED_EXTENSIONS = {".thm"}
 
 # Connexion Redis
 REDIS_HOST = os.getenv("REDIS_HOST", "service-cache")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_TTL = int(os.getenv("REDIS_TTL", "300"))
 CACHE_KEY_ALBUMS = "albums"
-CACHE_KEY_FILES = "album_files"
+CACHE_KEY_FILES = "album_files:v2"
 
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
 
@@ -130,6 +131,8 @@ def walk_dir(path: Path):
     entries = []
     for child in sorted(path.iterdir()):
         if child.name in [".DS_Store", "@eaDir"]:
+            continue
+        if child.is_file() and child.suffix.lower() in IGNORED_EXTENSIONS:
             continue
         entry = {"name": child.name, "type": "dir" if child.is_dir() else "file"}
         if child.is_dir():
