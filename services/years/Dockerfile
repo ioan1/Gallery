@@ -1,5 +1,5 @@
 # Image légère Python
-FROM arm32v7/python:3.12-slim-bookworm
+FROM arm32v7/python:3.12-slim-bullseye
 
 RUN apt-get update && \
     apt-get install -y build-essential zlib1g zlib1g-dev libssl-dev libffi-dev curl && \
