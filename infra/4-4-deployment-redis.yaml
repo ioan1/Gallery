@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-cache
+  namespace: gallery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-cache
+  template:
+    metadata:
+      labels:
+        app: service-cache
+    spec:
+      containers:
+        - name: service-cache
+          image: redis
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6379

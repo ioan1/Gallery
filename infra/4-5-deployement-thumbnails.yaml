@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thumbnails
+  namespace: gallery
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: thumbnails
+  template:
+    metadata:
+      labels:
+        app: thumbnails
+    spec:
+      containers:
+        - name: thumbnails
+          image: docker.redby.fr/gallery/service-thumbnails:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: TARGET_DIR
+              value: "/photos"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xint -XX:+UseSerialGC -XX:+UseContainerSupport"
+          volumeMounts:
+            - name: photos-storage
+              mountPath: /photos
+              readOnly: true
+          resources:
+            requests:
+              memory: "512Mi"
+            limits:
+              memory: "1Gi"
+      volumes:
+        - name: photos-storage
+          persistentVolumeClaim:
+            claimName: photos-pvc
