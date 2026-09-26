@@ -7,9 +7,45 @@ on:
     paths-ignore:
       - 'infra/**'
 
+permissions:
+  contents: write
+
+concurrency:
+  group: gallery-image-release
+  cancel-in-progress: false
+
 jobs:
-  years:
+  version:
     runs-on: ubuntu-latest
+    outputs:
+      image_version: ${{ steps.version.outputs.image_version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Calculate image version
+        id: version
+        run: |
+          git fetch --force --tags origin
+          latest_tag="$(git tag --list 'v1.0.*' --sort=-version:refname | head -n 1)"
+          if [[ -z "$latest_tag" ]]; then
+            image_version="1.0.0"
+          else
+            patch="${latest_tag##*.}"
+            if ! [[ "$patch" =~ ^[0-9]+$ ]]; then
+              echo "Invalid release tag: $latest_tag" >&2
+              exit 1
+            fi
+            image_version="1.0.$((patch + 1))"
+          fi
+          echo "image_version=$image_version" >> "$GITHUB_OUTPUT"
+
+  years:
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_VERSION: ${{ needs.version.outputs.image_version }}
 
     steps:
       - name: Checkout code
@@ -24,10 +60,15 @@ jobs:
       - name: Build Docker image - years
         working-directory: services/years/
         run: |
-          docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-years:latest --push .
+          docker buildx build --platform linux/arm/v7,linux/arm64 \
+            -t docker.redby.fr/gallery/service-years:${IMAGE_VERSION} \
+            -t docker.redby.fr/gallery/service-years:latest --push .
 
   albums:
+    needs: version
     runs-on: ubuntu-latest
+    env:
+      IMAGE_VERSION: ${{ needs.version.outputs.image_version }}
 
     steps:
       - name: Checkout code
@@ -42,12 +83,17 @@ jobs:
       - name: Build Docker image - albums
         working-directory: services/albums/
         run: |
-          docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-albums:latest --push .
+          docker buildx build --platform linux/arm/v7,linux/arm64 \
+            -t docker.redby.fr/gallery/service-albums:${IMAGE_VERSION} \
+            -t docker.redby.fr/gallery/service-albums:latest --push .
 
   # pictures job removed — service deleted
 
   thumbnails:
+    needs: version
     runs-on: ubuntu-latest
+    env:
+      IMAGE_VERSION: ${{ needs.version.outputs.image_version }}
 
     steps:
       - name: Checkout code
@@ -73,10 +119,15 @@ jobs:
       - name: Build Docker image - thumbnails
         working-directory: services/thumbnails/
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 -t docker.redby.fr/gallery/service-thumbnails:latest --push .
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -t docker.redby.fr/gallery/service-thumbnails:${IMAGE_VERSION} \
+            -t docker.redby.fr/gallery/service-thumbnails:latest --push .
 
   frontend:
+    needs: version
     runs-on: ubuntu-latest
+    env:
+      IMAGE_VERSION: ${{ needs.version.outputs.image_version }}
 
     steps:
       - name: Checkout code
@@ -91,11 +142,16 @@ jobs:
       - name: Build Docker image - frontend
         working-directory: frontend/
         run: |
-          docker buildx build --platform linux/arm/v7,linux/arm64 -t docker.redby.fr/gallery/frontend:latest --push .
+          docker buildx build --platform linux/arm/v7,linux/arm64 \
+            -t docker.redby.fr/gallery/frontend:${IMAGE_VERSION} \
+            -t docker.redby.fr/gallery/frontend:latest --push .
 
 
   random:
+    needs: version
     runs-on: ubuntu-latest
+    env:
+      IMAGE_VERSION: ${{ needs.version.outputs.image_version }}
 
     steps:
       - name: Checkout code
@@ -110,4 +166,57 @@ jobs:
       - name: Build Docker image - random
         working-directory: services/random/
         run: |
-          docker buildx build --platform linux/arm/v7 -t docker.redby.fr/gallery/service-random:latest --push .
+          docker buildx build --platform linux/arm/v7 \
+            -t docker.redby.fr/gallery/service-random:${IMAGE_VERSION} \
+            -t docker.redby.fr/gallery/service-random:latest --push .
+
+  update-deployments:
+    needs: [version, years, albums, thumbnails, frontend, random]
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_VERSION: ${{ needs.version.outputs.image_version }}
+
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Update Rancher deployment images
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          version = os.environ["IMAGE_VERSION"]
+          deployments = {
+              "infra/4-1-deplyoment-years.yaml": "docker.redby.fr/gallery/service-years",
+              "infra/4-2-deplyoment-albums.yaml": "docker.redby.fr/gallery/service-albums",
+              "infra/4-3-deployment-frontend.yaml": "docker.redby.fr/gallery/frontend",
+              "infra/4-5-deployement-thumbnails.yaml": "docker.redby.fr/gallery/service-thumbnails",
+          }
+
+          for filename, image in deployments.items():
+              path = Path(filename)
+              content = path.read_text()
+              updated, count = re.subn(
+                  rf"(image:\s*{re.escape(image)}:)[^\s#]+",
+                  rf"\g<1>{version}",
+                  content,
+              )
+              if count != 1:
+                  raise SystemExit(f"Expected one image reference for {image} in {filename}, got {count}")
+              path.write_text(updated)
+          PY
+
+      - name: Commit deployment version and Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add infra/4-1-deplyoment-years.yaml infra/4-2-deplyoment-albums.yaml \
+            infra/4-3-deployment-frontend.yaml infra/4-5-deployement-thumbnails.yaml
+          git commit -m "Deploy image release ${IMAGE_VERSION}"
+          git tag -a "v${IMAGE_VERSION}" "${GITHUB_SHA}" -m "Gallery image release ${IMAGE_VERSION}"
+          git push --atomic origin HEAD:main "refs/tags/v${IMAGE_VERSION}"
