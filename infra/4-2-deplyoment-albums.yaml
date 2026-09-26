@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: service-albums
-          image: docker.redby.fr/gallery/service-albums:latest
+          image: docker.redby.fr/gallery/service-albums:1.0.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

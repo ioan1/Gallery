@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: thumbnails
-          image: docker.redby.fr/gallery/service-thumbnails:latest
+          image: docker.redby.fr/gallery/service-thumbnails:1.0.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
