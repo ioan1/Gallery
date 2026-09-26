@@ -166,7 +166,7 @@ jobs:
       - name: Build Docker image - random
         working-directory: services/random/
         run: |
-          docker buildx build --platform linux/arm/v7 \
+          docker buildx build --platform linux/arm/v7,linux/arm64 \
             -t docker.redby.fr/gallery/service-random:${IMAGE_VERSION} \
             -t docker.redby.fr/gallery/service-random:latest --push .
 
