@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-years
+  namespace: gallery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-years
+  template:
+    metadata:
+      labels:
+        app: service-years
+    spec:
+      containers:
+        - name: service-years
+          image: docker.redby.fr/gallery/service-years:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: TARGET_DIR
+              value: "/photos"
+          volumeMounts:
+            - name: photos-storage
+              mountPath: /photos
+              readOnly: true
+      volumes:
+        - name: photos-storage
+          persistentVolumeClaim:
+            claimName: photos-pvc
