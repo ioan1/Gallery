@@ -1,0 +1,53 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: years-ingress
+  namespace: gallery
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - gallery.redby.fr
+      secretName: gallery-redby-fr-tls
+  rules:
+    - host: gallery.redby.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: service-frontend
+                port:
+                  number: 80
+          - path: /years
+            pathType: Prefix
+            backend:
+              service:
+                name: service-years
+                port:
+                  number: 8000
+          - path: /album
+            pathType: Prefix
+            backend:
+              service:
+                name: service-albums
+                port:
+                  number: 8000
+          - path: /thumbnail
+            pathType: Prefix
+            backend:
+              service:
+                name: service-thumbnails
+                port:
+                  number: 8080
+          - path: /random
+            pathType: Prefix
+            backend:
+              service:
+                name: service-random
+                port:
+                  number: 8000
+                  

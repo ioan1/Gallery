@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: random
+  namespace: gallery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: random
+  template:
+    metadata:
+      labels:
+        app: random
+    spec:
+      containers:
+        - name: random
+          image: docker.redby.fr/gallery/service-random:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
