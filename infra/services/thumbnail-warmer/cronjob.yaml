@@ -21,11 +21,16 @@ spec:
               image: docker.redby.fr/gallery/thumbnail-warmer:1.0.3
               imagePullPolicy: Always
               env:
-                - name: COGNITO_REFRESH_TOKEN
+                - name: COGNITO_USERNAME
                   valueFrom:
                     secretKeyRef:
                       name: thumbnail-warmer-auth
-                      key: refresh-token
+                      key: username
+                - name: COGNITO_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: thumbnail-warmer-auth
+                      key: password
                 - name: COGNITO_REGION
                   value: us-east-1
                 - name: COGNITO_CLIENT_ID

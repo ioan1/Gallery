@@ -31,17 +31,18 @@ def fetch_json(url, token):
 
 
 def get_access_token():
-    refresh_token = os.getenv("COGNITO_REFRESH_TOKEN")
-    if not refresh_token:
-        raise ValueError("COGNITO_REFRESH_TOKEN is required")
+    username = os.getenv("COGNITO_USERNAME")
+    password = os.getenv("COGNITO_PASSWORD")
+    if not username or not password:
+        raise ValueError("COGNITO_USERNAME and COGNITO_PASSWORD are required")
 
     request = Request(
         f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/",
         data=json.dumps(
             {
-                "AuthFlow": "REFRESH_TOKEN_AUTH",
+                "AuthFlow": "USER_PASSWORD_AUTH",
                 "ClientId": COGNITO_CLIENT_ID,
-                "AuthParameters": {"REFRESH_TOKEN": refresh_token},
+                "AuthParameters": {"USERNAME": username, "PASSWORD": password},
             }
         ).encode(),
         headers={
