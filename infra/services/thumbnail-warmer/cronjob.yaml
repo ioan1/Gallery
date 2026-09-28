@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: thumbnail-warmer
+  namespace: gallery
+spec:
+  schedule: "15 3 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      ttlSecondsAfterFinished: 604800
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: thumbnail-warmer
+              image: docker.redby.fr/gallery/thumbnail-warmer:1.0.0
+              imagePullPolicy: Always
+              env:
+                - name: COGNITO_REFRESH_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: thumbnail-warmer-auth
+                      key: refresh-token
+                - name: COGNITO_REGION
+                  value: us-east-1
+                - name: COGNITO_CLIENT_ID
+                  value: 4cm803bb86anli21j7nf29lvhh
+                - name: WARM_INTERVAL_SECONDS
+                  value: "1"
+                - name: HTTP_TIMEOUT_SECONDS
+                  value: "120"
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "25m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "500m"
