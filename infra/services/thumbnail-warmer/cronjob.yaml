@@ -22,15 +22,9 @@ spec:
               imagePullPolicy: Always
               env:
                 - name: COGNITO_USERNAME
-                  valueFrom:
-                    secretKeyRef:
-                      name: thumbnail-warmer-auth
-                      key: username
+                  value: "thumbnails-warmer"
                 - name: COGNITO_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: thumbnail-warmer-auth
-                      key: password
+                  value: "thumbnails-Warmer1"
                 - name: COGNITO_REGION
                   value: us-east-1
                 - name: COGNITO_CLIENT_ID
