@@ -22,7 +22,7 @@ spec:
               imagePullPolicy: Always
               env:
                 - name: COGNITO_USERNAME
-                  value: "thumbnails-warmer" 
+                  value: "thumbnails-warmer"
                 - name: COGNITO_PASSWORD
                   value: "thumbnails-Warmer1"
                 - name: COGNITO_REGION

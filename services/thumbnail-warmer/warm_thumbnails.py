@@ -50,8 +50,19 @@ def get_access_token():
             "X-Amz-Target": "AWSCognitoIdentityProviderService.InitiateAuth",
         },
     )
-    with urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
-        result = json.load(response)
+    try:
+        with urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
+            result = json.load(response)
+    except HTTPError as error:
+        try:
+            details = json.loads(error.read())
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            details = {}
+        error_code = details.get("__type", "Unknown").rsplit("#", 1)[-1]
+        message = details.get("message", "No error details returned")
+        raise ValueError(
+            f"Cognito authentication failed (HTTP {error.code}, {error_code}): {message}"
+        ) from None
     return result["AuthenticationResult"]["AccessToken"]
 
 
