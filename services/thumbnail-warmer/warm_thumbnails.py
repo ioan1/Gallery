@@ -108,6 +108,12 @@ def run():
                     try:
                         warm_thumbnail(year, album["id"], image_path, token)
                         warmed += 1
+                        logger.info(
+                            "Warmed thumbnail %s/%s/%s",
+                            year,
+                            album["id"],
+                            image_path,
+                        )
                     except (HTTPError, URLError, TimeoutError, OSError) as error:
                         failures += 1
                         logger.warning(
