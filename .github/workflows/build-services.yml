@@ -87,7 +87,28 @@ jobs:
             -t docker.redby.fr/gallery/service-albums:${IMAGE_VERSION} \
             -t docker.redby.fr/gallery/service-albums:latest --push .
 
-  # pictures job removed — service deleted
+  faces:
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_VERSION: ${{ needs.version.outputs.image_version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image - faces
+        working-directory: services/faces/
+        run: |
+          docker buildx build --platform linux/arm/v7,linux/arm64 \
+            -t docker.redby.fr/gallery/service-faces:${IMAGE_VERSION} \
+            -t docker.redby.fr/gallery/service-faces:latest --push .
 
   thumbnails:
     needs: version
@@ -194,7 +215,7 @@ jobs:
             -t docker.redby.fr/gallery/service-random:latest --push .
 
   update-deployments:
-    needs: [version, years, albums, thumbnails, thumbnail-warmer, frontend, random]
+    needs: [version, years, albums, faces, thumbnails, thumbnail-warmer, frontend, random]
     runs-on: ubuntu-latest
     env:
       IMAGE_VERSION: ${{ needs.version.outputs.image_version }}
@@ -217,6 +238,7 @@ jobs:
           deployments = {
               "infra/services/years/deployment.yaml": "docker.redby.fr/gallery/service-years",
               "infra/services/albums/deployment.yaml": "docker.redby.fr/gallery/service-albums",
+              "infra/services/faces/deployment.yaml": "docker.redby.fr/gallery/service-faces",
               "infra/services/frontend/deployment.yaml": "docker.redby.fr/gallery/frontend",
               "infra/services/thumbnails/deployment.yaml": "docker.redby.fr/gallery/service-thumbnails",
               "infra/services/thumbnail-warmer/cronjob.yaml": "docker.redby.fr/gallery/thumbnail-warmer",
@@ -240,8 +262,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add infra/services/years/deployment.yaml infra/services/albums/deployment.yaml \
-            infra/services/frontend/deployment.yaml infra/services/thumbnails/deployment.yaml \
-            infra/services/thumbnail-warmer/cronjob.yaml
+            infra/services/faces/deployment.yaml infra/services/frontend/deployment.yaml \
+            infra/services/thumbnails/deployment.yaml infra/services/thumbnail-warmer/cronjob.yaml
           git commit -m "Deploy image release ${IMAGE_VERSION}"
           git tag -a "v${IMAGE_VERSION}" "${GITHUB_SHA}" -m "Gallery image release ${IMAGE_VERSION}"
           git push --atomic origin HEAD:main "refs/tags/v${IMAGE_VERSION}"

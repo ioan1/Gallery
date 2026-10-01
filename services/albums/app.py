@@ -14,7 +14,7 @@ app = FastAPI(title="Albums service")
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic"}
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".webm"}
-IGNORED_EXTENSIONS = {".thm"}
+IGNORED_EXTENSIONS = {".thm", ".db"}
 
 # Connexion Redis
 REDIS_HOST = os.getenv("REDIS_HOST", "service-cache")
