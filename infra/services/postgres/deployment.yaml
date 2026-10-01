@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: service-faces-postgres
-          image: postgres:16-alpine
+          image: pgvector/pgvector:pg16
           imagePullPolicy: Always
           ports:
             - containerPort: 5432
