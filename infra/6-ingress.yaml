@@ -50,4 +50,11 @@ spec:
                 name: service-random
                 port:
                   number: 8000
+          - path: /faces
+            pathType: Prefix
+            backend:
+              service:
+                name: service-faces
+                port:
+                  number: 8000
                   
