@@ -28,6 +28,8 @@ https://gallery.redby.fr/thumbnails/small/2008/d467cc0f?name=IMAGE_517.jpg
 - `THUMBNAILS_BASE_URL` : base URL du service thumbnails, défaut `https://gallery.redby.fr`
 - `ALLOWED_HOST` : hôte autorisé, défaut `gallery.redby.fr`
 - `DATABASE_URL` : chaîne PostgreSQL, défaut `postgresql://faces:faces@service-postgres:5432/faces`
+- `FACE_DET_SIZE` : taille de détection InsightFace, défaut `1024`
+- `FACE_DET_THRESHOLD` : seuil de détection, défaut `0.35` (diminuer pour augmenter la sensibilité)
 
 ## Docker
 

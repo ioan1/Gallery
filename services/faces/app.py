@@ -20,6 +20,8 @@ DATABASE_URL = os.getenv(
 )
 HTTP_TIMEOUT_SECONDS = float(os.getenv("HTTP_TIMEOUT_SECONDS", "20"))
 MAX_IMAGE_BYTES = int(os.getenv("MAX_IMAGE_BYTES", str(10 * 1024 * 1024)))
+FACE_DET_SIZE = int(os.getenv("FACE_DET_SIZE", "1024"))
+FACE_DET_THRESHOLD = float(os.getenv("FACE_DET_THRESHOLD", "0.35"))
 
 SAFE_KEY_RE = re.compile(r"^[A-Za-z0-9._-]+$")
 SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9._-]+\.[A-Za-z0-9]+$")
@@ -133,7 +135,11 @@ def detect_faces(image_bytes: bytes):
 
     try:
         app = FaceAnalysis(providers=["CPUExecutionProvider"])
-        app.prepare(ctx_id=0, det_size=(640, 640))
+        app.prepare(
+            ctx_id=0,
+            det_size=(FACE_DET_SIZE, FACE_DET_SIZE),
+            det_thresh=FACE_DET_THRESHOLD,
+        )
     except Exception as exc:  # pragma: no cover
         raise RuntimeError(f"Failed to initialize InsightFace: {exc}") from exc
 
