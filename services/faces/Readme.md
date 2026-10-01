@@ -12,10 +12,10 @@ Service dédié à la détection de visages humains et au stockage des embedding
 }
 ```
 
-Le service reconstruit ensuite l’URL de la miniature :
+Le service reconstruit ensuite l’URL de l’image originale et transmet le JWT à thumbnails :
 
 ```text
-https://gallery.redby.fr/thumbnails/small/2008/d467cc0f?name=IMAGE_517.jpg
+https://gallery.redby.fr/thumbnails/original/2008/d467cc0f?name=IMAGE_517.jpg
 ```
 
 ## Endpoints
@@ -28,6 +28,7 @@ https://gallery.redby.fr/thumbnails/small/2008/d467cc0f?name=IMAGE_517.jpg
 - `THUMBNAILS_BASE_URL` : base URL du service thumbnails, défaut `https://gallery.redby.fr`
 - `ALLOWED_HOST` : hôte autorisé, défaut `gallery.redby.fr`
 - `DATABASE_URL` : chaîne PostgreSQL, défaut `postgresql://faces:faces@service-postgres:5432/faces`
+- `MAX_IMAGE_BYTES` : taille maximale de l’image source, défaut `52428800` (50 MiB)
 - `FACE_DET_SIZE` : taille de détection InsightFace, défaut `1024`
 - `FACE_DET_THRESHOLD` : seuil de détection, défaut `0.35` (diminuer pour augmenter la sensibilité)
 

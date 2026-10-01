@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse
 import numpy as np
 import psycopg2
 import requests
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from auth import verify_token
@@ -19,7 +19,7 @@ DATABASE_URL = os.getenv(
     "postgresql://faces:faces@service-faces-postgres:5432/faces",
 )
 HTTP_TIMEOUT_SECONDS = float(os.getenv("HTTP_TIMEOUT_SECONDS", "20"))
-MAX_IMAGE_BYTES = int(os.getenv("MAX_IMAGE_BYTES", str(10 * 1024 * 1024)))
+MAX_IMAGE_BYTES = int(os.getenv("MAX_IMAGE_BYTES", str(50 * 1024 * 1024)))
 FACE_DET_SIZE = int(os.getenv("FACE_DET_SIZE", "1024"))
 FACE_DET_THRESHOLD = float(os.getenv("FACE_DET_THRESHOLD", "0.35"))
 
@@ -90,15 +90,15 @@ def validate_image_key(category: str, album: str, name: str) -> str:
     if not SAFE_NAME_RE.fullmatch(name):
         raise ValueError("Invalid image name format")
 
-    url = f"{THUMBNAILS_BASE_URL}/thumbnails/small/{category}/{album}?name={name}"
+    url = f"{THUMBNAILS_BASE_URL}/thumbnails/original/{category}/{album}?name={name}"
     parsed = urlparse(url)
 
     if parsed.scheme != "https":
         raise ValueError("Only HTTPS urls are allowed")
     if parsed.hostname != ALLOWED_HOST:
         raise ValueError("Host not allowed")
-    if not parsed.path.startswith("/thumbnails/small/"):
-        raise ValueError("Invalid thumbnail path")
+    if not parsed.path.startswith("/thumbnails/original/"):
+        raise ValueError("Invalid original image path")
 
     qs = parse_qs(parsed.query)
     if qs.get("name", [""])[0] != name:
@@ -107,8 +107,13 @@ def validate_image_key(category: str, album: str, name: str) -> str:
     return url
 
 
-def download_image(image_url: str) -> bytes:
-    response = requests.get(image_url, timeout=HTTP_TIMEOUT_SECONDS, allow_redirects=False)
+def download_image(image_url: str, authorization: str) -> bytes:
+    response = requests.get(
+        image_url,
+        headers={"Authorization": authorization},
+        timeout=HTTP_TIMEOUT_SECONDS,
+        allow_redirects=False,
+    )
     response.raise_for_status()
 
     content_type = response.headers.get("Content-Type", "")
@@ -210,10 +215,14 @@ def health_check():
 
 
 @app.post("/faces/index")
-def index_face(payload: FaceIndexRequest, claims: dict = Depends(verify_token)):
+def index_face(
+    payload: FaceIndexRequest,
+    authorization: str = Header(...),
+    claims: dict = Depends(verify_token),
+):
     try:
         image_url = validate_image_key(payload.category, payload.album, payload.name)
-        image_bytes = download_image(image_url)
+        image_bytes = download_image(image_url, authorization)
         faces = detect_faces(image_bytes)
 
         if not faces:
