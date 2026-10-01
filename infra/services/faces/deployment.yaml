@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-faces
+  namespace: gallery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-faces
+  template:
+    metadata:
+      labels:
+        app: service-faces
+    spec:
+      containers:
+        - name: service-faces
+          image: docker.redby.fr/gallery/service-faces:1.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: THUMBNAILS_BASE_URL
+              value: "https://gallery.redby.fr"
+            - name: ALLOWED_HOST
+              value: "gallery.redby.fr"
+            - name: DATABASE_URL
+              value: "postgresql://faces:faces@service-faces-postgres:5432/faces"
+            - name: AWS_REGION
+              value: "us-east-1"
+            - name: USER_POOL_ID
+              value: "us-east-1_bHxrl8GNt"

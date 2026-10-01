@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-faces-postgres
+  namespace: gallery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-faces-postgres
+  template:
+    metadata:
+      labels:
+        app: service-faces-postgres
+    spec:
+      containers:
+        - name: service-faces-postgres
+          image: postgres:16-alpine
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "faces"
+            - name: POSTGRES_USER
+              value: "faces"
+            - name: POSTGRES_PASSWORD
+              value: "faces"
