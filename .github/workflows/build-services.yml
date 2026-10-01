@@ -106,7 +106,7 @@ jobs:
       - name: Build Docker image - faces
         working-directory: services/faces/
         run: |
-          docker buildx build --platform linux/arm/v7,linux/arm64 \
+          docker buildx build --platform linux/amd64,linux/arm64 \
             -t docker.redby.fr/gallery/service-faces:${IMAGE_VERSION} \
             -t docker.redby.fr/gallery/service-faces:latest --push .
 
