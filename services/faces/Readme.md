@@ -22,6 +22,9 @@ https://gallery.redby.fr/thumbnails/original/2008/d467cc0f?name=IMAGE_517.jpg
 
 - GET /health
 - POST /faces/index
+- GET /faces/{year}/{albumId}/people-count
+
+Le compteur regroupe les embeddings de l’album par similarité cosinus. Il est recalculé à la demande.
 
 ## Variables d’environnement
 
@@ -31,6 +34,7 @@ https://gallery.redby.fr/thumbnails/original/2008/d467cc0f?name=IMAGE_517.jpg
 - `MAX_IMAGE_BYTES` : taille maximale de l’image source, défaut `52428800` (50 MiB)
 - `FACE_DET_SIZE` : taille de détection InsightFace, défaut `1024`
 - `FACE_DET_THRESHOLD` : seuil de détection, défaut `0.35` (diminuer pour augmenter la sensibilité)
+- `PERSON_SIMILARITY_THRESHOLD` : similarité cosinus minimale pour regrouper deux visages, défaut `0.45`
 
 ## Docker
 

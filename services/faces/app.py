@@ -1,6 +1,6 @@
 import os
 import re
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 
 import numpy as np
 import psycopg2
@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from auth import verify_token
+from people import count_distinct_people
 
 app = FastAPI(title="Faces service")
 
@@ -22,9 +23,9 @@ HTTP_TIMEOUT_SECONDS = float(os.getenv("HTTP_TIMEOUT_SECONDS", "20"))
 MAX_IMAGE_BYTES = int(os.getenv("MAX_IMAGE_BYTES", str(50 * 1024 * 1024)))
 FACE_DET_SIZE = int(os.getenv("FACE_DET_SIZE", "1024"))
 FACE_DET_THRESHOLD = float(os.getenv("FACE_DET_THRESHOLD", "0.35"))
+PERSON_SIMILARITY_THRESHOLD = float(os.getenv("PERSON_SIMILARITY_THRESHOLD", "0.45"))
 
 SAFE_KEY_RE = re.compile(r"^[A-Za-z0-9._-]+$")
-SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9._-]+\.[A-Za-z0-9]+$")
 
 
 class FaceIndexRequest(BaseModel):
@@ -87,10 +88,16 @@ def validate_image_key(category: str, album: str, name: str) -> str:
         raise ValueError("Invalid category format")
     if not SAFE_KEY_RE.fullmatch(album):
         raise ValueError("Invalid album format")
-    if not SAFE_NAME_RE.fullmatch(name):
+    name_parts = name.split("/")
+    if (
+        len(name) > 256
+        or "\\" in name
+        or any(part in {"", ".", ".."} for part in name_parts)
+        or any(ord(character) < 32 for character in name)
+    ):
         raise ValueError("Invalid image name format")
 
-    url = f"{THUMBNAILS_BASE_URL}/thumbnails/original/{category}/{album}?name={name}"
+    url = f"{THUMBNAILS_BASE_URL}/thumbnails/original/{category}/{album}?name={quote(name, safe='/')}"
     parsed = urlparse(url)
 
     if parsed.scheme != "https":
@@ -157,7 +164,7 @@ def detect_faces(image_bytes: bytes):
     valid_faces = []
 
     for face in faces:
-        if face.det_score < 0.5:
+        if face.det_score < FACE_DET_THRESHOLD:
             continue
 
         bbox = face.bbox
@@ -175,7 +182,7 @@ def detect_faces(image_bytes: bytes):
     return valid_faces
 
 
-def save_face_record(category: str, album: str, name: str, image_url: str, face: dict) -> None:
+def save_face_records(category: str, album: str, name: str, image_url: str, faces: list[dict]) -> None:
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -189,22 +196,25 @@ def save_face_record(category: str, album: str, name: str, image_url: str, face:
                 (category, album, name, image_url),
             )
             image_id = cur.fetchone()[0]
-
-            cur.execute(
+            cur.execute("DELETE FROM faces WHERE image_id = %s", (image_id,))
+            cur.executemany(
                 """
                 INSERT INTO faces (image_id, face_type, embedding, confidence, x, y, w, h)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """,
-                (
-                    image_id,
-                    "human",
-                    face["embedding"],
-                    face["confidence"],
-                    face["x"],
-                    face["y"],
-                    face["w"],
-                    face["h"],
-                ),
+                [
+                    (
+                        image_id,
+                        "human",
+                        face["embedding"],
+                        face["confidence"],
+                        face["x"],
+                        face["y"],
+                        face["w"],
+                        face["h"],
+                    )
+                    for face in faces
+                ],
             )
         conn.commit()
 
@@ -212,6 +222,29 @@ def save_face_record(category: str, album: str, name: str, image_url: str, face:
 @app.get("/health")
 def health_check():
     return {"status": "ok", "service": "faces"}
+
+
+@app.get("/faces/{year}/{album_id}/people-count")
+def get_album_people_count(year: str, album_id: str, claims: dict = Depends(verify_token)):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT faces.embedding::text
+                FROM faces
+                JOIN images ON images.id = faces.image_id
+                WHERE images.category = %s AND images.album = %s
+                  AND faces.embedding IS NOT NULL
+                """,
+                (year, album_id),
+            )
+            embeddings = [row[0] for row in cur.fetchall()]
+
+    return {
+        "year": year,
+        "album": album_id,
+        "people_count": count_distinct_people(embeddings, PERSON_SIMILARITY_THRESHOLD),
+    }
 
 
 @app.post("/faces/index")
@@ -224,6 +257,7 @@ def index_face(
         image_url = validate_image_key(payload.category, payload.album, payload.name)
         image_bytes = download_image(image_url, authorization)
         faces = detect_faces(image_bytes)
+        save_face_records(payload.category, payload.album, payload.name, image_url, faces)
 
         if not faces:
             return {
@@ -235,9 +269,6 @@ def index_face(
                     "name": payload.name,
                 },
             }
-
-        for face in faces:
-            save_face_record(payload.category, payload.album, payload.name, image_url, face)
 
         return {
             "status": "ok",
