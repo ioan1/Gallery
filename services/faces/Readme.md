@@ -45,3 +45,27 @@ docker build -t gallery/faces .
 ## Déploiement Kubernetes
 
 Les manifests sont dans `infra/services/faces` et `infra/services/postgres`.
+
+### Persistance PostgreSQL
+
+Le manifeste `infra/services/postgres/pvc.yaml` crée un volume persistant de 10 Gio. PostgreSQL reste sur un seul pod (`replicas: 1`). Comme la base actuelle peut être abandonnée, les commandes suivantes la recréent vide sur le PVC :
+
+```bash
+kubectl apply -f infra/services/postgres/pvc.yaml
+kubectl apply -f infra/services/postgres/deployment.yaml
+kubectl -n gallery rollout status deployment/service-faces-postgres
+kubectl apply -f infra/services/faces/deployment.yaml
+```
+
+### pgAdmin
+
+pgAdmin est disponible sur `https://gallery.redby.fr/pgadmin/`. Créer son Secret avant son déploiement, avec un mot de passe fort :
+
+```bash
+kubectl -n gallery create secret generic pgadmin-credentials \
+  --from-literal=email='admin@example.com' \
+  --from-literal=password='REMPLACER_PAR_UN_MOT_DE_PASSE_FORT'
+kubectl apply -f infra/services/pgadmin/
+```
+
+Dans pgAdmin, ajouter un serveur avec l’hôte `service-faces-postgres`, le port `5432`, la base `faces` et l’utilisateur `faces`.

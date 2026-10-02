@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pgadmin-ingress
+  namespace: gallery
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: gallery-pgadmin-strip-prefix@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - gallery.redby.fr
+      secretName: gallery-redby-fr-tls
+  rules:
+    - host: gallery.redby.fr
+      http:
+        paths:
+          - path: /pgadmin
+            pathType: Prefix
+            backend:
+              service:
+                name: service-pgadmin
+                port:
+                  number: 80

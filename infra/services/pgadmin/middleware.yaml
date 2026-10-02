@@ -1,0 +1,10 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: pgadmin-strip-prefix
+  namespace: gallery
+spec:
+  stripPrefix:
+    prefixes:
+      - /pgadmin
+    forceSlash: true
