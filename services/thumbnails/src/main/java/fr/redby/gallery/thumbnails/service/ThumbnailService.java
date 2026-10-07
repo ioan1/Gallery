@@ -5,6 +5,7 @@ import fr.redby.gallery.thumbnails.strategy.image.HeicThumbnailStrategy;
 import fr.redby.gallery.thumbnails.strategy.image.JpegThumbnailStrategy;
 import fr.redby.gallery.thumbnails.strategy.video.MovThumbnailStrategy;
 import fr.redby.gallery.thumbnails.strategy.video.Mp4ThumbnailStrategy;
+import fr.redby.gallery.thumbnails.util.ThumbnailProcessRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,11 +37,34 @@ public class ThumbnailService {
                 log.warn("No thumbnail strategy found for {}", imagePath);
                 throw new IOException("No thumbnail strategy found for " + imagePath);
             }
+
             return strategy.generate(imagePath);
         } catch (IOException e) {
             log.error("Failed to generate thumbnail for {}:{}:{} -> {}", year, albumId, name, imagePath, e);
             throw e;
         }
+    }
+
+    @Cacheable(
+            value = "thumbnails",
+            key = "#year + ':' + #albumId + ':' + #name + ':face:' + #x + ':' + #y + ':' + #width + ':' + #height"
+    )
+    public byte[] getFaceThumbnail(
+            String year, String albumId, String name, Path imagePath,
+            int x, int y, int width, int height
+    ) throws IOException {
+        return ThumbnailProcessRunner.runProcessToBytes(List.of(
+                "magick", imagePath.toString(),
+                "-auto-orient",
+                "-crop", width + "x" + height + "+" + x + "+" + y,
+                "+repage",
+                "-resize", "160x160",
+                "-background", "white",
+                "-gravity", "center",
+                "-extent", "160x160",
+                "-quality", "90",
+                "jpeg:-"
+        ));
     }
 
     private ThumbnailStrategy selectStrategy(Path imagePath) {

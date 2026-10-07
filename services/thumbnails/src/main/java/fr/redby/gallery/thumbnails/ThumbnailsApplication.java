@@ -88,7 +88,17 @@ public class ThumbnailsApplication {
     @GetMapping(value = "/thumbnails/small/{year}/{albumId}", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> smallPath(@PathVariable String year, @PathVariable String albumId, @RequestParam(required = true) String name,
                                             @RequestHeader(value = "Authorization", required = false) String authorization,
+                                            @RequestParam(required = false) Integer cropX,
+                                            @RequestParam(required = false) Integer cropY,
+                                            @RequestParam(required = false) Integer cropWidth,
+                                            @RequestParam(required = false) Integer cropHeight,
                                             @RequestParam(required = false) String note) throws IOException {
+        boolean hasCrop = cropX != null || cropY != null || cropWidth != null || cropHeight != null;
+        if (hasCrop && (cropX == null || cropY == null || cropWidth == null || cropHeight == null
+                || cropX < 0 || cropY < 0 || cropWidth < 1 || cropHeight < 1
+                || cropX > 100000 || cropY > 100000 || cropWidth > 10000 || cropHeight > 10000)) {
+            return ResponseEntity.badRequest().build();
+        }
         try {
             // Fetch album info from albums service to get album name
             String albumsServiceUrl = System.getenv("ALBUMS_SERVICE_URL");
@@ -106,7 +116,7 @@ public class ThumbnailsApplication {
             Album[] albums = response.getBody();
 
             if (albums == null || albums.length == 0) {
-                return fallbackThumbnail(note);
+                return hasCrop ? ResponseEntity.notFound().build() : fallbackThumbnail(note);
             }
 
             Album album = java.util.Arrays.stream(albums)
@@ -115,7 +125,7 @@ public class ThumbnailsApplication {
                     .orElse(null);
 
             if (album == null) {
-                return fallbackThumbnail(note);
+                return hasCrop ? ResponseEntity.notFound().build() : fallbackThumbnail(note);
             }
 
             String albumDate = album.date != null ? album.date.format(DateTimeFormatter.BASIC_ISO_DATE) : "";
@@ -126,7 +136,9 @@ public class ThumbnailsApplication {
 
             if (!imagePath.startsWith(albumBase) || !Files.exists(imagePath)) {
                 log.warn("Image not found or invalid path: " + imagePath);
-                return fallbackThumbnail(album.name + " - " + name);
+                return hasCrop
+                        ? ResponseEntity.notFound().build()
+                        : fallbackThumbnail(album.name + " - " + name);
             }
 
             try {
@@ -136,7 +148,10 @@ public class ThumbnailsApplication {
                 throw new IOException("Interrupted while waiting for request processing slot", e);
             }
             try {
-                byte[] imageBytes = thumbnailService.getThumbnail(year, albumId, name, imagePath);
+                byte[] imageBytes = hasCrop
+                        ? thumbnailService.getFaceThumbnail(
+                                year, albumId, name, imagePath, cropX, cropY, cropWidth, cropHeight)
+                        : thumbnailService.getThumbnail(year, albumId, name, imagePath);
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.IMAGE_JPEG);
                 headers.setContentLength(imageBytes.length);
@@ -147,7 +162,9 @@ public class ThumbnailsApplication {
 
         } catch (Exception e) {
             log.error("Error loading image", e);
-            return fallbackThumbnail(note);
+            return hasCrop
+                    ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+                    : fallbackThumbnail(note);
         }
     }
 

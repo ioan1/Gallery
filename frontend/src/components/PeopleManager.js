@@ -4,7 +4,8 @@ import AuthImage from "./AuthImage";
 
 function imageSource(face) {
   const imageName = face.name.split("/").map(encodeURIComponent).join("/");
-  return `/thumbnails/small/${encodeURIComponent(face.year)}/${encodeURIComponent(face.album_id)}?name=${imageName}`;
+  const crop = face.crop;
+  return `/thumbnails/small/${encodeURIComponent(face.year)}/${encodeURIComponent(face.album_id)}?name=${imageName}&cropX=${crop.x}&cropY=${crop.y}&cropWidth=${crop.width}&cropHeight=${crop.height}`;
 }
 
 export default function PeopleManager() {

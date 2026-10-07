@@ -184,20 +184,25 @@ def detect_faces(image_bytes: bytes):
 
     faces = app.get(image)
     valid_faces = []
+    image_height, image_width = image.shape[:2]
 
     for face in faces:
         if face.det_score < FACE_DET_THRESHOLD:
             continue
 
         bbox = face.bbox
+        x = max(0, min(int(bbox[0]), image_width - 1))
+        y = max(0, min(int(bbox[1]), image_height - 1))
+        right = max(x + 1, min(int(bbox[2]), image_width))
+        bottom = max(y + 1, min(int(bbox[3]), image_height))
         valid_faces.append(
             {
                 "embedding": face.embedding.astype(float).tolist(),
                 "confidence": float(face.det_score),
-                "x": int(bbox[0]),
-                "y": int(bbox[1]),
-                "w": int(bbox[2] - bbox[0]),
-                "h": int(bbox[3] - bbox[1]),
+                "x": x,
+                "y": y,
+                "w": right - x,
+                "h": bottom - y,
             }
         )
 
@@ -302,7 +307,8 @@ def get_people(claims: dict = Depends(verify_token)):
             cur.execute(
                 """
                 SELECT faces.id, faces.embedding::text, faces.confidence, faces.person_id,
-                       people.label, images.category, images.album, images.image_name
+                       people.label, images.category, images.album, images.image_name,
+                       faces.x, faces.y, faces.w, faces.h
                 FROM faces
                 JOIN images ON images.id = faces.image_id
                 LEFT JOIN people ON people.id = faces.person_id
@@ -366,6 +372,12 @@ def get_people(claims: dict = Depends(verify_token)):
                     "year": representative[5],
                     "album_id": representative[6],
                     "name": representative[7],
+                    "crop": {
+                        "x": representative[8],
+                        "y": representative[9],
+                        "width": representative[10],
+                        "height": representative[11],
+                    },
                 },
             }
         )
