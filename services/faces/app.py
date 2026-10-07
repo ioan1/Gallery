@@ -9,7 +9,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from auth import verify_token
-from people import count_distinct_people
+from people import count_distinct_people, group_similar_embeddings
 
 app = FastAPI(title="Faces service")
 
@@ -32,6 +32,11 @@ class FaceIndexRequest(BaseModel):
     category: str = Field(..., min_length=1, max_length=128)
     album: str = Field(..., min_length=1, max_length=128)
     name: str = Field(..., min_length=1, max_length=256)
+
+
+class FaceLabelRequest(BaseModel):
+    face_ids: list[int] = Field(..., min_length=1)
+    label: str = Field(..., min_length=1, max_length=128)
 
 
 def get_db_connection():
@@ -69,6 +74,23 @@ def ensure_schema() -> None:
                     h INT,
                     created_at TIMESTAMPTZ DEFAULT NOW()
                 );
+                """
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS people (
+                    id SERIAL PRIMARY KEY,
+                    label TEXT NOT NULL,
+                    embedding vector(512) NOT NULL,
+                    created_at TIMESTAMPTZ DEFAULT NOW()
+                );
+                """
+            )
+            cur.execute(
+                """
+                ALTER TABLE faces
+                ADD COLUMN IF NOT EXISTS person_id INT
+                REFERENCES people(id) ON DELETE SET NULL;
                 """
             )
             cur.execute(
@@ -185,6 +207,11 @@ def detect_faces(image_bytes: bytes):
 def save_face_records(category: str, album: str, name: str, image_url: str, faces: list[dict]) -> None:
     with get_db_connection() as conn:
         with conn.cursor() as cur:
+            cur.execute("SELECT id, embedding::text FROM people")
+            people = [
+                (person_id, np.fromstring(embedding.strip("[]"), sep=",", dtype=float))
+                for person_id, embedding in cur.fetchall()
+            ]
             cur.execute(
                 """
                 INSERT INTO images (category, album, image_name, image_url)
@@ -199,8 +226,8 @@ def save_face_records(category: str, album: str, name: str, image_url: str, face
             cur.execute("DELETE FROM faces WHERE image_id = %s", (image_id,))
             cur.executemany(
                 """
-                INSERT INTO faces (image_id, face_type, embedding, confidence, x, y, w, h)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO faces (image_id, face_type, embedding, confidence, x, y, w, h, person_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 [
                     (
@@ -212,11 +239,32 @@ def save_face_records(category: str, album: str, name: str, image_url: str, face
                         face["y"],
                         face["w"],
                         face["h"],
+                        find_matching_person(face["embedding"], people),
                     )
                     for face in faces
                 ],
             )
         conn.commit()
+
+
+def find_matching_person(embedding: list[float], people: list[tuple[int, np.ndarray]]) -> int | None:
+    vector = np.asarray(embedding, dtype=float)
+    norm = np.linalg.norm(vector)
+    if norm == 0:
+        return None
+    vector /= norm
+
+    best_match = None
+    best_similarity = PERSON_SIMILARITY_THRESHOLD
+    for person_id, person_embedding in people:
+        person_norm = np.linalg.norm(person_embedding)
+        if person_norm == 0 or person_embedding.size != vector.size:
+            continue
+        similarity = float(vector @ (person_embedding / person_norm))
+        if similarity >= best_similarity:
+            best_match = person_id
+            best_similarity = similarity
+    return best_match
 
 
 @app.get("/health")
@@ -245,6 +293,157 @@ def get_album_people_count(year: str, album_id: str, claims: dict = Depends(veri
         "album": album_id,
         "people_count": count_distinct_people(embeddings, PERSON_SIMILARITY_THRESHOLD),
     }
+
+
+@app.get("/faces/people")
+def get_people(claims: dict = Depends(verify_token)):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT faces.id, faces.embedding::text, faces.confidence, faces.person_id,
+                       people.label, images.category, images.album, images.image_name
+                FROM faces
+                JOIN images ON images.id = faces.image_id
+                LEFT JOIN people ON people.id = faces.person_id
+                WHERE faces.embedding IS NOT NULL
+                ORDER BY faces.id
+                """
+            )
+            rows = cur.fetchall()
+
+    embeddings = [row[1] for row in rows]
+    groups = group_similar_embeddings(embeddings, PERSON_SIMILARITY_THRESHOLD)
+    merged_groups = []
+    group_by_person = {}
+    for group in groups:
+        person_ids = [rows[index][3] for index in group if rows[index][3] is not None]
+        person_id = (
+            max(set(person_ids), key=lambda value: (person_ids.count(value), -value))
+            if person_ids
+            else None
+        )
+        if person_id is not None and person_id in group_by_person:
+            merged_groups[group_by_person[person_id]].extend(group)
+        else:
+            if person_id is not None:
+                group_by_person[person_id] = len(merged_groups)
+            merged_groups.append(group)
+
+    result = []
+    for group in merged_groups:
+        members = [rows[index] for index in group]
+        identity_counts = {}
+        for row in members:
+            if row[3] is not None:
+                identity_counts[row[3]] = identity_counts.get(row[3], 0) + 1
+        person_id = (
+            max(identity_counts, key=identity_counts.get)
+            if identity_counts
+            else None
+        )
+        representative = max(members, key=lambda row: row[2] or 0)
+        albums = sorted({(row[5], row[6]) for row in members})
+        result.append(
+            {
+                "id": (
+                    f"person-{person_id}"
+                    if person_id is not None
+                    else f"face-{representative[0]}"
+                ),
+                "person_id": person_id,
+                "label": next(
+                    (row[4] for row in members if row[3] == person_id and row[4]),
+                    "",
+                ),
+                "face_ids": [row[0] for row in members],
+                "face_count": len(members),
+                "albums": [
+                    {"year": year, "album_id": album_id}
+                    for year, album_id in albums
+                ],
+                "representative": {
+                    "year": representative[5],
+                    "album_id": representative[6],
+                    "name": representative[7],
+                },
+            }
+        )
+
+    return result
+
+
+@app.put("/faces/people/label")
+def save_person_label(payload: FaceLabelRequest, claims: dict = Depends(verify_token)):
+    label = payload.label.strip()
+    if not label:
+        raise HTTPException(status_code=400, detail="A label is required")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT id, embedding::text, person_id
+                FROM faces
+                WHERE id = ANY(%s) AND embedding IS NOT NULL
+                """,
+                (payload.face_ids,),
+            )
+            rows = cur.fetchall()
+            if len(rows) != len(set(payload.face_ids)):
+                raise HTTPException(status_code=404, detail="One or more faces were not found")
+
+            embeddings = [
+                np.fromstring(row[1].strip("[]"), sep=",", dtype=float)
+                for row in rows
+            ]
+            centroid = np.mean(embeddings, axis=0)
+            norm = np.linalg.norm(centroid)
+            if norm == 0:
+                raise HTTPException(status_code=400, detail="Cannot label invalid face embeddings")
+            centroid /= norm
+            centroid_value = f"[{','.join(str(value) for value in centroid)}]"
+
+            existing_person_ids = [row[2] for row in rows if row[2] is not None]
+            if existing_person_ids:
+                person_id = max(
+                    set(existing_person_ids),
+                    key=lambda value: (existing_person_ids.count(value), -value),
+                )
+                cur.execute(
+                    "UPDATE people SET label = %s WHERE id = %s RETURNING id",
+                    (label, person_id),
+                )
+                if cur.fetchone() is None:
+                    raise HTTPException(status_code=404, detail="Person was not found")
+                other_person_ids = list(set(existing_person_ids) - {person_id})
+                if other_person_ids:
+                    cur.execute(
+                        "UPDATE faces SET person_id = %s WHERE person_id = ANY(%s)",
+                        (person_id, other_person_ids),
+                    )
+                    cur.execute(
+                        "DELETE FROM people WHERE id = ANY(%s)",
+                        (other_person_ids,),
+                    )
+            else:
+                cur.execute(
+                    """
+                    INSERT INTO people (label, embedding)
+                    VALUES (%s, %s)
+                    RETURNING id
+                    """,
+                    (label, centroid_value),
+                )
+                person_id = cur.fetchone()[0]
+
+            cur.execute(
+                "UPDATE faces SET person_id = %s WHERE id = ANY(%s)",
+                (person_id, payload.face_ids),
+            )
+        conn.commit()
+
+    return {"person_id": person_id, "label": label}
 
 
 @app.post("/faces/index")

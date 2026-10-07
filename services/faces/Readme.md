@@ -23,8 +23,23 @@ https://gallery.redby.fr/thumbnails/original/2008/d467cc0f?name=IMAGE_517.jpg
 - GET /health
 - POST /faces/index
 - GET /faces/{year}/{albumId}/people-count
+- GET /faces/people : groupes les visages indexés de tous les albums
+- PUT /faces/people/label : associe un libellé à un groupe de visages
 
-Le compteur regroupe les embeddings de l’album par similarité cosinus. Il est recalculé à la demande.
+Le corps de la requête de libellé contient les identifiants de visages renvoyés par
+`GET /faces/people` et le texte à enregistrer :
+
+```json
+{
+  "face_ids": [12, 18],
+  "label": "Camille"
+}
+```
+
+Les groupes globaux sont calculés par similarité cosinus. Depuis le frontend, ouvrez
+« Identifier les visages » pour consulter ces groupes et enregistrer un nom ou un
+libellé. L’association est conservée dans PostgreSQL et les nouveaux visages similaires
+retrouvent ce libellé lors des scans suivants.
 
 ## Variables d’environnement
 

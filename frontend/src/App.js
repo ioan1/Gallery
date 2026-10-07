@@ -3,11 +3,13 @@ import { useAuth } from "react-oidc-context";
 import { fetchYears, fetchAlbums, setAuthContext } from "./api";
 import YearList from "./components/YearList";
 import AlbumList from "./components/AlbumList";
+import PeopleManager from "./components/PeopleManager";
 
 function App() {
   const [years, setYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState(null);
   const [albums, setAlbums] = useState([]);
+  const [showPeople, setShowPeople] = useState(false);
   const auth = useAuth();
 
   // Configurer le contexte d'authentification pour l'API
@@ -100,6 +102,15 @@ function App() {
       />
       <h2 style={{ marginTop: "24px" }}>Albums de {selectedYear}</h2>
       <AlbumList albums={albums} />
+      <button
+        type="button"
+        aria-expanded={showPeople}
+        onClick={() => setShowPeople((visible) => !visible)}
+        style={{ marginTop: 24, padding: "8px 12px", cursor: "pointer" }}
+      >
+        {showPeople ? "Masquer les visages" : "Identifier les visages"}
+      </button>
+      {showPeople && <PeopleManager />}
     </div>
   );
 }

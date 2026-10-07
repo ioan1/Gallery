@@ -1,16 +1,20 @@
 import numpy as np
 
 
-def count_distinct_people(embedding_values: list[str], similarity_threshold: float) -> int:
+def group_similar_embeddings(
+    embedding_values: list[str], similarity_threshold: float
+) -> list[list[int]]:
     vectors = []
-    for embedding_value in embedding_values:
+    original_indexes = []
+    for original_index, embedding_value in enumerate(embedding_values):
         vector = np.fromstring(embedding_value.strip("[]"), sep=",", dtype=float)
         norm = np.linalg.norm(vector)
         if vector.size and norm > 0:
             vectors.append(vector / norm)
+            original_indexes.append(original_index)
 
     if not vectors:
-        return 0
+        return []
 
     matrix = np.vstack(vectors)
     parents = list(range(len(matrix)))
@@ -32,4 +36,11 @@ def count_distinct_people(embedding_values: list[str], similarity_threshold: flo
         for match_index in np.flatnonzero(similarities >= similarity_threshold):
             union(index, int(match_index))
 
-    return len({find(index) for index in range(len(matrix))})
+    groups = {}
+    for index, original_index in enumerate(original_indexes):
+        groups.setdefault(find(index), []).append(original_index)
+    return list(groups.values())
+
+
+def count_distinct_people(embedding_values: list[str], similarity_threshold: float) -> int:
+    return len(group_similar_embeddings(embedding_values, similarity_threshold))

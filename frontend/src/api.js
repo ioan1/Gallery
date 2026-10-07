@@ -45,6 +45,28 @@ export async function fetchAlbumPeopleCount(year, albumId) {
   return result;
 }
 
+export async function fetchPeople() {
+  const response = await fetchWithAuth(`${API_BASE}/faces/people`);
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.detail || "Erreur lors du chargement des visages");
+  }
+  return result;
+}
+
+export async function savePersonLabel(faceIds, label) {
+  const response = await fetchWithAuth(`${API_BASE}/faces/people/label`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ face_ids: faceIds, label }),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.detail || "Erreur lors de l’enregistrement du libellé");
+  }
+  return result;
+}
+
 export function indexAlbumImage(year, albumId, name) {
   const request = faceIndexQueue.then(async () => {
     const response = await fetchWithAuth(`${API_BASE}/faces/index`, {
