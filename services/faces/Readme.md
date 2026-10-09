@@ -74,12 +74,9 @@ kubectl apply -f infra/services/faces/deployment.yaml
 
 ### pgAdmin
 
-pgAdmin est disponible sur `https://gallery.redby.fr/pgadmin/`. Créer son Secret avant son déploiement, avec un mot de passe fort :
+pgAdmin est disponible sur `https://gallery.redby.fr/pgadmin/`. Les identifiants sont configurés en dur dans `infra/services/pgadmin/deployment.yaml` : `admin@example.com` / `pgadmin`. Modifiez-les dans ce manifeste avant le déploiement si nécessaire :
 
 ```bash
-kubectl -n gallery create secret generic pgadmin-credentials \
-  --from-literal=email='admin@example.com' \
-  --from-literal=password='REMPLACER_PAR_UN_MOT_DE_PASSE_FORT'
 kubectl apply -f infra/services/pgadmin/
 ```
 

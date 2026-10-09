@@ -21,15 +21,9 @@ spec:
             - containerPort: 80
           env:
             - name: PGADMIN_DEFAULT_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: pgadmin-credentials
-                  key: email
+              value: "admin@example.com"
             - name: PGADMIN_DEFAULT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: pgadmin-credentials
-                  key: password
+              value: "pgadmin"
             - name: PGADMIN_CONFIG_PROXY_X_FOR_COUNT
               value: "1"
             - name: PGADMIN_CONFIG_PROXY_X_PROTO_COUNT
