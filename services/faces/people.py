@@ -44,3 +44,27 @@ def group_similar_embeddings(
 
 def count_distinct_people(embedding_values: list[str], similarity_threshold: float) -> int:
     return len(group_similar_embeddings(embedding_values, similarity_threshold))
+
+
+def find_matching_person(
+    embedding: list[float],
+    known_faces: list[tuple[int, np.ndarray]],
+    similarity_threshold: float,
+) -> int | None:
+    vector = np.asarray(embedding, dtype=float)
+    norm = np.linalg.norm(vector)
+    if norm == 0:
+        return None
+    vector /= norm
+
+    best_match = None
+    best_similarity = similarity_threshold
+    for person_id, face_embedding in known_faces:
+        face_norm = np.linalg.norm(face_embedding)
+        if face_norm == 0 or face_embedding.size != vector.size:
+            continue
+        similarity = float(vector @ (face_embedding / face_norm))
+        if similarity >= best_similarity:
+            best_match = person_id
+            best_similarity = similarity
+    return best_match

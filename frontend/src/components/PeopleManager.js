@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { fetchPeople, savePersonLabel } from "../api";
+import { assignFacesToPerson, fetchPeople, savePersonLabel } from "../api";
 import AuthImage from "./AuthImage";
 
 function imageSource(face) {
@@ -11,6 +11,7 @@ function imageSource(face) {
 export default function PeopleManager() {
   const [people, setPeople] = useState([]);
   const [labels, setLabels] = useState({});
+  const [assignmentTargets, setAssignmentTargets] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [savingId, setSavingId] = useState(null);
@@ -50,12 +51,34 @@ export default function PeopleManager() {
     }
   };
 
+  const handleAssign = async (person) => {
+    const targetId = Number(assignmentTargets[person.id]);
+    if (!targetId) return;
+
+    setSavingId(person.id);
+    setError(null);
+    try {
+      await assignFacesToPerson(person.face_ids, targetId);
+      await loadPeople();
+    } catch (assignError) {
+      setError(assignError.message);
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const knownPeople = [...new Map(
+    people
+      .filter((person) => person.person_id && person.label)
+      .map((person) => [person.person_id, { id: person.person_id, label: person.label }])
+  ).values()];
+
   if (loading) return <p>Chargement des visages…</p>;
 
   return (
     <section aria-labelledby="people-title" style={{ marginTop: 24 }}>
       <h2 id="people-title">Visages de tous les albums</h2>
-      <p>Les visages similaires sont regroupés, même s’ils proviennent d’albums différents.</p>
+      <p>Les visages similaires sont regroupés. Vous pouvez aussi associer des groupes différents à une même personne, par exemple pour suivre son évolution au fil des années.</p>
       {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
       {people.length === 0 ? (
         <p>Aucun visage indexé. Lancez un scan depuis un album pour commencer.</p>
@@ -90,6 +113,34 @@ export default function PeopleManager() {
                   <button type="submit" disabled={!labels[person.id]?.trim() || savingId !== null} style={{ marginTop: 8 }}>
                     {savingId === person.id ? "Enregistrement…" : "Enregistrer"}
                   </button>
+                  {knownPeople.some((knownPerson) => knownPerson.id !== person.person_id) && (
+                    <div style={{ marginTop: 8 }}>
+                      <label>
+                        <span style={{ display: "block", marginBottom: 4 }}>Associer à une personne</span>
+                        <select
+                          value={assignmentTargets[person.id] || ""}
+                          onChange={(event) => setAssignmentTargets((current) => ({ ...current, [person.id]: event.target.value }))}
+                          disabled={savingId !== null}
+                          style={{ boxSizing: "border-box", width: "100%", padding: 6 }}
+                        >
+                          <option value="">Choisir une personne…</option>
+                          {knownPeople
+                            .filter((knownPerson) => knownPerson.id !== person.person_id)
+                            .map((knownPerson) => (
+                              <option key={knownPerson.id} value={knownPerson.id}>{knownPerson.label}</option>
+                            ))}
+                        </select>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleAssign(person)}
+                        disabled={!assignmentTargets[person.id] || savingId !== null}
+                        style={{ marginTop: 8 }}
+                      >
+                        Associer les visages
+                      </button>
+                    </div>
+                  )}
                 </div>
               </form>
             );

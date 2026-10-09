@@ -25,21 +25,26 @@ https://gallery.redby.fr/thumbnails/original/2008/d467cc0f?name=IMAGE_517.jpg
 - GET /faces/{year}/{albumId}/people-count
 - GET /faces/people : groupes les visages indexés de tous les albums
 - PUT /faces/people/label : associe un libellé à un groupe de visages
+- PUT /faces/people/assign : rattache un groupe de visages à une personne existante
 
 Le corps de la requête de libellé contient les identifiants de visages renvoyés par
-`GET /faces/people` et le texte à enregistrer :
+`GET /faces/people` et le texte à enregistrer. Pour rattacher un autre groupe,
+utilisez les identifiants renvoyés par `GET /faces/people` et l’identifiant de la personne :
 
 ```json
 {
-  "face_ids": [12, 18],
-  "label": "Camille"
+  "face_ids": [35, 41],
+  "person_id": 2
 }
 ```
 
-Les groupes globaux sont calculés par similarité cosinus. Depuis le frontend, ouvrez
-« Identifier les visages » pour consulter ces groupes et enregistrer un nom ou un
-libellé. L’association est conservée dans PostgreSQL et les nouveaux visages similaires
-retrouvent ce libellé lors des scans suivants.
+Le modèle lie chaque visage détecté (`faces`) à une personne (`people`) par `person_id`.
+Une même personne peut ainsi avoir plusieurs visages différents, issus de plusieurs années.
+Depuis le frontend, ouvrez « Identifier les visages », enregistrez d’abord le nom d’un
+groupe, puis choisissez cette personne dans la liste pour rattacher les autres groupes.
+Les visages rattachés restent liés à la personne dans PostgreSQL. Lors d’un nouveau scan,
+chaque embedding détecté est comparé aux embeddings individuels des visages déjà associés
+dans `faces`; aucun embedding agrégé n’est stocké dans `people`.
 
 ## Variables d’environnement
 

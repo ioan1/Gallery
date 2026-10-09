@@ -67,6 +67,19 @@ export async function savePersonLabel(faceIds, label) {
   return result;
 }
 
+export async function assignFacesToPerson(faceIds, personId) {
+  const response = await fetchWithAuth(`${API_BASE}/faces/people/assign`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ face_ids: faceIds, person_id: personId }),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.detail || "Erreur lors de l’association des visages");
+  }
+  return result;
+}
+
 export function indexAlbumImage(year, albumId, name) {
   const request = faceIndexQueue.then(async () => {
     const response = await fetchWithAuth(`${API_BASE}/faces/index`, {

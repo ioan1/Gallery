@@ -9,7 +9,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from auth import verify_token
-from people import count_distinct_people, group_similar_embeddings
+from people import count_distinct_people, find_matching_person, group_similar_embeddings
 
 app = FastAPI(title="Faces service")
 
@@ -37,6 +37,11 @@ class FaceIndexRequest(BaseModel):
 class FaceLabelRequest(BaseModel):
     face_ids: list[int] = Field(..., min_length=1)
     label: str = Field(..., min_length=1, max_length=128)
+
+
+class FaceAssignmentRequest(BaseModel):
+    face_ids: list[int] = Field(..., min_length=1)
+    person_id: int
 
 
 def get_db_connection():
@@ -81,11 +86,11 @@ def ensure_schema() -> None:
                 CREATE TABLE IF NOT EXISTS people (
                     id SERIAL PRIMARY KEY,
                     label TEXT NOT NULL,
-                    embedding vector(512) NOT NULL,
                     created_at TIMESTAMPTZ DEFAULT NOW()
                 );
                 """
             )
+            cur.execute("ALTER TABLE people DROP COLUMN IF EXISTS embedding;")
             cur.execute(
                 """
                 ALTER TABLE faces
@@ -212,11 +217,6 @@ def detect_faces(image_bytes: bytes):
 def save_face_records(category: str, album: str, name: str, image_url: str, faces: list[dict]) -> None:
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, embedding::text FROM people")
-            people = [
-                (person_id, np.fromstring(embedding.strip("[]"), sep=",", dtype=float))
-                for person_id, embedding in cur.fetchall()
-            ]
             cur.execute(
                 """
                 INSERT INTO images (category, album, image_name, image_url)
@@ -229,6 +229,17 @@ def save_face_records(category: str, album: str, name: str, image_url: str, face
             )
             image_id = cur.fetchone()[0]
             cur.execute("DELETE FROM faces WHERE image_id = %s", (image_id,))
+            cur.execute(
+                """
+                SELECT person_id, embedding::text
+                FROM faces
+                WHERE person_id IS NOT NULL AND embedding IS NOT NULL
+                """
+            )
+            known_faces = [
+                (person_id, np.fromstring(embedding.strip("[]"), sep=",", dtype=float))
+                for person_id, embedding in cur.fetchall()
+            ]
             cur.executemany(
                 """
                 INSERT INTO faces (image_id, face_type, embedding, confidence, x, y, w, h, person_id)
@@ -244,32 +255,16 @@ def save_face_records(category: str, album: str, name: str, image_url: str, face
                         face["y"],
                         face["w"],
                         face["h"],
-                        find_matching_person(face["embedding"], people),
+                        find_matching_person(
+                            face["embedding"],
+                            known_faces,
+                            PERSON_SIMILARITY_THRESHOLD,
+                        ),
                     )
                     for face in faces
                 ],
             )
         conn.commit()
-
-
-def find_matching_person(embedding: list[float], people: list[tuple[int, np.ndarray]]) -> int | None:
-    vector = np.asarray(embedding, dtype=float)
-    norm = np.linalg.norm(vector)
-    if norm == 0:
-        return None
-    vector /= norm
-
-    best_match = None
-    best_similarity = PERSON_SIMILARITY_THRESHOLD
-    for person_id, person_embedding in people:
-        person_norm = np.linalg.norm(person_embedding)
-        if person_norm == 0 or person_embedding.size != vector.size:
-            continue
-        similarity = float(vector @ (person_embedding / person_norm))
-        if similarity >= best_similarity:
-            best_match = person_id
-            best_similarity = similarity
-    return best_match
 
 
 @app.get("/health")
@@ -395,7 +390,7 @@ def save_person_label(payload: FaceLabelRequest, claims: dict = Depends(verify_t
         with conn.cursor() as cur:
             cur.execute(
                 """
-                SELECT id, embedding::text, person_id
+                SELECT id, person_id
                 FROM faces
                 WHERE id = ANY(%s) AND embedding IS NOT NULL
                 """,
@@ -405,18 +400,7 @@ def save_person_label(payload: FaceLabelRequest, claims: dict = Depends(verify_t
             if len(rows) != len(set(payload.face_ids)):
                 raise HTTPException(status_code=404, detail="One or more faces were not found")
 
-            embeddings = [
-                np.fromstring(row[1].strip("[]"), sep=",", dtype=float)
-                for row in rows
-            ]
-            centroid = np.mean(embeddings, axis=0)
-            norm = np.linalg.norm(centroid)
-            if norm == 0:
-                raise HTTPException(status_code=400, detail="Cannot label invalid face embeddings")
-            centroid /= norm
-            centroid_value = f"[{','.join(str(value) for value in centroid)}]"
-
-            existing_person_ids = [row[2] for row in rows if row[2] is not None]
+            existing_person_ids = [row[1] for row in rows if row[1] is not None]
             if existing_person_ids:
                 person_id = max(
                     set(existing_person_ids),
@@ -441,11 +425,11 @@ def save_person_label(payload: FaceLabelRequest, claims: dict = Depends(verify_t
             else:
                 cur.execute(
                     """
-                    INSERT INTO people (label, embedding)
-                    VALUES (%s, %s)
+                    INSERT INTO people (label)
+                    VALUES (%s)
                     RETURNING id
                     """,
-                    (label, centroid_value),
+                    (label,),
                 )
                 person_id = cur.fetchone()[0]
 
@@ -456,6 +440,54 @@ def save_person_label(payload: FaceLabelRequest, claims: dict = Depends(verify_t
         conn.commit()
 
     return {"person_id": person_id, "label": label}
+
+
+@app.put("/faces/people/assign")
+def assign_faces_to_person(
+    payload: FaceAssignmentRequest,
+    claims: dict = Depends(verify_token),
+):
+    face_ids = set(payload.face_ids)
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM people WHERE id = %s", (payload.person_id,))
+            if cur.fetchone() is None:
+                raise HTTPException(status_code=404, detail="Person was not found")
+
+            cur.execute(
+                """
+                SELECT id, person_id
+                FROM faces
+                WHERE id = ANY(%s) AND embedding IS NOT NULL
+                """,
+                (list(face_ids),),
+            )
+            rows = cur.fetchall()
+            if len(rows) != len(face_ids):
+                raise HTTPException(status_code=404, detail="One or more faces were not found")
+
+            previous_person_ids = {
+                row[1] for row in rows if row[1] is not None and row[1] != payload.person_id
+            }
+            cur.execute(
+                "UPDATE faces SET person_id = %s WHERE id = ANY(%s)",
+                (payload.person_id, list(face_ids)),
+            )
+
+            if previous_person_ids:
+                cur.execute(
+                    """
+                    DELETE FROM people
+                    WHERE id = ANY(%s)
+                      AND NOT EXISTS (
+                          SELECT 1 FROM faces WHERE faces.person_id = people.id
+                      )
+                    """,
+                    (list(previous_person_ids),),
+                )
+        conn.commit()
+
+    return {"person_id": payload.person_id, "face_ids": sorted(face_ids)}
 
 
 @app.post("/faces/index")
