@@ -9,7 +9,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from auth import verify_token
-from people import count_distinct_people, find_matching_person, group_similar_embeddings
+from people import find_matching_person, group_face_rows, group_similar_embeddings
 
 app = FastAPI(title="Faces service")
 
@@ -278,20 +278,27 @@ def get_album_people_count(year: str, album_id: str, claims: dict = Depends(veri
         with conn.cursor() as cur:
             cur.execute(
                 """
-                SELECT faces.embedding::text
+                SELECT faces.id, faces.embedding::text, faces.confidence, faces.person_id,
+                       people.label, images.category, images.album, images.image_name,
+                       faces.x, faces.y, faces.w, faces.h
                 FROM faces
                 JOIN images ON images.id = faces.image_id
+                LEFT JOIN people ON people.id = faces.person_id
                 WHERE images.category = %s AND images.album = %s
                   AND faces.embedding IS NOT NULL
+                ORDER BY faces.id
                 """,
                 (year, album_id),
             )
-            embeddings = [row[0] for row in cur.fetchall()]
+            rows = cur.fetchall()
 
+    people = group_face_rows(rows, PERSON_SIMILARITY_THRESHOLD)
+    people.sort(key=lambda person: (-person["photo_count"], person["label"].casefold(), person["id"]))
     return {
         "year": year,
         "album": album_id,
-        "people_count": count_distinct_people(embeddings, PERSON_SIMILARITY_THRESHOLD),
+        "people_count": len(people),
+        "people": people,
     }
 
 
@@ -313,71 +320,7 @@ def get_people(claims: dict = Depends(verify_token)):
             )
             rows = cur.fetchall()
 
-    embeddings = [row[1] for row in rows]
-    groups = group_similar_embeddings(embeddings, PERSON_SIMILARITY_THRESHOLD)
-    merged_groups = []
-    group_by_person = {}
-    for group in groups:
-        person_ids = [rows[index][3] for index in group if rows[index][3] is not None]
-        person_id = (
-            max(set(person_ids), key=lambda value: (person_ids.count(value), -value))
-            if person_ids
-            else None
-        )
-        if person_id is not None and person_id in group_by_person:
-            merged_groups[group_by_person[person_id]].extend(group)
-        else:
-            if person_id is not None:
-                group_by_person[person_id] = len(merged_groups)
-            merged_groups.append(group)
-
-    result = []
-    for group in merged_groups:
-        members = [rows[index] for index in group]
-        identity_counts = {}
-        for row in members:
-            if row[3] is not None:
-                identity_counts[row[3]] = identity_counts.get(row[3], 0) + 1
-        person_id = (
-            max(identity_counts, key=identity_counts.get)
-            if identity_counts
-            else None
-        )
-        representative = max(members, key=lambda row: row[2] or 0)
-        albums = sorted({(row[5], row[6]) for row in members})
-        result.append(
-            {
-                "id": (
-                    f"person-{person_id}"
-                    if person_id is not None
-                    else f"face-{representative[0]}"
-                ),
-                "person_id": person_id,
-                "label": next(
-                    (row[4] for row in members if row[3] == person_id and row[4]),
-                    "",
-                ),
-                "face_ids": [row[0] for row in members],
-                "face_count": len(members),
-                "albums": [
-                    {"year": year, "album_id": album_id}
-                    for year, album_id in albums
-                ],
-                "representative": {
-                    "year": representative[5],
-                    "album_id": representative[6],
-                    "name": representative[7],
-                    "crop": {
-                        "x": representative[8],
-                        "y": representative[9],
-                        "width": representative[10],
-                        "height": representative[11],
-                    },
-                },
-            }
-        )
-
-    return result
+    return group_face_rows(rows, PERSON_SIMILARITY_THRESHOLD)
 
 
 @app.put("/faces/people/label")

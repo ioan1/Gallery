@@ -2,7 +2,12 @@ import unittest
 
 import numpy as np
 
-from people import count_distinct_people, find_matching_person, group_similar_embeddings
+from people import (
+    count_distinct_people,
+    find_matching_person,
+    group_face_rows,
+    group_similar_embeddings,
+)
 
 
 class CountDistinctPeopleTests(unittest.TestCase):
@@ -21,6 +26,23 @@ class CountDistinctPeopleTests(unittest.TestCase):
             group_similar_embeddings(embeddings, 0.8),
             [[0, 2], [1]],
         )
+
+
+class GroupFaceRowsTests(unittest.TestCase):
+    def test_people_include_unique_photo_counts_and_are_ordered_by_photo_count(self):
+        rows = [
+            (1, "[1,0]", 0.9, 1, "Alice", "2024", "album", "a.jpg", 0, 0, 10, 10),
+            (2, "[0.99,0.1]", 0.9, 1, "Alice", "2024", "album", "a.jpg", 0, 0, 10, 10),
+            (3, "[0.98,0.2]", 0.9, 1, "Alice", "2024", "album", "b.jpg", 0, 0, 10, 10),
+            (4, "[0,1]", 0.9, 2, "Bob", "2024", "album", "c.jpg", 0, 0, 10, 10),
+        ]
+
+        people = group_face_rows(rows, 0.8)
+
+        self.assertEqual([person["label"] for person in people], ["Alice", "Bob"])
+        self.assertEqual(people[0]["photo_count"], 2)
+        self.assertEqual(people[0]["photos"], ["a.jpg", "b.jpg"])
+        self.assertEqual(people[1]["photo_count"], 1)
 
 
 class FindMatchingPersonTests(unittest.TestCase):

@@ -4,7 +4,7 @@ import AuthImage from "./AuthImage";
 import Lightbox from "./Lightbox";
 
 // Render a list of items (files or directories)
-function renderList(items, year, albumId, path = "", onOpen) {
+function renderList(items, year, albumId, path = "", onOpen, highlightedPhotos = null) {
   if (!items || items.length === 0) return null;
 
   // Normalize path to avoid leading slashes (we want "sub/dir", not "/sub/dir")
@@ -25,15 +25,27 @@ function renderList(items, year, albumId, path = "", onOpen) {
       {items.map((item) => {
         if (item.type === "file") {
           const itemPath = basePath ? `${basePath}/${item.name}` : item.name;
+          const isHighlighted = highlightedPhotos?.includes(itemPath);
+          const isDimmed = highlightedPhotos?.length > 0 && !isHighlighted;
           // Encode each path segment but preserve slashes so the thumbnails
           // service can receive nested paths like "gopro/GH011066.MP4".
           const encodedItemPath = itemPath.split("/").map(encodeURIComponent).join("/");
           return (
-            <div key={itemPath} style={{ cursor: "pointer" }} onClick={() => onOpen && onOpen(itemPath)}>
+            <div
+              key={itemPath}
+              style={{
+                cursor: "pointer",
+                padding: 2,
+                border: isHighlighted ? "2px solid #e67e22" : "2px solid transparent",
+                borderRadius: 8,
+                opacity: isDimmed ? 0.3 : 1,
+                transform: isHighlighted ? "scale(1.04)" : undefined,
+                transition: "opacity 150ms ease, transform 150ms ease, border-color 150ms ease",
+              }}
+              onClick={() => onOpen && onOpen(itemPath)}
+            >
               <AuthImage
                 key={itemPath}
-              // For now the thumbnails service will serve a placeholder image.
-              // Parameters will be added later.
               src={`/thumbnails/small/${year}/${albumId}?name=${encodedItemPath}`}
               style={{
                 width: 150,
@@ -55,7 +67,7 @@ function renderList(items, year, albumId, path = "", onOpen) {
               <div style={{ fontWeight: "bold", marginBottom: 4 }}>{item.name}/</div>
               {item.children && item.children.length > 0 && (
                 <div style={{ marginLeft: 10 }}>
-                  {renderList(item.children, year, albumId, dirPath, onOpen)}
+                  {renderList(item.children, year, albumId, dirPath, onOpen, highlightedPhotos)}
                 </div>
               )}
             </div>
@@ -68,7 +80,7 @@ function renderList(items, year, albumId, path = "", onOpen) {
   );
 }
 
-export default function AlbumContent({ year, albumId }) {
+export default function AlbumContent({ year, albumId, highlightedPhotos = null }) {
   const [tree, setTree] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -123,7 +135,7 @@ export default function AlbumContent({ year, albumId }) {
 
   return (
     <div>
-      {renderList(tree, year, albumId, "", openLightboxAt)}
+      {renderList(tree, year, albumId, "", openLightboxAt, highlightedPhotos)}
       <Lightbox open={lightboxOpen} files={fileList} startIndex={lightboxIndex} year={year} albumId={albumId} onClose={() => setLightboxOpen(false)} />
     </div>
   );

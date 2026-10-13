@@ -21,6 +21,8 @@ export default function AlbumThumbnail({ album }) {
   const [showContent, setShowContent] = useState(false);
   const [showPeople, setShowPeople] = useState(false);
   const [peopleCount, setPeopleCount] = useState(null);
+  const [albumPeople, setAlbumPeople] = useState([]);
+  const [highlightedPhotos, setHighlightedPhotos] = useState(null);
   const [peopleLoading, setPeopleLoading] = useState(false);
   const [peopleError, setPeopleError] = useState(null);
   const [scanning, setScanning] = useState(false);
@@ -33,6 +35,9 @@ export default function AlbumThumbnail({ album }) {
     event.stopPropagation();
     const shouldOpen = !showPeople;
     setShowPeople(shouldOpen);
+    if (!shouldOpen) {
+      setHighlightedPhotos(null);
+    }
 
     if (shouldOpen && peopleCount === null && !peopleLoading) {
       setPeopleLoading(true);
@@ -40,6 +45,7 @@ export default function AlbumThumbnail({ album }) {
       try {
         const result = await fetchAlbumPeopleCount(year, album.id);
         setPeopleCount(result.people_count);
+        setAlbumPeople(result.people);
       } catch (error) {
         setPeopleError(error.message);
       } finally {
@@ -74,6 +80,7 @@ export default function AlbumThumbnail({ album }) {
       setScanProgress({ completed: imagePaths.length, total: imagePaths.length, failures, done: true });
       const result = await fetchAlbumPeopleCount(year, album.id);
       setPeopleCount(result.people_count);
+      setAlbumPeople(result.people);
     } catch (error) {
       setPeopleError(error.message);
     } finally {
@@ -128,9 +135,36 @@ export default function AlbumThumbnail({ album }) {
         </button>
       </div>
       {showPeople && (
-        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 12, padding: "8px 16px" }}>
+        <div style={{ padding: "8px 16px" }}>
           {peopleLoading ? <span>Chargement…</span> : peopleError ? <span role="alert">{peopleError}</span> : (
-            <strong>{peopleCount === null ? "Nombre inconnu" : `${peopleCount} personne${peopleCount === 1 ? "" : "s"} détectée${peopleCount === 1 ? "" : "s"}`}</strong>
+            <>
+              <strong>{peopleCount === null ? "Nombre inconnu" : `${peopleCount} personne${peopleCount === 1 ? "" : "s"} détectée${peopleCount === 1 ? "" : "s"}`}</strong>
+              {albumPeople.length > 0 && (
+                <ol style={{ margin: "8px 0", paddingLeft: 24 }}>
+                  {albumPeople.map((person, index) => (
+                    <li key={person.id}>
+                      <button
+                        type="button"
+                        onMouseEnter={() => setHighlightedPhotos(person.photos)}
+                        onMouseLeave={() => setHighlightedPhotos(null)}
+                        onFocus={() => setHighlightedPhotos(person.photos)}
+                        onBlur={() => setHighlightedPhotos(null)}
+                        style={{
+                          cursor: "pointer",
+                          padding: "2px 4px",
+                          border: 0,
+                          borderRadius: 3,
+                          background: "transparent",
+                          textAlign: "left",
+                        }}
+                      >
+                        {person.label || `Personne détectée ${index + 1}`} — {person.photo_count} photo{person.photo_count === 1 ? "" : "s"}
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </>
           )}
           <button type="button" onClick={scanAlbum} disabled={scanning || peopleLoading}>
             {scanning ? "Scan en cours…" : "Scanner l’album"}
@@ -144,9 +178,9 @@ export default function AlbumThumbnail({ album }) {
           )}
         </div>
       )}
-      {showContent && (
+      {(showContent || showPeople) && (
         <div style={{ margin: "8px 0 16px 0", paddingLeft: 16 }}>
-          <AlbumContent year={year} albumId={album.id} />
+          <AlbumContent year={year} albumId={album.id} highlightedPhotos={highlightedPhotos} />
         </div>
       )}
     </div>
