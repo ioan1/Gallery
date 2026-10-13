@@ -18,7 +18,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: thumbnail-warmer
-              image: docker.redby.fr/gallery/thumbnail-warmer:1.0.15
+              image: docker.redby.fr/gallery/thumbnail-warmer:1.0.16
               imagePullPolicy: Always
               env:
                 - name: COGNITO_USERNAME
