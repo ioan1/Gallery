@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: service-faces
-          image: docker.redby.fr/gallery/service-faces:1.0.14
+          image: docker.redby.fr/gallery/service-faces:1.0.15
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
